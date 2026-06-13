@@ -11,7 +11,21 @@ function findForOwnedListing(schoolId, listingId) {
   return prisma.application.findMany({
     where: { listingId, listing: { schoolId } },
     orderBy: { createdAt: 'desc' },
+    include: { contract: true },
   });
+}
+
+// Une candidature précise, scopée à l'école propriétaire (isolation). Inclut l'annonce
+// (+ son école) et le contrat éventuel pour les contrôleurs de gestion/contrat.
+function findOwnedById(schoolId, applicationId) {
+  return prisma.application.findFirst({
+    where: { id: applicationId, listing: { schoolId } },
+    include: { listing: { include: { school: true } }, contract: true },
+  });
+}
+
+function updateStatus(applicationId, status) {
+  return prisma.application.update({ where: { id: applicationId }, data: { status } });
 }
 
 // Total des candidatures reçues par une école (toutes annonces confondues).
@@ -19,4 +33,10 @@ function countBySchool(schoolId) {
   return prisma.application.count({ where: { listing: { schoolId } } });
 }
 
-module.exports = { createForListing, findForOwnedListing, countBySchool };
+module.exports = {
+  createForListing,
+  findForOwnedListing,
+  findOwnedById,
+  updateStatus,
+  countBySchool,
+};

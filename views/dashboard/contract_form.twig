@@ -1,0 +1,153 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  {% set action = '/mes-annonces/' ~ listing.id ~ '/candidatures/' ~ application.id ~ '/accepter' %}
+  <section class="form-card">
+    <h1>Établir le contrat</h1>
+    <p class="muted">
+      Candidat : <strong>{{ application.applicantName }}</strong> — {{ application.applicantEmail }}<br>
+      Annonce : {{ listing.title }} ({{ listing.city }})
+    </p>
+    <p class="muted">Accepter la candidature et générer le contrat à partir des termes ci-dessous.</p>
+
+    <form action="{{ action }}" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label for="type">Type de contrat</label>
+        <select id="type" name="type">
+          <option value="freelance" {% if values.type == 'freelance' %}selected{% endif %}>Freelance / prestation</option>
+          <option value="cdi" {% if values.type == 'cdi' %}selected{% endif %}>CDI</option>
+          <option value="cdd" {% if values.type == 'cdd' %}selected{% endif %}>CDD</option>
+          <option value="apprentissage" {% if values.type == 'apprentissage' %}selected{% endif %}>Apprentissage</option>
+          <option value="generic" {% if values.type == 'generic' %}selected{% endif %}>Générique</option>
+        </select>
+        {% if errors.type %}<p class="field-error">{{ errors.type }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="startDate">Date de début</label>
+        <input id="startDate" name="startDate" type="date" value="{{ values.startDate|default('') }}" required>
+        {% if errors.startDate %}<p class="field-error">{{ errors.startDate }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="endDate">Date de fin <span class="muted">(requise pour un CDD)</span></label>
+        <input id="endDate" name="endDate" type="date" value="{{ values.endDate|default('') }}">
+        {% if errors.endDate %}<p class="field-error">{{ errors.endDate }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="motif">Motif de recours <span class="muted">(requis pour un CDD)</span></label>
+        <input id="motif" name="motif" type="text" value="{{ values.motif|default('') }}"
+               placeholder="ex. remplacement, accroissement temporaire d'activité…">
+        {% if errors.motif %}<p class="field-error">{{ errors.motif }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="grossSalary">Rémunération</label>
+        <input id="grossSalary" name="grossSalary" type="text" value="{{ values.grossSalary|default('') }}"
+               placeholder="ex. 2200€ brut/mois, 25€/h…" required>
+        {% if errors.grossSalary %}<p class="field-error">{{ errors.grossSalary }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="weeklyHours">Heures / semaine <span class="muted">(optionnel)</span></label>
+        <input id="weeklyHours" name="weeklyHours" type="number" min="1" max="60"
+               value="{{ values.weeklyHours|default('') }}">
+        {% if errors.weeklyHours %}<p class="field-error">{{ errors.weeklyHours }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="trialPeriodWeeks">Période d'essai (semaines) <span class="muted">(contrats salariés)</span></label>
+        <input id="trialPeriodWeeks" name="trialPeriodWeeks" type="number" min="0" max="104"
+               value="{{ values.trialPeriodWeeks|default('') }}">
+        {% if errors.trialPeriodWeeks %}<p class="field-error">{{ errors.trialPeriodWeeks }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="workplace">Lieu de travail</label>
+        <input id="workplace" name="workplace" type="text" value="{{ values.workplace|default('') }}" required>
+        {% if errors.workplace %}<p class="field-error">{{ errors.workplace }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="providerSiret">SIRET du prestataire <span class="muted">(requis pour un contrat freelance)</span></label>
+        <input id="providerSiret" name="providerSiret" type="text" inputmode="numeric"
+               value="{{ values.providerSiret|default('') }}">
+        {% if errors.providerSiret %}<p class="field-error">{{ errors.providerSiret }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="schoolAddress">Adresse de l'auto-école</label>
+        <input id="schoolAddress" name="schoolAddress" type="text" value="{{ values.schoolAddress|default('') }}" required>
+        {% if errors.schoolAddress %}<p class="field-error">{{ errors.schoolAddress }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="applicantAddress">Adresse du candidat</label>
+        <input id="applicantAddress" name="applicantAddress" type="text" value="{{ values.applicantAddress|default('') }}" required>
+        {% if errors.applicantAddress %}<p class="field-error">{{ errors.applicantAddress }}</p>{% endif %}
+      </div>
+
+      <h2>Identité du candidat <span class="muted" style="font-weight:400;font-size:0.9rem">(optionnel, repris dans le contrat)</span></h2>
+
+      <div class="form-group">
+        <label for="birthDate">Date de naissance</label>
+        <input id="birthDate" name="birthDate" type="date" value="{{ values.birthDate|default('') }}">
+        {% if errors.birthDate %}<p class="field-error">{{ errors.birthDate }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="birthPlace">Lieu de naissance</label>
+        <input id="birthPlace" name="birthPlace" type="text" value="{{ values.birthPlace|default('') }}"
+               placeholder="ex. Marseille (13)">
+      </div>
+
+      <div class="form-group">
+        <label for="nationality">Nationalité</label>
+        <input id="nationality" name="nationality" type="text" value="{{ values.nationality|default('') }}"
+               placeholder="ex. Française">
+      </div>
+
+      <div class="form-group">
+        <label for="teachingAuthNumber">N° d'autorisation d'enseigner / carte d'enseignant</label>
+        <input id="teachingAuthNumber" name="teachingAuthNumber" type="text"
+               value="{{ values.teachingAuthNumber|default('') }}">
+      </div>
+
+      <div class="form-group">
+        <label for="teachingAuthValidUntil">Validité de l'autorisation d'enseigner</label>
+        <input id="teachingAuthValidUntil" name="teachingAuthValidUntil" type="date"
+               value="{{ values.teachingAuthValidUntil|default('') }}">
+        {% if errors.teachingAuthValidUntil %}<p class="field-error">{{ errors.teachingAuthValidUntil }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="licenseNumber">N° de permis de conduire</label>
+        <input id="licenseNumber" name="licenseNumber" type="text" value="{{ values.licenseNumber|default('') }}">
+      </div>
+
+      <div class="form-group">
+        <label for="licenseCategories">Catégories de permis</label>
+        <input id="licenseCategories" name="licenseCategories" type="text"
+               value="{{ values.licenseCategories|default('') }}" placeholder="ex. B, A2">
+      </div>
+
+      <div class="form-group">
+        <label for="extraClauses">Clauses particulières <span class="muted">(optionnel)</span></label>
+        <textarea id="extraClauses" name="extraClauses" rows="4">{{ values.extraClauses|default('') }}</textarea>
+        {% if errors.extraClauses %}<p class="field-error">{{ errors.extraClauses }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Accepter & générer le contrat</button>
+    </form>
+
+    <p class="form-footer">
+      <a href="/mes-annonces/{{ listing.id }}/candidatures">Retour aux candidatures</a>
+    </p>
+    <p class="muted" style="font-size:0.8rem">
+      Le contrat généré est un modèle indicatif, à faire valider juridiquement avant signature.
+    </p>
+  </section>
+{% endblock %}

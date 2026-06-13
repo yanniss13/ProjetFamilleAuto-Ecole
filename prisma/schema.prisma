@@ -22,6 +22,12 @@ model School {
   siret        String  @unique
   phone        String?
 
+  // Localisation (optionnelle) : adresse saisie par l'école + coordonnées géocodées
+  // (Nominatim) pour la carte affichée sur la page détail d'une annonce.
+  address   String?
+  latitude  Float?
+  longitude Float?
+
   // Vérification d'email + réinitialisation de mot de passe (on stocke des HASH
   // de jetons, jamais les jetons en clair).
   emailVerified     Boolean   @default(false)
@@ -67,12 +73,55 @@ model Application {
   applicantEmail String
   applicantPhone String?
   message        String
-  cvPath         String? // chemin du CV PDF stocké (sous public/uploads/)
+  cvPath           String? // chemin relatif du CV (PDF) sous storage/
+  idCardPath       String? // chemin relatif de la pièce d'identité (PDF/JPG/PNG) sous storage/
+  licensePath      String? // chemin relatif du permis de conduire (PDF/JPG/PNG) sous storage/
+  teachingCardPath String? // chemin relatif de la carte/autorisation d'enseigner sous storage/
+  status           String  @default("pending") // "pending" | "accepted" | "rejected"
 
   listingId Int
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
+  contract Contract?
+
   createdAt DateTime @default(now())
 
   @@index([listingId])
+}
+
+// Contrat généré quand une auto-école accepte une candidature (relation 1‑1).
+model Contract {
+  id   Int    @id @default(autoincrement())
+  type String // "freelance" | "cdi" | "cdd" | "apprentissage" | "generic"
+
+  // Termes saisis par l'école au moment de l'acceptation.
+  startDate        DateTime
+  endDate          DateTime? // CDD
+  motif            String? // motif de recours (CDD)
+  grossSalary      String // texte libre : "2200€ brut/mois", "25€/h"…
+  weeklyHours      Int?
+  trialPeriodWeeks Int?
+  workplace        String
+  providerSiret    String? // SIRET du prestataire (freelance)
+  schoolAddress    String?
+  applicantAddress String?
+  extraClauses     String?
+
+  // Identité du candidat nécessaire au contrat (saisie par l'école à l'acceptation).
+  birthDate              DateTime?
+  birthPlace             String?
+  nationality            String?
+  teachingAuthNumber     String? // n° d'autorisation d'enseigner / carte d'enseignant
+  teachingAuthValidUntil DateTime?
+  licenseNumber          String? // n° de permis de conduire
+  licenseCategories      String? // catégories détenues (ex. "B, A2")
+
+  pdfPath           String // chemin relatif du PDF sous storage/contracts/
+  sentToApplicantAt DateTime?
+
+  applicationId Int         @unique
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
