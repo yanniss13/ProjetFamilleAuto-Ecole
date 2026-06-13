@@ -1,0 +1,30 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header"><h1>Annonces</h1></div>
+
+  <form action="/annonces" method="get" class="filter-bar">
+    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville…)">
+    <input type="text" name="departement" value="{{ filters.departement }}" placeholder="Département (ex. 13)">
+    <button type="submit" class="btn">Filtrer</button>
+  </form>
+
+  {% if listings|length == 0 %}
+    <p class="muted">Aucune annonce ne correspond à votre recherche.</p>
+  {% else %}
+    <ul class="listing-list">
+      {% for l in listings %}
+        <li class="listing-card">
+          <a href="/annonces/{{ l.id }}"><h2>{{ l.title }}</h2></a>
+          <p class="muted">
+            {{ l.city }} ({{ l.department }})
+            {% if l.contractType %} · {{ l.contractType }}{% endif %}
+            {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
+          </p>
+          <p>{{ l.description }}</p>
+          <p><a href="/annonces/{{ l.id }}" class="btn btn-small">Voir &amp; postuler</a></p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

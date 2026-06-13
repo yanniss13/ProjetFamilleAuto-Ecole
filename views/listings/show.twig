@@ -1,0 +1,58 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <article class="hero">
+    <h1>{{ listing.title }}</h1>
+    <p class="muted">
+      {{ listing.city }} ({{ listing.department }})
+      {% if listing.contractType %} · {{ listing.contractType }}{% endif %}
+      {% if listing.hoursPerWeek %} · {{ listing.hoursPerWeek }} h/sem{% endif %}
+    </p>
+    {% if listing.compensation %}<p><strong>Rémunération :</strong> {{ listing.compensation }}</p>{% endif %}
+    <p>{{ listing.description }}</p>
+    <p class="muted">Publiée par {{ listing.school.businessName }}</p>
+  </article>
+
+  <section class="form-card">
+    <h2>Postuler à cette annonce</h2>
+    {# Multipart : le jeton CSRF passe en query (corps non parsé au middleware csrf). #}
+    <form action="/annonces/{{ listing.id }}/postuler?_csrf={{ csrfToken }}"
+          method="post" enctype="multipart/form-data" novalidate>
+      <div class="form-group">
+        <label for="applicantName">Nom</label>
+        <input id="applicantName" name="applicantName" type="text"
+               value="{{ values.applicantName|default('') }}" autocomplete="name" required>
+        {% if errors.applicantName %}<p class="field-error">{{ errors.applicantName }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="applicantEmail">Email</label>
+        <input id="applicantEmail" name="applicantEmail" type="email"
+               value="{{ values.applicantEmail|default('') }}" autocomplete="email" required>
+        {% if errors.applicantEmail %}<p class="field-error">{{ errors.applicantEmail }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="applicantPhone">Téléphone <span class="muted">(optionnel)</span></label>
+        <input id="applicantPhone" name="applicantPhone" type="tel"
+               value="{{ values.applicantPhone|default('') }}" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required>{{ values.message|default('') }}</textarea>
+        {% if errors.message %}<p class="field-error">{{ errors.message }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="cv">CV (PDF, 5 Mo max)</label>
+        <input id="cv" name="cv" type="file" accept="application/pdf">
+        {% if errors.cv %}<p class="field-error">{{ errors.cv }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Envoyer ma candidature</button>
+    </form>
+  </section>
+
+  <p class="form-footer"><a href="/annonces">Retour aux annonces</a></p>
+{% endblock %}

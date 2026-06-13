@@ -1,0 +1,23 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Nouveau mot de passe</h1>
+
+    {# Le formulaire poste sur l'URL courante (qui contient le jeton). #}
+    <form action="" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        {% if errors.password %}<p class="field-error">{{ errors.password }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="passwordConfirm">Confirmation</label>
+        <input id="passwordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" required>
+        {% if errors.passwordConfirm %}<p class="field-error">{{ errors.passwordConfirm }}</p>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary">Réinitialiser</button>
+    </form>
+  </section>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>{{ isEdit ? 'Modifier une annonce' : 'Nouvelle annonce' }}</h1>
+
+    <form action="{{ isEdit ? '/mes-annonces/' ~ listing.id ~ '/modifier' : '/mes-annonces' }}"
+          method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label for="title">Titre</label>
+        <input id="title" name="title" type="text" value="{{ values.title|default('') }}" required>
+        {% if errors.title %}<p class="field-error">{{ errors.title }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="6" required>{{ values.description|default('') }}</textarea>
+        {% if errors.description %}<p class="field-error">{{ errors.description }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="city">Ville</label>
+        <input id="city" name="city" type="text" value="{{ values.city|default('') }}" required>
+        {% if errors.city %}<p class="field-error">{{ errors.city }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="department">Département</label>
+        <input id="department" name="department" type="text"
+               value="{{ values.department|default('') }}" placeholder="ex. 13" required>
+        {% if errors.department %}<p class="field-error">{{ errors.department }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="contractType">Type de contrat <span class="muted">(optionnel)</span></label>
+        <select id="contractType" name="contractType">
+          <option value="">—</option>
+          <option value="cdi" {% if values.contractType == 'cdi' %}selected{% endif %}>CDI</option>
+          <option value="cdd" {% if values.contractType == 'cdd' %}selected{% endif %}>CDD</option>
+          <option value="freelance" {% if values.contractType == 'freelance' %}selected{% endif %}>Freelance</option>
+          <option value="apprentissage" {% if values.contractType == 'apprentissage' %}selected{% endif %}>Apprentissage</option>
+        </select>
+        {% if errors.contractType %}<p class="field-error">{{ errors.contractType }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="hoursPerWeek">Heures / semaine <span class="muted">(optionnel)</span></label>
+        <input id="hoursPerWeek" name="hoursPerWeek" type="number" min="1" max="60"
+               value="{{ values.hoursPerWeek|default('') }}">
+        {% if errors.hoursPerWeek %}<p class="field-error">{{ errors.hoursPerWeek }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="compensation">Rémunération <span class="muted">(optionnel)</span></label>
+        <input id="compensation" name="compensation" type="text"
+               value="{{ values.compensation|default('') }}" placeholder="ex. 2200€ brut/mois, à négocier…">
+      </div>
+
+      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Enregistrer' : 'Publier' }}</button>
+    </form>
+
+    <p class="form-footer"><a href="/mes-annonces">Retour à mes annonces</a></p>
+  </section>
+{% endblock %}

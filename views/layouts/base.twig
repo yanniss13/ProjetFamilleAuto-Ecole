@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrfToken }}">
+  <title>{% if title %}{{ title }} · {% endif %}MoniteurConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Aller au contenu</a>
+  {% include 'partials/nav.twig' %}
+
+  <main id="main" class="container">
+    {% include 'partials/flash.twig' %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>MoniteurConnect — auto-écoles &amp; moniteurs indépendants</p>
+  </footer>
+</body>
+</html>

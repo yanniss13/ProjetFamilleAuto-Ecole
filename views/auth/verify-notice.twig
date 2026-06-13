@@ -1,0 +1,10 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="hero">
+    <h1>Vérification de l'email</h1>
+    {# TODO: adapter le message selon le résultat (succès / lien invalide ou expiré). #}
+    <p>Si votre lien est valide, votre adresse est désormais confirmée. Vous pouvez vous connecter.</p>
+    <p><a href="/connexion" class="btn btn-primary">Se connecter</a></p>
+  </section>
+{% endblock %}
