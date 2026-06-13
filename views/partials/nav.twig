@@ -1,0 +1,17 @@
+<header class="navbar">
+  <a class="navbar-brand" href="/">MoniteurConnect</a>
+  <nav class="navbar-links">
+    <a href="/annonces">Annonces</a>
+    {% if currentSchool %}
+      <a href="/tableau-de-bord">Tableau de bord</a>
+      <a href="/mes-annonces">Mes annonces</a>
+      <form action="/deconnexion" method="post" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="link-button">Déconnexion</button>
+      </form>
+    {% else %}
+      <a href="/connexion">Connexion</a>
+      <a href="/inscription">Inscription auto-école</a>
+    {% endif %}
+  </nav>
+</header>

@@ -1,0 +1,55 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Inscription auto-école</h1>
+    {% if errors.global %}<div class="flash flash-error" role="alert">{{ errors.global }}</div>{% endif %}
+
+    <form action="/inscription" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label for="businessName">Raison sociale</label>
+        <input id="businessName" name="businessName" type="text"
+               autocomplete="organization" value="{{ values.businessName|default('') }}" required>
+        {% if errors.businessName %}<p class="field-error">{{ errors.businessName }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email"
+               autocomplete="email" value="{{ values.email|default('') }}" required>
+        {% if errors.email %}<p class="field-error">{{ errors.email }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="siret">SIRET</label>
+        <input id="siret" name="siret" type="text" inputmode="numeric"
+               value="{{ values.siret|default('') }}" required>
+        {% if errors.siret %}<p class="field-error">{{ errors.siret }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Téléphone <span class="muted">(optionnel)</span></label>
+        <input id="phone" name="phone" type="tel"
+               autocomplete="tel" value="{{ values.phone|default('') }}">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        {% if errors.password %}<p class="field-error">{{ errors.password }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="passwordConfirm">Confirmation du mot de passe</label>
+        <input id="passwordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" required>
+        {% if errors.passwordConfirm %}<p class="field-error">{{ errors.passwordConfirm }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Créer le compte</button>
+    </form>
+
+    <p class="form-footer">Déjà inscrit ? <a href="/connexion">Se connecter</a></p>
+  </section>
+{% endblock %}

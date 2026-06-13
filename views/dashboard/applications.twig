@@ -1,0 +1,29 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header">
+    <h1>Candidatures{% if listing %} — {{ listing.title }}{% endif %}</h1>
+    <a href="/mes-annonces" class="btn">Retour</a>
+  </div>
+
+  {% if applications|length == 0 %}
+    <p class="muted">Aucune candidature pour cette annonce.</p>
+  {% else %}
+    <table class="data-table">
+      <thead>
+        <tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>CV</th><th>Reçue le</th></tr>
+      </thead>
+      <tbody>
+        {% for a in applications %}
+          <tr>
+            <td>{{ a.applicantName }}</td>
+            <td>{{ a.applicantEmail }}</td>
+            <td>{{ a.applicantPhone|default('—') }}</td>
+            <td>{% if a.cvPath %}<a href="{{ a.cvPath }}">Télécharger</a>{% else %}—{% endif %}</td>
+            <td>{{ a.createdAt }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

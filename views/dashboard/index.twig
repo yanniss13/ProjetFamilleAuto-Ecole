@@ -1,0 +1,24 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="hero">
+    <h1>Tableau de bord</h1>
+    <p>Bienvenue, <strong>{{ currentSchool.businessName }}</strong>.</p>
+  </section>
+
+  <section class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.listings }}</span>
+      <span class="stat-label">Annonces</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ stats.applications }}</span>
+      <span class="stat-label">Candidatures reçues</span>
+    </div>
+  </section>
+
+  <div class="dashboard-actions">
+    <a href="/mes-annonces" class="btn btn-primary">Gérer mes annonces</a>
+    <a href="/mes-annonces/nouvelle" class="btn">Publier une annonce</a>
+  </div>
+{% endblock %}

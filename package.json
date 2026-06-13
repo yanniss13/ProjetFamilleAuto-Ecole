@@ -1,0 +1,29 @@
+{
+  "name": "moniteur-connect",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plateforme d'annonces reliant auto-écoles et moniteurs indépendants.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "test": "node test/smoke.cjs"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "express-session": "^1.19.0",
+    "helmet": "^8.2.0",
+    "multer": "^2.0.0",
+    "nodemailer": "^7.0.0",
+    "twig": "^3.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.0.0"
+  }
+}

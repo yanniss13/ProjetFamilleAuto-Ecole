@@ -1,0 +1,78 @@
+// Schéma de données — MoniteurConnect
+// Plateforme d'annonces : les auto-écoles (School) publient des annonces (Listing),
+// les moniteurs indépendants postulent (Application) SANS créer de compte.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // SQLite en développement (zéro install). En production : passer le provider à
+  // "postgresql" et fournir une DATABASE_URL Postgres — aucun changement de code.
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Compte auto-école (le seul type d'utilisateur authentifié).
+model School {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  passwordHash String
+  businessName String
+  siret        String  @unique
+  phone        String?
+
+  // Vérification d'email + réinitialisation de mot de passe (on stocke des HASH
+  // de jetons, jamais les jetons en clair).
+  emailVerified     Boolean   @default(false)
+  verifyTokenHash   String?   @unique
+  verifyTokenExpiry DateTime?
+  resetTokenHash    String?   @unique
+  resetTokenExpiry  DateTime?
+
+  listings Listing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Annonce publiée par une auto-école (offre / besoin de moniteur).
+model Listing {
+  id           Int     @id @default(autoincrement())
+  title        String
+  description  String
+  contractType String? // "cdi" | "cdd" | "freelance" | "apprentissage" (validé applicativement)
+  city         String
+  department   String  // code département, ex. "13", "75", "2A"
+  hoursPerWeek Int?
+  compensation String? // texte libre (ex. "à négocier", "2200€ brut/mois")
+  status       String  @default("open") // "open" | "closed"
+
+  schoolId Int
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([department])
+  @@index([status])
+}
+
+// Candidature d'un moniteur indépendant à une annonce (déposée sans compte).
+model Application {
+  id             Int     @id @default(autoincrement())
+  applicantName  String
+  applicantEmail String
+  applicantPhone String?
+  message        String
+  cvPath         String? // chemin du CV PDF stocké (sous public/uploads/)
+
+  listingId Int
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}
