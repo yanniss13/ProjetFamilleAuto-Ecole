@@ -13,11 +13,24 @@
     <p class="muted">Publiée par {{ listing.school.businessName }}</p>
   </article>
 
+  <section class="map-section">
+    <h2>Localisation</h2>
+    {% if listing.school.latitude %}
+      <div id="map"
+           data-lat="{{ listing.school.latitude }}"
+           data-lng="{{ listing.school.longitude }}"
+           data-label="{{ listing.school.businessName }}{% if listing.school.address %} — {{ listing.school.address }}{% endif %}"></div>
+    {% else %}
+      <p class="muted">Localisation indisponible pour cette auto-école.</p>
+    {% endif %}
+  </section>
+
   <section class="form-card">
     <h2>Postuler à cette annonce</h2>
     {# Multipart : le jeton CSRF passe en query (corps non parsé au middleware csrf). #}
     <form action="/annonces/{{ listing.id }}/postuler?_csrf={{ csrfToken }}"
           method="post" enctype="multipart/form-data" novalidate>
+      {% if errors.files %}<div class="flash flash-error" role="alert">{{ errors.files }}</div>{% endif %}
       <div class="form-group">
         <label for="applicantName">Nom</label>
         <input id="applicantName" name="applicantName" type="text"
@@ -46,8 +59,27 @@
 
       <div class="form-group">
         <label for="cv">CV (PDF, 5 Mo max)</label>
-        <input id="cv" name="cv" type="file" accept="application/pdf">
+        <input id="cv" name="cv" type="file" accept="application/pdf" required>
         {% if errors.cv %}<p class="field-error">{{ errors.cv }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="idCard">Pièce d'identité (PDF, JPG ou PNG, 5 Mo max)</label>
+        <input id="idCard" name="idCard" type="file" accept="application/pdf,image/jpeg,image/png" required>
+        {% if errors.idCard %}<p class="field-error">{{ errors.idCard }}</p>{% endif %}
+        <p class="muted">Recto/verso de votre carte d'identité, passeport ou titre de séjour.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="license">Permis de conduire (PDF, JPG ou PNG, 5 Mo max)</label>
+        <input id="license" name="license" type="file" accept="application/pdf,image/jpeg,image/png" required>
+        {% if errors.license %}<p class="field-error">{{ errors.license }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="teachingCard">Carte d'enseignant / autorisation d'enseigner (PDF, JPG ou PNG, 5 Mo max)</label>
+        <input id="teachingCard" name="teachingCard" type="file" accept="application/pdf,image/jpeg,image/png" required>
+        {% if errors.teachingCard %}<p class="field-error">{{ errors.teachingCard }}</p>{% endif %}
       </div>
 
       <button type="submit" class="btn btn-primary">Envoyer ma candidature</button>
@@ -55,4 +87,18 @@
   </section>
 
   <p class="form-footer"><a href="/annonces">Retour aux annonces</a></p>
+{% endblock %}
+
+{# Assets carto chargés uniquement quand l'école a des coordonnées. #}
+{% block head %}
+  {% if listing.school.latitude %}
+    <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {% if listing.school.latitude %}
+    <script src="/vendor/leaflet/leaflet.js"></script>
+    <script src="/js/listing-map.js"></script>
+  {% endif %}
 {% endblock %}

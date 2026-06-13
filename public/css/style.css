@@ -80,6 +80,17 @@ body {
 .btn-danger { background: var(--color-error-text); color: #fff; border-color: var(--color-error-text); }
 .btn-danger:hover { background: #7f1d1d; border-color: #7f1d1d; color: #fff; }
 
+/* --- Carte de localisation (page détail) --- */
+.map-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.map-section h2 { margin-top: 0; }
+#map { height: 320px; border-radius: var(--radius); border: 1px solid var(--color-border); }
+
 /* --- Pied de page --- */
 .footer { text-align: center; color: var(--color-muted); padding: 2rem 1.5rem; font-size: 0.9rem; }
 
@@ -161,6 +172,22 @@ body {
 .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
 .badge-available { background: var(--color-success-bg); color: var(--color-success-text); }
 .badge-assigned { background: #dbeafe; color: #1e40af; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-rejected { background: var(--color-error-bg); color: var(--color-error-text); }
+
+/* --- Candidatures (cartes) --- */
+.application-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+.application-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.application-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
+.application-head h2 { margin: 0; font-size: 1.1rem; }
+.application-message { white-space: pre-wrap; background: #f9fafb; border-radius: var(--radius); padding: 0.75rem; margin: 0.75rem 0; }
+.application-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.application-actions.section { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--color-border); }
 
 /* --- Grille de statistiques (dashboard) --- */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1.5rem 0; }

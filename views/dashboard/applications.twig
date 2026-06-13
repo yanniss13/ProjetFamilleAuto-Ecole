@@ -9,21 +9,62 @@
   {% if applications|length == 0 %}
     <p class="muted">Aucune candidature pour cette annonce.</p>
   {% else %}
-    <table class="data-table">
-      <thead>
-        <tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>CV</th><th>Reçue le</th></tr>
-      </thead>
-      <tbody>
-        {% for a in applications %}
-          <tr>
-            <td>{{ a.applicantName }}</td>
-            <td>{{ a.applicantEmail }}</td>
-            <td>{{ a.applicantPhone|default('—') }}</td>
-            <td>{% if a.cvPath %}<a href="{{ a.cvPath }}">Télécharger</a>{% else %}—{% endif %}</td>
-            <td>{{ a.createdAt }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <ul class="application-list">
+      {% for a in applications %}
+        {% set base = '/mes-annonces/' ~ listing.id ~ '/candidatures/' ~ a.id %}
+        <li class="application-card">
+          <div class="application-head">
+            <h2>{{ a.applicantName }}</h2>
+            {% if a.status == 'accepted' %}
+              <span class="badge badge-available">Acceptée</span>
+            {% elseif a.status == 'rejected' %}
+              <span class="badge badge-rejected">Refusée</span>
+            {% else %}
+              <span class="badge badge-pending">En attente</span>
+            {% endif %}
+          </div>
+
+          <p class="muted">
+            {{ a.applicantEmail }}
+            {% if a.applicantPhone %} · {{ a.applicantPhone }}{% endif %}
+            · reçue le {{ a.createdAt|date('d/m/Y à H:i') }}
+          </p>
+
+          <div class="application-message">{{ a.message }}</div>
+
+          <div class="application-actions">
+            <a href="{{ base }}/cv" class="btn btn-small">CV</a>
+            <a href="{{ base }}/piece-identite" class="btn btn-small">Pièce d'identité</a>
+            <a href="{{ base }}/permis" class="btn btn-small">Permis</a>
+            <a href="{{ base }}/carte-enseignant" class="btn btn-small">Carte d'enseignant</a>
+
+            {% if a.status != 'accepted' %}
+              <a href="{{ base }}/accepter" class="btn btn-small btn-primary">Accepter</a>
+            {% endif %}
+            {% if a.status == 'pending' %}
+              <form action="{{ base }}/refuser" method="post" class="inline-form"
+                    onsubmit="return confirm('Refuser cette candidature ?');">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <button type="submit" class="btn btn-small btn-danger">Refuser</button>
+              </form>
+            {% endif %}
+          </div>
+
+          {% if a.status == 'accepted' and a.contract %}
+            <div class="application-actions section">
+              <a href="{{ base }}/contrat/telecharger" class="btn btn-small btn-primary">Télécharger le contrat</a>
+              <a href="{{ base }}/accepter" class="btn btn-small">Modifier le contrat</a>
+              <form action="{{ base }}/contrat/envoyer" method="post" class="inline-form">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <button type="submit" class="btn btn-small">Envoyer au candidat</button>
+              </form>
+              {% if a.contract.sentToApplicantAt %}
+                <span class="muted">Envoyé le {{ a.contract.sentToApplicantAt|date('d/m/Y à H:i') }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
   {% endif %}
 {% endblock %}

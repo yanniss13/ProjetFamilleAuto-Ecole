@@ -5,9 +5,12 @@ node_modules/
 prisma/dev.db
 prisma/dev.db-journal
 
-# CV téléversés (on garde le dossier, pas son contenu)
-public/uploads/*
-!public/uploads/.gitkeep
+# Fichiers privés téléversés (CV, pièces d'identité, contrats) — données personnelles.
+# On garde l'arborescence (.gitkeep), jamais le contenu.
+storage/**
+!storage/
+!storage/*/
+!storage/**/.gitkeep
 
 npm-debug.log*
 .vscode/

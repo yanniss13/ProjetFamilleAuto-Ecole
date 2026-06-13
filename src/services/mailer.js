@@ -26,14 +26,18 @@ function maskEmail(email) {
 }
 
 // Envoi générique. Ne logge jamais le contenu/jeton, seulement l'email masqué.
-async function send(to, subject, html, link = null) {
+// Renvoie true si l'email est parti (ou, en mode dev sans SMTP, s'il a été « traité »
+// et journalisé), false uniquement en cas d'échec réel d'envoi SMTP.
+// `link` et `attachments` sont optionnels.
+async function send(to, subject, html, { link = null, attachments = null } = {}) {
   if (!SMTP_CONFIGURE) {
     console.warn(`[mail:DEV] SMTP non configuré — "${subject}" pour ${maskEmail(to)} non envoyé.`);
     if (link) console.warn(`[mail:DEV] Lien : ${link}`);
-    return false;
+    if (attachments) console.warn(`[mail:DEV] Pièce(s) jointe(s) : ${attachments.map((a) => a.path).join(', ')}`);
+    return true; // dev : considéré comme traité (journalisé) — ne bloque pas le flux applicatif
   }
   try {
-    await transporter.sendMail({ from: FROM, to, subject, html });
+    await transporter.sendMail({ from: FROM, to, subject, html, ...(attachments ? { attachments } : {}) });
     console.log(`[mail] "${subject}" envoyé à ${maskEmail(to)}`);
     return true;
   } catch (e) {
@@ -52,7 +56,7 @@ function sendVerification(email, rawToken) {
     `<p>Bienvenue sur MoniteurConnect.</p>
      <p>Confirmez votre adresse (lien valable 24 h) :</p>
      <p><a href="${link}">Vérifier mon adresse</a></p>`,
-    link
+    { link }
   );
 }
 
@@ -64,7 +68,7 @@ function sendReset(email, rawToken) {
     `<p>Vous avez demandé à réinitialiser votre mot de passe.</p>
      <p>Lien valable 1 h, usage unique :</p>
      <p><a href="${link}">Choisir un nouveau mot de passe</a></p>`,
-    link
+    { link }
   );
 }
 
@@ -79,4 +83,25 @@ function sendApplicationNotification(schoolEmail, listingTitle, applicantName) {
   );
 }
 
-module.exports = { send, sendVerification, sendReset, sendApplicationNotification, maskEmail, APP_URL };
+// Envoie le contrat (PDF) au candidat en pièce jointe (déclenché manuellement par l'école).
+function sendContractToApplicant(applicantEmail, applicantName, listingTitle, pdfPath) {
+  return send(
+    applicantEmail,
+    `Votre contrat — ${listingTitle}`,
+    `<p>Bonjour ${applicantName},</p>
+     <p>Votre candidature à l'annonce « ${listingTitle} » a été acceptée. Vous trouverez votre
+     contrat en pièce jointe.</p>
+     <p>Merci de le relire ; en cas de question, répondez directement à l'auto-école.</p>`,
+    { attachments: [{ filename: 'contrat.pdf', path: pdfPath, contentType: 'application/pdf' }] }
+  );
+}
+
+module.exports = {
+  send,
+  sendVerification,
+  sendReset,
+  sendApplicationNotification,
+  sendContractToApplicant,
+  maskEmail,
+  APP_URL,
+};
