@@ -17,7 +17,21 @@ function update(id, data) {
   return prisma.school.update({ where: { id }, data });
 }
 
-// TODO (flux email) : recherche par verifyTokenHash / resetTokenHash, marquage
-// emailVerified, pose/effacement des jetons. À ajouter à l'implémentation.
+// --- Flux email (jetons hachés) ---
+// Les colonnes verifyTokenHash / resetTokenHash sont @unique : findUnique suffit.
+function findByVerifyTokenHash(hash) {
+  return prisma.school.findUnique({ where: { verifyTokenHash: hash } });
+}
+function findByResetTokenHash(hash) {
+  return prisma.school.findUnique({ where: { resetTokenHash: hash } });
+}
 
-module.exports = { findById, findByEmail, findBySiret, create, update };
+module.exports = {
+  findById,
+  findByEmail,
+  findBySiret,
+  create,
+  update,
+  findByVerifyTokenHash,
+  findByResetTokenHash,
+};

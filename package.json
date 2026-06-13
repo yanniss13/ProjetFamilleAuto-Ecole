@@ -13,6 +13,7 @@
     "test": "node test/smoke.cjs"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -21,9 +22,11 @@
     "helmet": "^8.2.0",
     "multer": "^2.0.0",
     "nodemailer": "^7.0.0",
+    "pdfkit": "^0.19.1",
     "twig": "^3.0.0"
   },
   "devDependencies": {
+    "leaflet": "^1.9.4",
     "prisma": "^6.0.0"
   }
 }

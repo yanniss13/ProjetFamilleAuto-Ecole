@@ -2,9 +2,15 @@
 
 {% block content %}
   <section class="hero">
-    <h1>Vérification de l'email</h1>
-    {# TODO: adapter le message selon le résultat (succès / lien invalide ou expiré). #}
-    <p>Si votre lien est valide, votre adresse est désormais confirmée. Vous pouvez vous connecter.</p>
-    <p><a href="/connexion" class="btn btn-primary">Se connecter</a></p>
+    {% if status == 'success' %}
+      <h1>Adresse confirmée</h1>
+      <p>Votre adresse email est confirmée. Vous pouvez maintenant vous connecter.</p>
+      <p><a href="/connexion" class="btn btn-primary">Se connecter</a></p>
+    {% else %}
+      <h1>Lien invalide ou expiré</h1>
+      <p>Ce lien de vérification n'est plus valide. Connectez-vous pour recevoir un nouveau lien,
+         ou réinscrivez-vous si besoin.</p>
+      <p><a href="/connexion" class="btn btn-primary">Connexion</a></p>
+    {% endif %}
   </section>
 {% endblock %}
