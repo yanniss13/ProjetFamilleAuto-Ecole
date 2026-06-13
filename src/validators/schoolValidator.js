@@ -15,6 +15,7 @@ function validateRegister(body) {
   const email = (body.email || '').trim().toLowerCase();
   const siret = normalizeSiret(body.siret);
   const phone = (body.phone || '').trim();
+  const address = (body.address || '').trim();
   const password = body.password || '';
   const passwordConfirm = body.passwordConfirm || '';
 
@@ -35,7 +36,19 @@ function validateRegister(body) {
   return {
     isValid: Object.keys(errors).length === 0,
     errors,
-    value: { businessName, email, siret, phone: phone || null, password },
+    value: { businessName, email, siret, phone: phone || null, address: address || null, password },
+  };
+}
+
+// Profil éditable (adresse + téléphone) — tous deux optionnels.
+function validateProfile(body) {
+  const errors = {};
+  const phone = (body.phone || '').trim();
+  const address = (body.address || '').trim();
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+    value: { phone: phone || null, address: address || null },
   };
 }
 
@@ -48,4 +61,4 @@ function validateLogin(body) {
   return { isValid: Object.keys(errors).length === 0, errors, value: { email, password } };
 }
 
-module.exports = { validateRegister, validateLogin, normalizeSiret };
+module.exports = { validateRegister, validateProfile, validateLogin, normalizeSiret };

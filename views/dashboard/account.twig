@@ -1,0 +1,32 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Mon compte</h1>
+    <p class="muted">
+      Renseignez l'adresse de votre auto-école : elle sera affichée sur une carte dans vos
+      annonces, pour que les moniteurs situent le lieu. Champ optionnel.
+    </p>
+
+    <form action="/mon-compte" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label for="address">Adresse <span class="muted">(optionnel)</span></label>
+        <input id="address" name="address" type="text"
+               value="{{ values.address|default('') }}"
+               placeholder="ex. 12 rue de la République, 13001 Marseille">
+        {% if errors.address %}<p class="field-error">{{ errors.address }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Téléphone <span class="muted">(optionnel)</span></label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel"
+               value="{{ values.phone|default('') }}">
+        {% if errors.phone %}<p class="field-error">{{ errors.phone }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+  </section>
+{% endblock %}
