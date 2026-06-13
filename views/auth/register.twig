@@ -36,6 +36,14 @@
       </div>
 
       <div class="form-group">
+        <label for="address">Adresse <span class="muted">(optionnel — pour la carte des annonces)</span></label>
+        <input id="address" name="address" type="text" autocomplete="street-address"
+               value="{{ values.address|default('') }}"
+               placeholder="ex. 12 rue de la République, 13001 Marseille">
+        {% if errors.address %}<p class="field-error">{{ errors.address }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
         <label for="password">Mot de passe</label>
         <input id="password" name="password" type="password" autocomplete="new-password" required>
         {% if errors.password %}<p class="field-error">{{ errors.password }}</p>{% endif %}

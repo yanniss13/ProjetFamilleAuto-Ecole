@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrfToken }}">
   <title>{% if title %}{{ title }} · {% endif %}MoniteurConnect</title>
   <link rel="stylesheet" href="/css/style.css">
+  {% block head %}{% endblock %}
 </head>
 <body>
   <a href="#main" class="skip-link">Aller au contenu</a>
@@ -19,5 +20,6 @@
   <footer class="footer">
     <p>MoniteurConnect — auto-écoles &amp; moniteurs indépendants</p>
   </footer>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -6,6 +6,7 @@ const authRoutes = require('./authRoutes');
 const listingRoutes = require('./listingRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const manageRoutes = require('./manageRoutes');
+const accountRoutes = require('./accountRoutes');
 const requireAuth = require('../middlewares/requireAuth');
 const loadSchool = require('../middlewares/loadSchool');
 
@@ -22,5 +23,6 @@ router.use('/annonces', listingRoutes);
 // préfixes distincts pour que les gardes ne s'appliquent QU'à ces routes.
 router.use('/tableau-de-bord', requireAuth, loadSchool, dashboardRoutes);
 router.use('/mes-annonces', requireAuth, loadSchool, manageRoutes);
+router.use('/mon-compte', requireAuth, loadSchool, accountRoutes);
 
 module.exports = router;
