@@ -1,5 +1,6 @@
 // Annonces : consultation publique + gestion par l'auto-école propriétaire.
 const listingService = require('../services/listingService');
+const { validateListing } = require('../validators/listingValidator');
 const { parseId, notFound } = require('../utils/http');
 
 // ----------------------------- Public -----------------------------
@@ -51,10 +52,23 @@ function newForm(req, res) {
 }
 
 // POST /mes-annonces
-function create(req, res) {
-  // TODO: validateListing -> listingService.createForSchool(req.school.id, value).
-  req.flash('error', "Création d'annonce : à implémenter (voir docs/DESIGN.md).");
-  res.redirect('/mes-annonces');
+async function create(req, res, next) {
+  try {
+    const { isValid, errors, value } = validateListing(req.body);
+    if (!isValid) {
+      return res.status(400).render('dashboard/listing_form', {
+        title: 'Nouvelle annonce',
+        errors,
+        values: req.body,
+        isEdit: false,
+      });
+    }
+    await listingService.createForSchool(req.school.id, value);
+    req.flash('success', 'Annonce publiée.');
+    res.redirect('/mes-annonces');
+  } catch (err) {
+    next(err);
+  }
 }
 
 // GET /mes-annonces/:id/modifier
@@ -77,24 +91,58 @@ async function editForm(req, res, next) {
 }
 
 // POST /mes-annonces/:id/modifier
-function update(req, res) {
-  // TODO: parseId + findOwnedById -> validateListing -> updateOwned.
-  req.flash('error', 'Modification : à implémenter (voir docs/DESIGN.md).');
-  res.redirect('/mes-annonces');
+async function update(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) return notFound(res);
+    const listing = await listingService.findOwnedById(req.school.id, id);
+    if (!listing) return notFound(res);
+
+    const { isValid, errors, value } = validateListing(req.body);
+    if (!isValid) {
+      return res.status(400).render('dashboard/listing_form', {
+        title: 'Modifier une annonce',
+        errors,
+        values: req.body,
+        listing,
+        isEdit: true,
+      });
+    }
+    await listingService.updateOwned(req.school.id, id, value);
+    req.flash('success', 'Annonce mise à jour.');
+    res.redirect('/mes-annonces');
+  } catch (err) {
+    next(err);
+  }
 }
 
 // POST /mes-annonces/:id/supprimer
-function destroy(req, res) {
-  // TODO: parseId + deleteOwned (supprime aussi les candidatures en cascade).
-  req.flash('error', 'Suppression : à implémenter (voir docs/DESIGN.md).');
-  res.redirect('/mes-annonces');
+async function destroy(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) return notFound(res);
+    // deleteOwned est scopé par schoolId : count 0 => annonce inexistante ou non possédée.
+    const { count } = await listingService.deleteOwned(req.school.id, id);
+    if (count === 0) return notFound(res);
+    req.flash('success', 'Annonce supprimée (ainsi que ses candidatures).');
+    res.redirect('/mes-annonces');
+  } catch (err) {
+    next(err);
+  }
 }
 
 // POST /mes-annonces/:id/cloturer
-function close(req, res) {
-  // TODO: updateOwned(..., { status: 'closed' }).
-  req.flash('error', 'Clôture : à implémenter (voir docs/DESIGN.md).');
-  res.redirect('/mes-annonces');
+async function close(req, res, next) {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) return notFound(res);
+    const { count } = await listingService.updateOwned(req.school.id, id, { status: 'closed' });
+    if (count === 0) return notFound(res);
+    req.flash('success', 'Annonce clôturée.');
+    res.redirect('/mes-annonces');
+  } catch (err) {
+    next(err);
+  }
 }
 
 module.exports = { browse, show, mine, newForm, create, editForm, update, destroy, close };
