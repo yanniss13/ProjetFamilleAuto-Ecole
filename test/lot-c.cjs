@@ -12,6 +12,7 @@ const fs = require('fs');
 const app = require('../src/app');
 const prisma = require('../src/config/prisma');
 const adminService = require('../src/services/adminService');
+const { createOrUpdateAdmin } = require('../scripts/create-admin');
 const passwordUtil = require('../src/utils/password');
 const { STORAGE_DIR } = require('../src/config/storage');
 
@@ -71,6 +72,17 @@ async function main() {
     });
     createdSchoolIds.push(school.id);
     ok(school.suspended === false, 'C : School.suspended défaut false');
+
+    // C (Task 2) : CLI createOrUpdateAdmin (upsert + bcrypt)
+    const cliEmail = `cli.${STAMP}@example.test`;
+    const a1 = await createOrUpdateAdmin({ email: cliEmail, password: 'firstpass1' });
+    createdAdminIds.push(a1.id);
+    ok(a1.email === cliEmail && (await passwordUtil.compare('firstpass1', a1.passwordHash)), 'C : createOrUpdateAdmin crée + hache le mot de passe');
+    const a2 = await createOrUpdateAdmin({ email: cliEmail, password: 'secondpass2' });
+    ok(a2.id === a1.id && (await passwordUtil.compare('secondpass2', a2.passwordHash)), 'C : re-créer le même email met à jour le mot de passe (upsert)');
+    let rejected = false;
+    try { await createOrUpdateAdmin({ email: cliEmail, password: 'court' }); } catch { rejected = true; }
+    ok(rejected, 'C : createOrUpdateAdmin rejette un mot de passe trop court');
 
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {
