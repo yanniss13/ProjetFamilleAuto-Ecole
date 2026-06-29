@@ -2,6 +2,7 @@
 const listingService = require('../services/listingService');
 const { validateListing } = require('../validators/listingValidator');
 const { parseId, notFound } = require('../utils/http');
+const { deleteStored } = require('../config/storage');
 
 // ----------------------------- Public -----------------------------
 
@@ -121,9 +122,12 @@ async function destroy(req, res, next) {
   try {
     const id = parseId(req.params.id);
     if (!id) return notFound(res);
+    // On collecte les chemins AVANT la suppression (la cascade DB efface les candidatures).
+    const filePaths = await listingService.findFilePathsForListing(req.school.id, id);
     // deleteOwned est scopé par schoolId : count 0 => annonce inexistante ou non possédée.
     const { count } = await listingService.deleteOwned(req.school.id, id);
     if (count === 0) return notFound(res);
+    for (const rel of filePaths) deleteStored(rel); // best-effort, ne bloque jamais
     req.flash('success', 'Annonce supprimée (ainsi que ses candidatures).');
     res.redirect('/mes-annonces');
   } catch (err) {

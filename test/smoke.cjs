@@ -61,7 +61,7 @@ async function req(jar, method, urlPath, { body, headers = {} } = {}) {
   });
   storeCookies(jar, res);
   const text = await res.text();
-  return { status: res.status, location: res.headers.get('location'), text };
+  return { status: res.status, location: res.headers.get('location'), headers: res.headers, text };
 }
 function csrfFrom(html) {
   const m = html.match(/name="csrf-token" content="([^"]+)"/);
@@ -264,6 +264,18 @@ async function main() {
     ok(r.status === 404, 'École B ne peut pas télécharger le permis de A (404)');
     r = await req(jarB, 'GET', `${apBase}/contrat/telecharger`);
     ok(r.status === 404, 'École B ne peut pas télécharger le contrat de A (404)');
+
+    // A1) Suppression de l'annonce : les fichiers sensibles doivent disparaître du disque.
+    const marieCv = path.join(STORAGE_DIR, marie.cvPath);
+    const marieId = path.join(STORAGE_DIR, marie.idCardPath);
+    r = await req(jarA, 'POST', `/mes-annonces/${listing.id}/supprimer`, form({ _csrf: csrfA }));
+    ok(r.status === 302, 'Suppression de l’annonce -> redirection');
+    ok(!fs.existsSync(cvAbs) && !fs.existsSync(idAbs) && !fs.existsSync(licAbs) && !fs.existsSync(teachAbs),
+      'A1 : pièces de Jean (CV/CNI/permis/carte) supprimées du stockage');
+    ok(!fs.existsSync(pdfAbs), 'A1 : PDF de contrat supprimé du stockage');
+    ok(!fs.existsSync(marieCv) && !fs.existsSync(marieId), 'A1 : pièces de Marie supprimées du stockage');
+    const goneListing = await prisma.listing.findUnique({ where: { id: listing.id } });
+    ok(!goneListing, 'A1 : annonce supprimée en base');
 
     console.log(`\n✅ Smoke test réussi — ${passed} assertions.`);
   } finally {
