@@ -41,6 +41,16 @@ async function main() {
       });
     }
 
+    // A2 — les colonnes normalisées *Lower sont peuplées par createForSchool (withLower).
+    // Échoue sur le code pré-Task-4 (colonnes absentes / null).
+    const l = await prisma.listing.findFirst({ where: { schoolId: school.id } });
+    ok(
+      l.titleLower === l.title.toLowerCase()
+        && l.descriptionLower === l.description.toLowerCase()
+        && l.cityLower === l.city.toLowerCase(),
+      'A2 : colonnes *Lower peuplées à la création',
+    );
+
     // A3 — pagination publique au niveau service
     const p1 = await listingService.findPublic({ q: tag, page: 1 });
     ok(p1.items.length === PAGE_SIZE && p1.total === PAGE_SIZE + 1, 'A3 findPublic page 1 = 20 / total 21');
