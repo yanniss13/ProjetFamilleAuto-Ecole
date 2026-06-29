@@ -1,13 +1,14 @@
 // Accès aux données de l'entité Listing via Prisma.
 // Les méthodes de gestion sont scopées par schoolId (isolation entre auto-écoles).
 const prisma = require('../config/prisma');
+const { paginate } = require('../utils/pagination');
 
 // --- Public ---
 
-// Annonces ouvertes, filtrables par département et recherche texte.
+// Annonces ouvertes, filtrables par département et recherche texte, paginées.
 // NB : sous SQLite, `contains` est sensible à la casse — à affiner à l'implémentation
 // (ex. stocker/normaliser en minuscules) si besoin.
-function findPublic({ department, q } = {}) {
+async function findPublic({ department, q, page = 1 } = {}) {
   const where = { status: 'open' };
   if (department) where.department = department;
   if (q) {
@@ -17,11 +18,16 @@ function findPublic({ department, q } = {}) {
       { city: { contains: q } },
     ];
   }
-  return prisma.listing.findMany({
+  const total = await prisma.listing.count({ where });
+  const { skip, take } = paginate(page, total);
+  const items = await prisma.listing.findMany({
     where,
     orderBy: { createdAt: 'desc' },
     include: { school: true },
+    skip,
+    take,
   });
+  return { items, total };
 }
 
 function findPublicById(id) {

@@ -1,0 +1,15 @@
+{% if pagination and pagination.pageCount > 1 %}
+  <nav class="pagination" aria-label="Pagination">
+    {% if pagination.prevUrl %}
+      <a class="btn btn-small" href="{{ pagination.prevUrl }}">← Précédent</a>
+    {% else %}
+      <span class="btn btn-small btn-disabled" aria-disabled="true">← Précédent</span>
+    {% endif %}
+    <span class="pagination-status">page {{ pagination.page }} / {{ pagination.pageCount }}</span>
+    {% if pagination.nextUrl %}
+      <a class="btn btn-small" href="{{ pagination.nextUrl }}">Suivant →</a>
+    {% else %}
+      <span class="btn btn-small btn-disabled" aria-disabled="true">Suivant →</span>
+    {% endif %}
+  </nav>
+{% endif %}

@@ -217,3 +217,8 @@ body {
 .skip-link:focus { top: 0.5rem; }
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
+
+/* --- Pagination --- */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin: 1.5rem 0; }
+.pagination-status { color: var(--color-muted); font-size: 0.9rem; }
+.btn-disabled { opacity: 0.5; pointer-events: none; }
