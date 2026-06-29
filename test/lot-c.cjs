@@ -84,6 +84,38 @@ async function main() {
     try { await createOrUpdateAdmin({ email: cliEmail, password: 'court' }); } catch { rejected = true; }
     ok(rejected, 'C : createOrUpdateAdmin rejette un mot de passe trop court');
 
+    // C (Task 3) : auth admin + cloisonnement
+    const adminJar = makeJar();
+    let rc = await req(adminJar, 'GET', '/admin'); // non connecté
+    ok(rc.status === 302 && rc.location === '/admin/connexion', 'C : /admin sans session -> redirection login');
+    rc = await req(adminJar, 'GET', '/admin/connexion');
+    let csrfC = csrfFrom(rc.text);
+    rc = await req(adminJar, 'POST', '/admin/connexion', form({ _csrf: csrfC, email: adminEmail, password: 'mauvais' }));
+    ok(rc.status === 401, 'C : mauvais mot de passe admin -> 401');
+    rc = await req(adminJar, 'GET', '/admin/connexion');
+    csrfC = csrfFrom(rc.text);
+    rc = await req(adminJar, 'POST', '/admin/connexion', form({ _csrf: csrfC, email: adminEmail, password: ADMIN_PWD }));
+    ok(rc.status === 302 && rc.location === '/admin', 'C : login admin OK -> /admin');
+    rc = await req(adminJar, 'GET', '/admin');
+    ok(rc.status === 200 && /administration/i.test(rc.text), 'C : tableau de bord admin accessible');
+
+    // Cloisonnement : une session école n'accède pas à /admin.
+    const schoolJar = makeJar();
+    rc = await req(schoolJar, 'GET', '/inscription');
+    let csrfS = csrfFrom(rc.text);
+    const sEmail = `c.iso.${STAMP}@example.test`;
+    await req(schoolJar, 'POST', '/inscription', form({ _csrf: csrfS, businessName: 'Iso', email: sEmail, siret: `8${String(STAMP).slice(-13).padStart(13, '0')}`, password: 'motdepasse123', passwordConfirm: 'motdepasse123' }));
+    const sRow = await prisma.school.findUnique({ where: { email: sEmail } });
+    createdSchoolIds.push(sRow.id);
+    await prisma.school.update({ where: { id: sRow.id }, data: { emailVerified: true } });
+    rc = await req(schoolJar, 'GET', '/connexion');
+    csrfS = csrfFrom(rc.text);
+    await req(schoolJar, 'POST', '/connexion', form({ _csrf: csrfS, email: sEmail, password: 'motdepasse123' }));
+    rc = await req(schoolJar, 'GET', '/admin');
+    ok(rc.status === 302 && rc.location === '/admin/connexion', 'C : session école ne peut pas atteindre /admin');
+    rc = await req(adminJar, 'GET', '/tableau-de-bord');
+    ok(rc.status === 302 && rc.location === '/connexion', 'C : session admin ne peut pas atteindre /tableau-de-bord');
+
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {
     // Nettoyage : fichiers des candidatures + écoles + admins de test.

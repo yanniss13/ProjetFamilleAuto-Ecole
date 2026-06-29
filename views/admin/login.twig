@@ -1,0 +1,26 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Connexion administration</h1>
+    {% if errors.global %}<div class="flash flash-error" role="alert">{{ errors.global }}</div>{% endif %}
+
+    <form action="/admin/connexion" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" value="{{ values.email|default('') }}" required>
+        {% if errors.email %}<p class="field-error">{{ errors.email }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        {% if errors.password %}<p class="field-error">{{ errors.password }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+  </section>
+{% endblock %}
