@@ -17,8 +17,9 @@ const isProd = process.env.NODE_ENV === 'production';
 if (isProd) app.set('trust proxy', 1);
 
 // En-têtes HTTP de sécurité, dont une Content-Security-Policy stricte (defaults helmet :
-// default-src/script-src/style-src 'self', pas d'inline). On autorise en plus les tuiles
-// OpenStreetMap chargées par Leaflet sur la page détail d'une annonce.
+// default-src/script-src 'self', pas de JS inline). Le `style-src` par défaut de helmet
+// conserve 'unsafe-inline' (non durci ici) ; seul le JS inline est bloqué. On autorise
+// en plus les tuiles OpenStreetMap chargées par Leaflet sur la page détail d'une annonce.
 app.use(
   helmet({
     contentSecurityPolicy: {

@@ -4,6 +4,13 @@ const prisma = require('../config/prisma');
 const { paginate } = require('../utils/pagination');
 
 // Ajoute les copies minuscules des champs recherchables présents dans `data`.
+// Recherche INSENSIBLE À LA CASSE uniquement (pas insensible aux accents) : on replie
+// la casse via JS `toLowerCase()` (Unicode), tandis que le backfill de la migration
+// utilise le `lower()` SQL (ASCII-only sous SQLite, dépendant de la locale sous
+// PostgreSQL). Conséquence : un libellé accentué (« Nîmes ») rétro-rempli sous SQLite
+// peut ne pas matcher un terme replié côté JS. Les lignes créées/éditées ensuite
+// passent par ce helper et sont cohérentes. À traiter (normalisation des accents) si
+// une vraie recherche tolérante aux accents devient nécessaire.
 function withLower(data) {
   const out = { ...data };
   if (typeof data.title === 'string') out.titleLower = data.title.toLowerCase();
