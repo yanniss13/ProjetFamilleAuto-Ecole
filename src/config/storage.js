@@ -23,4 +23,17 @@ function resolveStored(relPath) {
   return abs;
 }
 
-module.exports = { STORAGE_DIR, SUBDIRS, resolveStored };
+// Supprime un fichier du stockage privé en best-effort : tolère l'absence et ne lève
+// jamais (une erreur disque ne doit pas empêcher une suppression logique en base).
+function deleteStored(relPath) {
+  if (!relPath) return;
+  const abs = resolveStored(relPath);
+  if (!abs) return;
+  try {
+    fs.rmSync(abs, { force: true });
+  } catch (err) {
+    console.warn(`deleteStored: échec suppression ${relPath}:`, err.message);
+  }
+}
+
+module.exports = { STORAGE_DIR, SUBDIRS, resolveStored, deleteStored };

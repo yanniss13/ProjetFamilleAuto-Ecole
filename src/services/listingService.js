@@ -52,13 +52,19 @@ function countBySchool(schoolId) {
   return prisma.listing.count({ where: { schoolId } });
 }
 
-module.exports = {
-  findPublic,
-  findPublicById,
-  findAllBySchool,
-  findOwnedById,
-  createForSchool,
-  updateOwned,
-  deleteOwned,
-  countBySchool,
-};
+// Tous les chemins de fichiers privés rattachés à une annonce possédée par l'école :
+// pièces des candidatures + PDF de contrat. Sert au nettoyage disque avant suppression.
+async function findFilePathsForListing(schoolId, id) {
+  const apps = await prisma.application.findMany({
+    where: { listingId: id, listing: { schoolId } },
+    include: { contract: true },
+  });
+  const paths = [];
+  for (const a of apps) {
+    paths.push(a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath);
+    if (a.contract) paths.push(a.contract.pdfPath);
+  }
+  return paths.filter(Boolean);
+}
+
+module.exports = { findPublic, findPublicById, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing };
