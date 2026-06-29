@@ -96,12 +96,56 @@ function sendContractToApplicant(applicantEmail, applicantName, listingTitle, pd
   );
 }
 
+// Confirme au candidat la réception de sa candidature + lien de suivi.
+function sendApplicationConfirmation(applicantEmail, applicantName, listingTitle, token) {
+  const link = token ? `${APP_URL}/suivi/${token}` : null;
+  return send(
+    applicantEmail,
+    `Candidature reçue — ${listingTitle}`,
+    `<p>Bonjour ${applicantName},</p>
+     <p>Votre candidature à l'annonce « ${listingTitle} » a bien été reçue.</p>
+     ${link ? `<p>Suivez son avancement à tout moment : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    { link }
+  );
+}
+
+// Informe le candidat que sa candidature est acceptée (le contrat suit, envoyé par l'école).
+function sendApplicationAccepted(applicantEmail, applicantName, listingTitle, token) {
+  const link = token ? `${APP_URL}/suivi/${token}` : null;
+  return send(
+    applicantEmail,
+    `Candidature acceptée — ${listingTitle}`,
+    `<p>Bonjour ${applicantName},</p>
+     <p>Bonne nouvelle : votre candidature à « ${listingTitle} » a été acceptée. L'auto-école
+     vous transmettra votre contrat par email.</p>
+     ${link ? `<p>Détails : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    { link }
+  );
+}
+
+// Informe le candidat que sa candidature n'a pas été retenue.
+function sendApplicationRejected(applicantEmail, applicantName, listingTitle, token) {
+  const link = token ? `${APP_URL}/suivi/${token}` : null;
+  return send(
+    applicantEmail,
+    `Votre candidature — ${listingTitle}`,
+    `<p>Bonjour ${applicantName},</p>
+     <p>Votre candidature à « ${listingTitle} » n'a pas été retenue cette fois-ci. Merci de
+     l'intérêt porté à cette auto-école.</p>
+     ${link ? `<p>Suivi : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    { link }
+  );
+}
+
 module.exports = {
   send,
   sendVerification,
   sendReset,
   sendApplicationNotification,
   sendContractToApplicant,
+  sendApplicationConfirmation,
+  sendApplicationAccepted,
+  sendApplicationRejected,
   maskEmail,
   APP_URL,
 };

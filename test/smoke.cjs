@@ -25,6 +25,7 @@ const app = require('../src/app');
 const prisma = require('../src/config/prisma');
 const { STORAGE_DIR } = require('../src/config/storage');
 const applicationService = require('../src/services/applicationService');
+const mailer = require('../src/services/mailer');
 
 const PORT = 4055;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -101,6 +102,16 @@ async function main() {
   const createdSchoolIds = [];
 
   try {
+    // B (Task 3) : les 3 fonctions existent et, en dev (SMTP vide), renvoient true.
+    ok((await mailer.sendApplicationConfirmation('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationConfirmation (dev) OK');
+    ok((await mailer.sendApplicationAccepted('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationAccepted (dev) OK');
+    ok((await mailer.sendApplicationRejected('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationRejected (dev) OK');
+    // Interception pour vérifier le CÂBLAGE depuis les contrôleurs (le même objet exports
+    // est partagé avec les contrôleurs, donc réassigner ses propriétés est visible).
+    const mailCalls = [];
+    mailer.sendApplicationConfirmation = (...a) => { mailCalls.push(['confirmation', ...a]); return true; };
+    mailer.sendApplicationAccepted = (...a) => { mailCalls.push(['accepted', ...a]); return true; };
+    mailer.sendApplicationRejected = (...a) => { mailCalls.push(['rejected', ...a]); return true; };
     // 1) Inscription + vérification (posée via Prisma) + connexion
     let r = await req(jarA, 'GET', '/inscription');
     let csrf = csrfFrom(r.text);
@@ -169,6 +180,8 @@ async function main() {
     // 5) Deux candidatures complètes (CV + CNI)
     r = await req(pub, 'POST', `/annonces/${listing.id}/postuler?_csrf=${encodeURIComponent(csrfPub)}`, { body: applicationForm('Jean Moniteur', 'jean@example.test') });
     ok(r.status === 302, 'Candidature Jean (CV + CNI) déposée');
+    const conf = mailCalls.find((c) => c[0] === 'confirmation' && c[1] === 'jean@example.test');
+    ok(conf && typeof conf[4] === 'string' && conf[4].length === 64, 'B : email de confirmation au candidat avec lien de suivi');
     r = await req(pub, 'POST', `/annonces/${listing.id}/postuler?_csrf=${encodeURIComponent(csrfPub)}`, { body: applicationForm('Marie Conduite', 'marie@example.test') });
     ok(r.status === 302, 'Candidature Marie (CV + CNI) déposée');
 
@@ -237,6 +250,7 @@ async function main() {
       licenseNumber: '13AB45678', licenseCategories: 'B, A2',
     }));
     ok(r.status === 302, 'Acceptation + génération du contrat');
+    ok(mailCalls.some((c) => c[0] === 'accepted' && c[1] === 'jean@example.test'), 'B : email d’acceptation envoyé au candidat');
 
     const jeanAfter = await prisma.application.findUnique({ where: { id: jean.id }, include: { contract: true } });
     ok(jeanAfter.status === 'accepted', 'Candidature passée en "accepted"');
@@ -252,6 +266,7 @@ async function main() {
     ok(r.status === 302, 'Refus de la candidature Marie');
     const marieAfter = await prisma.application.findUnique({ where: { id: marie.id } });
     ok(marieAfter.status === 'rejected', 'Candidature Marie en "rejected"');
+    ok(mailCalls.some((c) => c[0] === 'rejected' && c[1] === 'marie@example.test'), 'B : email de refus envoyé au candidat');
     trk = await req(pub, 'GET', `/suivi/${marie.trackingToken}`);
     ok(/Refusée/.test(trk.text), 'B : suivi reflète « Refusée » après refus');
 

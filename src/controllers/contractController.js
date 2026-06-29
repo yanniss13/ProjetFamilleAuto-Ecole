@@ -46,6 +46,8 @@ async function reject(req, res, next) {
     }
 
     await applicationService.updateStatus(application.id, 'rejected');
+    // Best-effort : informe le candidat du refus (lien de suivi rappelé).
+    await mailer.sendApplicationRejected(application.applicantEmail, application.applicantName, application.listing.title, application.trackingToken);
     req.flash('success', 'Candidature refusée.');
     res.redirect(candidaturesUrl(application));
   } catch (err) {
@@ -159,6 +161,8 @@ async function accept(req, res, next) {
 
     await contractService.upsertForApplication(application.id, { ...value, pdfPath: relPath });
     await applicationService.updateStatus(application.id, 'accepted');
+    // Best-effort : informe le candidat de l'acceptation (lien de suivi rappelé).
+    await mailer.sendApplicationAccepted(application.applicantEmail, application.applicantName, application.listing.title, application.trackingToken);
 
     req.flash('success', 'Candidature acceptée et contrat généré.');
     res.redirect(candidaturesUrl(application));
