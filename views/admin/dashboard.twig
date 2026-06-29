@@ -1,0 +1,21 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="hero">
+    <h1>Administration</h1>
+    <p>Supervision et modération de la plateforme.</p>
+  </section>
+
+  {% if stats %}
+    <section class="stats-grid">
+      <div class="stat-card"><span class="stat-value">{{ stats.schools }}</span><span class="stat-label">Auto-écoles</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.listings }}</span><span class="stat-label">Annonces</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.applications }}</span><span class="stat-label">Candidatures</span></div>
+    </section>
+  {% endif %}
+
+  <div class="dashboard-actions">
+    <a href="/admin/ecoles" class="btn btn-primary">Auto-écoles</a>
+    <a href="/admin/annonces" class="btn">Annonces</a>
+  </div>
+{% endblock %}
