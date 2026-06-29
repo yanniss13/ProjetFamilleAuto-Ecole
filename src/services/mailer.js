@@ -25,6 +25,18 @@ function maskEmail(email) {
   return `${(local && local[0]) || '*'}***@${(parts[0] && parts[0][0]) || '*'}***${tld}`;
 }
 
+// Échappe le texte fourni par l'utilisateur avant interpolation dans le HTML d'un email
+// (nom du candidat, titre d'annonce). Évite une injection HTML/lien dans un email lu par
+// l'auto-école ou le candidat. Les sujets restent en clair (non HTML), donc non échappés.
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Envoi générique. Ne logge jamais le contenu/jeton, seulement l'email masqué.
 // Renvoie true si l'email est parti (ou, en mode dev sans SMTP, s'il a été « traité »
 // et journalisé), false uniquement en cas d'échec réel d'envoi SMTP.
@@ -77,8 +89,8 @@ function sendApplicationNotification(schoolEmail, listingTitle, applicantName) {
   return send(
     schoolEmail,
     `Nouvelle candidature — ${listingTitle}`,
-    `<p>Vous avez reçu une candidature de <strong>${applicantName}</strong> pour votre annonce
-     « ${listingTitle} ».</p>
+    `<p>Vous avez reçu une candidature de <strong>${esc(applicantName)}</strong> pour votre annonce
+     « ${esc(listingTitle)} ».</p>
      <p>Connectez-vous à votre tableau de bord pour la consulter.</p>`
   );
 }
@@ -88,8 +100,8 @@ function sendContractToApplicant(applicantEmail, applicantName, listingTitle, pd
   return send(
     applicantEmail,
     `Votre contrat — ${listingTitle}`,
-    `<p>Bonjour ${applicantName},</p>
-     <p>Votre candidature à l'annonce « ${listingTitle} » a été acceptée. Vous trouverez votre
+    `<p>Bonjour ${esc(applicantName)},</p>
+     <p>Votre candidature à l'annonce « ${esc(listingTitle)} » a été acceptée. Vous trouverez votre
      contrat en pièce jointe.</p>
      <p>Merci de le relire ; en cas de question, répondez directement à l'auto-école.</p>`,
     { attachments: [{ filename: 'contrat.pdf', path: pdfPath, contentType: 'application/pdf' }] }
@@ -102,8 +114,8 @@ function sendApplicationConfirmation(applicantEmail, applicantName, listingTitle
   return send(
     applicantEmail,
     `Candidature reçue — ${listingTitle}`,
-    `<p>Bonjour ${applicantName},</p>
-     <p>Votre candidature à l'annonce « ${listingTitle} » a bien été reçue.</p>
+    `<p>Bonjour ${esc(applicantName)},</p>
+     <p>Votre candidature à l'annonce « ${esc(listingTitle)} » a bien été reçue.</p>
      ${link ? `<p>Suivez son avancement à tout moment : <a href="${link}">voir le suivi</a></p>` : ''}`,
     { link }
   );
@@ -115,8 +127,8 @@ function sendApplicationAccepted(applicantEmail, applicantName, listingTitle, to
   return send(
     applicantEmail,
     `Candidature acceptée — ${listingTitle}`,
-    `<p>Bonjour ${applicantName},</p>
-     <p>Bonne nouvelle : votre candidature à « ${listingTitle} » a été acceptée. L'auto-école
+    `<p>Bonjour ${esc(applicantName)},</p>
+     <p>Bonne nouvelle : votre candidature à « ${esc(listingTitle)} » a été acceptée. L'auto-école
      vous transmettra votre contrat par email.</p>
      ${link ? `<p>Détails : <a href="${link}">voir le suivi</a></p>` : ''}`,
     { link }
@@ -129,8 +141,8 @@ function sendApplicationRejected(applicantEmail, applicantName, listingTitle, to
   return send(
     applicantEmail,
     `Votre candidature — ${listingTitle}`,
-    `<p>Bonjour ${applicantName},</p>
-     <p>Votre candidature à « ${listingTitle} » n'a pas été retenue cette fois-ci. Merci de
+    `<p>Bonjour ${esc(applicantName)},</p>
+     <p>Votre candidature à « ${esc(listingTitle)} » n'a pas été retenue cette fois-ci. Merci de
      l'intérêt porté à cette auto-école.</p>
      ${link ? `<p>Suivi : <a href="${link}">voir le suivi</a></p>` : ''}`,
     { link }
@@ -147,5 +159,6 @@ module.exports = {
   sendApplicationAccepted,
   sendApplicationRejected,
   maskEmail,
+  esc,
   APP_URL,
 };

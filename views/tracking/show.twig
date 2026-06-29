@@ -20,9 +20,11 @@
   </p>
 
   {% if application.status == 'accepted' %}
-    <p>Votre candidature a été acceptée. L'auto-école vous transmettra votre contrat par email.</p>
     {% if application.contract and application.contract.sentToApplicantAt %}
+      <p>Votre candidature a été acceptée. L'auto-école vous a transmis votre contrat par email.</p>
       <p class="muted">Contrat envoyé le {{ application.contract.sentToApplicantAt|date('d/m/Y à H:i') }}.</p>
+    {% else %}
+      <p>Votre candidature a été acceptée. L'auto-école vous transmettra votre contrat par email.</p>
     {% endif %}
   {% elseif application.status == 'rejected' %}
     <p>Votre candidature n'a pas été retenue cette fois-ci. Merci de l'intérêt porté à cette auto-école.</p>
