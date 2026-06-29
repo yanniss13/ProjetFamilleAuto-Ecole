@@ -39,8 +39,12 @@ function findPublicById(id) {
 
 // --- Gestion (scopée par école) ---
 
-function findAllBySchool(schoolId) {
-  return prisma.listing.findMany({ where: { schoolId }, orderBy: { createdAt: 'desc' } });
+async function findAllBySchool(schoolId, page = 1) {
+  const where = { schoolId };
+  const total = await prisma.listing.count({ where });
+  const { skip, take } = paginate(page, total);
+  const items = await prisma.listing.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take });
+  return { items, total };
 }
 function findOwnedById(schoolId, id) {
   return prisma.listing.findFirst({ where: { id, schoolId } });

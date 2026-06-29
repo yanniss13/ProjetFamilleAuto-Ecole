@@ -10,6 +10,7 @@ process.env.GEOCODING_DISABLED = '1';
 const app = require('../src/app');
 const prisma = require('../src/config/prisma');
 const listingService = require('../src/services/listingService');
+const applicationService = require('../src/services/applicationService');
 const { PAGE_SIZE } = require('../src/utils/pagination');
 
 const PORT = 4056;
@@ -51,6 +52,27 @@ async function main() {
     const html = await res.text();
     ok(/page\s*1\s*\/\s*2/.test(html), 'A3 partial affiche « page 1 / 2 »');
     ok(html.includes(`/annonces?q=${tag}&amp;page=2`), 'A3 lien « Suivant » conserve le filtre q');
+
+    // A3 — pagination "mes annonces" (école)
+    const m1 = await listingService.findAllBySchool(school.id, 1);
+    ok(m1.items.length === PAGE_SIZE && m1.total === PAGE_SIZE + 1, 'A3 findAllBySchool page 1 = 20 / total 21');
+    const m2 = await listingService.findAllBySchool(school.id, 2);
+    ok(m2.items.length === 1, 'A3 findAllBySchool page 2 = 1');
+
+    // A3 — pagination des candidatures d'une annonce
+    const target = m1.items[0];
+    for (let i = 0; i < PAGE_SIZE + 1; i++) {
+      await prisma.application.create({
+        data: {
+          listingId: target.id, applicantName: `Cand ${i}`,
+          applicantEmail: `cand${i}.${STAMP}@example.test`, message: 'Bonjour',
+        },
+      });
+    }
+    const a1 = await applicationService.findForOwnedListing(school.id, target.id, 1);
+    ok(a1.items.length === PAGE_SIZE && a1.total === PAGE_SIZE + 1, 'A3 findForOwnedListing page 1 = 20 / total 21');
+    const a2 = await applicationService.findForOwnedListing(school.id, target.id, 2);
+    ok(a2.items.length === 1, 'A3 findForOwnedListing page 2 = 1');
 
     console.log(`\n✅ Lot A tests réussis — ${passed} assertions.`);
   } finally {
