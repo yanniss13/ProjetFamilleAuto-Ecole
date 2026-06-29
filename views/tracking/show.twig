@@ -1,0 +1,32 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header"><h1>Suivi de votre candidature</h1></div>
+
+  <p class="muted">
+    Annonce : <strong>{{ application.listing.title }}</strong>
+    — {{ application.listing.school.businessName }}
+  </p>
+  <p class="muted">Candidature déposée le {{ application.createdAt|date('d/m/Y') }}</p>
+
+  <p>
+    {% if application.status == 'accepted' %}
+      <span class="badge badge-available">Acceptée</span>
+    {% elseif application.status == 'rejected' %}
+      <span class="badge badge-rejected">Refusée</span>
+    {% else %}
+      <span class="badge badge-pending">En attente</span>
+    {% endif %}
+  </p>
+
+  {% if application.status == 'accepted' %}
+    <p>Votre candidature a été acceptée. L'auto-école vous transmettra votre contrat par email.</p>
+    {% if application.contract and application.contract.sentToApplicantAt %}
+      <p class="muted">Contrat envoyé le {{ application.contract.sentToApplicantAt|date('d/m/Y à H:i') }}.</p>
+    {% endif %}
+  {% elseif application.status == 'rejected' %}
+    <p>Votre candidature n'a pas été retenue cette fois-ci. Merci de l'intérêt porté à cette auto-école.</p>
+  {% else %}
+    <p>Votre candidature est en cours d'examen par l'auto-école.</p>
+  {% endif %}
+{% endblock %}
