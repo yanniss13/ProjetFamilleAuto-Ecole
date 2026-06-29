@@ -43,7 +43,7 @@
             {% endif %}
             {% if a.status == 'pending' %}
               <form action="{{ base }}/refuser" method="post" class="inline-form"
-                    onsubmit="return confirm('Refuser cette candidature ?');">
+                    data-confirm="Refuser cette candidature ?">
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                 <button type="submit" class="btn btn-small btn-danger">Refuser</button>
               </form>
