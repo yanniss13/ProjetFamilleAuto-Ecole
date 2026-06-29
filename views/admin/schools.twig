@@ -1,0 +1,41 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header"><h1>Auto-écoles</h1><a href="/admin" class="btn">Retour</a></div>
+
+  {% if schools|length == 0 %}
+    <p class="muted">Aucune auto-école.</p>
+  {% else %}
+    <table class="data-table">
+      <thead><tr><th>Nom</th><th>Email</th><th>SIRET</th><th>Annonces</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in schools %}
+          <tr>
+            <td>{{ s.businessName }}</td>
+            <td>{{ s.email }}</td>
+            <td>{{ s.siret }}</td>
+            <td>{{ s._count.listings }}</td>
+            <td>
+              {% if s.suspended %}<span class="badge badge-rejected">Suspendue</span>
+              {% else %}<span class="badge badge-available">Active</span>{% endif %}
+            </td>
+            <td class="actions">
+              {% if s.suspended %}
+                <form action="/admin/ecoles/{{ s.id }}/reactiver" method="post" class="inline-form">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                  <button type="submit" class="btn btn-small">Réactiver</button>
+                </form>
+              {% else %}
+                <form action="/admin/ecoles/{{ s.id }}/suspendre" method="post" class="inline-form"
+                      data-confirm="Suspendre cette auto-école ? Ses annonces seront masquées et sa connexion bloquée.">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                  <button type="submit" class="btn btn-small btn-danger">Suspendre</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

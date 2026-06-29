@@ -94,4 +94,26 @@ async function findFilePathsForListing(schoolId, id) {
   return paths.filter(Boolean);
 }
 
-module.exports = { findPublic, findPublicById, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing };
+// --- Admin (non scopé par école) ---
+
+// Mêmes champs de fichiers que findFilePathsForListing, mais SANS filtre schoolId.
+async function findAnyFilePathsForListing(id) {
+  const apps = await prisma.application.findMany({ where: { listingId: id }, include: { contract: true } });
+  const paths = [];
+  for (const a of apps) {
+    paths.push(a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath);
+    if (a.contract) paths.push(a.contract.pdfPath);
+  }
+  return paths.filter(Boolean);
+}
+function deleteAny(id) {
+  return prisma.listing.delete({ where: { id } });
+}
+function findAllWithSchool() {
+  return prisma.listing.findMany({ orderBy: { createdAt: 'desc' }, include: { school: true } });
+}
+function countAll() {
+  return prisma.listing.count();
+}
+
+module.exports = { findPublic, findPublicById, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };

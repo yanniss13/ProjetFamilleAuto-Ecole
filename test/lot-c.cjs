@@ -50,6 +50,10 @@ function form(obj) {
   for (const [k, v] of Object.entries(obj)) p.append(k, v);
   return { body: p.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 }
+async function adminCsrf(jar) {
+  const r = await req(jar, 'GET', '/admin/ecoles');
+  return csrfFrom(r.text);
+}
 
 const adminEmail = `admin.${STAMP}@example.test`;
 const ADMIN_PWD = 'adminpass123';
@@ -115,6 +119,26 @@ async function main() {
     ok(rc.status === 302 && rc.location === '/admin/connexion', 'C : session école ne peut pas atteindre /admin');
     rc = await req(adminJar, 'GET', '/tableau-de-bord');
     ok(rc.status === 302 && rc.location === '/connexion', 'C : session admin ne peut pas atteindre /tableau-de-bord');
+
+    // C (Task 4) : modération — retrait d'une annonce (avec nettoyage des fichiers)
+    const modListing = await prisma.listing.create({
+      data: { title: `ModAnnonce ${STAMP}`, description: 'à modérer', city: 'Lyon', department: '69', schoolId: sRow.id, titleLower: `modannonce ${STAMP}`, descriptionLower: 'à modérer', cityLower: 'lyon' },
+    });
+    // une candidature avec un fichier sur disque pour vérifier le nettoyage
+    const relCv = `cv/lotc-${STAMP}.pdf`;
+    fs.writeFileSync(path.join(STORAGE_DIR, relCv), '%PDF-1.4\n%%EOF\n');
+    await prisma.application.create({ data: { listingId: modListing.id, applicantName: 'X', applicantEmail: `x.${STAMP}@e.test`, message: 'm', cvPath: relCv } });
+
+    rc = await req(adminJar, 'GET', '/admin/annonces');
+    ok(rc.status === 200 && rc.text.includes(`ModAnnonce ${STAMP}`), 'C : liste admin des annonces');
+    rc = await req(adminJar, 'POST', `/admin/annonces/${modListing.id}/supprimer`, form({ _csrf: await adminCsrf(adminJar) }));
+    ok(rc.status === 302, 'C : retrait d’annonce -> redirection');
+    ok(!(await prisma.listing.findUnique({ where: { id: modListing.id } })), 'C : annonce retirée de la base');
+    ok(!fs.existsSync(path.join(STORAGE_DIR, relCv)), 'C : fichier de la candidature nettoyé');
+
+    // C (Task 4) : compteurs du dashboard
+    rc = await req(adminJar, 'GET', '/admin');
+    ok(/Auto-écoles/.test(rc.text) && /stat-value/.test(rc.text), 'C : dashboard affiche des compteurs');
 
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {
