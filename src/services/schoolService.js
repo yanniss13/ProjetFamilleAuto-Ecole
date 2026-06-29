@@ -26,6 +26,17 @@ function findByResetTokenHash(hash) {
   return prisma.school.findUnique({ where: { resetTokenHash: hash } });
 }
 
+// --- Admin ---
+function findAllWithCounts() {
+  return prisma.school.findMany({ orderBy: { createdAt: 'desc' }, include: { _count: { select: { listings: true } } } });
+}
+function countAll() {
+  return prisma.school.count();
+}
+function setSuspended(id, value) {
+  return prisma.school.update({ where: { id }, data: { suspended: value } });
+}
+
 module.exports = {
   findById,
   findByEmail,
@@ -34,4 +45,7 @@ module.exports = {
   update,
   findByVerifyTokenHash,
   findByResetTokenHash,
+  findAllWithCounts,
+  countAll,
+  setSuspended,
 };

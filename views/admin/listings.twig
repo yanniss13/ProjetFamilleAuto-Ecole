@@ -1,0 +1,30 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header"><h1>Annonces</h1><a href="/admin" class="btn">Retour</a></div>
+
+  {% if listings|length == 0 %}
+    <p class="muted">Aucune annonce.</p>
+  {% else %}
+    <table class="data-table">
+      <thead><tr><th>Titre</th><th>Auto-école</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for l in listings %}
+          <tr>
+            <td>{{ l.title }}</td>
+            <td>{{ l.school.businessName }}</td>
+            <td>{{ l.city }} ({{ l.department }})</td>
+            <td>{{ l.status }}</td>
+            <td class="actions">
+              <form action="/admin/annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
+                    data-confirm="Retirer définitivement cette annonce et ses candidatures ?">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <button type="submit" class="btn btn-small btn-danger">Retirer</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
