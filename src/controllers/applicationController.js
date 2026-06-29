@@ -77,6 +77,8 @@ async function apply(req, res, next) {
     });
 
     await mailer.sendApplicationNotification(listing.school.email, listing.title, value.applicantName);
+    // Best-effort : confirme au candidat + lien de suivi (n'interrompt pas le flux).
+    await mailer.sendApplicationConfirmation(value.applicantEmail, value.applicantName, listing.title, trackingToken);
 
     req.flash('success', 'Votre candidature a bien été envoyée.');
     res.redirect(`/annonces/${id}`);
