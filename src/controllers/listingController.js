@@ -47,11 +47,22 @@ async function show(req, res, next) {
 // ----------------------- Gestion (auto-école) ----------------------
 // Protégées en amont par requireAuth + loadSchool : req.school est défini.
 
-// GET /mes-annonces
+// GET /mes-annonces  (?page=)
 async function mine(req, res, next) {
   try {
-    const listings = await listingService.findAllBySchool(req.school.id);
-    res.render('dashboard/listings', { title: 'Mes annonces', listings });
+    const page = parsePage(req.query.page);
+    const { items, total } = await listingService.findAllBySchool(req.school.id, page);
+    const { page: current, pageCount } = paginate(page, total);
+    res.render('dashboard/listings', {
+      title: 'Mes annonces',
+      listings: items,
+      pagination: {
+        page: current,
+        pageCount,
+        prevUrl: current > 1 ? pageUrl('/mes-annonces', {}, current - 1) : null,
+        nextUrl: current < pageCount ? pageUrl('/mes-annonces', {}, current + 1) : null,
+      },
+    });
   } catch (err) {
     next(err);
   }

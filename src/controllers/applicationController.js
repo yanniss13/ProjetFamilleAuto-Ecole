@@ -8,6 +8,7 @@ const mailer = require('../services/mailer');
 const { relPathOf } = require('../middlewares/upload');
 const { resolveStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
+const { parsePage, paginate, pageUrl } = require('../utils/pagination');
 
 // Récupère le 1er fichier d'un champ multer (.fields => req.files[name] = [file]).
 function fileOf(req, field) {
@@ -82,7 +83,7 @@ async function apply(req, res, next) {
   }
 }
 
-// GET /mes-annonces/:id/candidatures  (auto-école propriétaire)
+// GET /mes-annonces/:id/candidatures  (?page=)  (auto-école propriétaire)
 async function forListing(req, res, next) {
   try {
     const id = parseId(req.params.id);
@@ -91,8 +92,20 @@ async function forListing(req, res, next) {
     const listing = await listingService.findOwnedById(req.school.id, id);
     if (!listing) return notFound(res);
 
-    const applications = await applicationService.findForOwnedListing(req.school.id, id);
-    res.render('dashboard/applications', { title: 'Candidatures', applications, listing });
+    const page = parsePage(req.query.page);
+    const { items, total } = await applicationService.findForOwnedListing(req.school.id, id, page);
+    const { page: current, pageCount } = paginate(page, total);
+    res.render('dashboard/applications', {
+      title: 'Candidatures',
+      applications: items,
+      listing,
+      pagination: {
+        page: current,
+        pageCount,
+        prevUrl: current > 1 ? pageUrl(`/mes-annonces/${id}/candidatures`, {}, current - 1) : null,
+        nextUrl: current < pageCount ? pageUrl(`/mes-annonces/${id}/candidatures`, {}, current + 1) : null,
+      },
+    });
   } catch (err) {
     next(err);
   }
