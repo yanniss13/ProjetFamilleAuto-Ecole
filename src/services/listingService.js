@@ -3,19 +3,29 @@
 const prisma = require('../config/prisma');
 const { paginate } = require('../utils/pagination');
 
+// Ajoute les copies minuscules des champs recherchables présents dans `data`.
+function withLower(data) {
+  const out = { ...data };
+  if (typeof data.title === 'string') out.titleLower = data.title.toLowerCase();
+  if (typeof data.description === 'string') out.descriptionLower = data.description.toLowerCase();
+  if (typeof data.city === 'string') out.cityLower = data.city.toLowerCase();
+  return out;
+}
+
 // --- Public ---
 
 // Annonces ouvertes, filtrables par département et recherche texte, paginées.
-// NB : sous SQLite, `contains` est sensible à la casse — à affiner à l'implémentation
-// (ex. stocker/normaliser en minuscules) si besoin.
+// Recherche insensible à la casse via les colonnes normalisées `*Lower`, identique
+// sous SQLite (dev) et PostgreSQL (prod).
 async function findPublic({ department, q, page = 1 } = {}) {
   const where = { status: 'open' };
   if (department) where.department = department;
   if (q) {
+    const term = q.toLowerCase();
     where.OR = [
-      { title: { contains: q } },
-      { description: { contains: q } },
-      { city: { contains: q } },
+      { titleLower: { contains: term } },
+      { descriptionLower: { contains: term } },
+      { cityLower: { contains: term } },
     ];
   }
   const total = await prisma.listing.count({ where });
@@ -50,10 +60,10 @@ function findOwnedById(schoolId, id) {
   return prisma.listing.findFirst({ where: { id, schoolId } });
 }
 function createForSchool(schoolId, data) {
-  return prisma.listing.create({ data: { ...data, schoolId } });
+  return prisma.listing.create({ data: { ...withLower(data), schoolId } });
 }
 function updateOwned(schoolId, id, data) {
-  return prisma.listing.updateMany({ where: { id, schoolId }, data });
+  return prisma.listing.updateMany({ where: { id, schoolId }, data: withLower(data) });
 }
 function deleteOwned(schoolId, id) {
   return prisma.listing.deleteMany({ where: { id, schoolId } });
