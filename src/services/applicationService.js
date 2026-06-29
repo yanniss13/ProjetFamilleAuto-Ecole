@@ -40,10 +40,20 @@ function countBySchool(schoolId) {
   return prisma.application.count({ where: { listing: { schoolId } } });
 }
 
+// Candidature retrouvée par son jeton de suivi public (page /suivi). Inclut annonce + école
+// (pour l'affichage) et le contrat (pour savoir s'il a été envoyé).
+function findByTrackingToken(token) {
+  return prisma.application.findUnique({
+    where: { trackingToken: token },
+    include: { listing: { include: { school: true } }, contract: true },
+  });
+}
+
 module.exports = {
   createForListing,
   findForOwnedListing,
   findOwnedById,
   updateStatus,
   countBySchool,
+  findByTrackingToken,
 };

@@ -13,4 +13,10 @@ function generateToken() {
   return { raw, hash: hashToken(raw) };
 }
 
-module.exports = { hashToken, generateToken };
+// Jeton opaque non hashé (lien de suivi candidat) : non sensible (ne révèle que le statut,
+// déjà en base), donc stockable en clair pour pouvoir reconstruire le lien dans les emails.
+function generateOpaqueToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+module.exports = { hashToken, generateToken, generateOpaqueToken };
