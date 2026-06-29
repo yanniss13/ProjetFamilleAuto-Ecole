@@ -22,6 +22,9 @@ model School {
   siret        String  @unique
   phone        String?
 
+  // Suspension par un administrateur : bloque la connexion et masque les annonces du public.
+  suspended Boolean @default(false)
+
   // Localisation (optionnelle) : adresse saisie par l'école + coordonnées géocodées
   // (Nominatim) pour la carte affichée sur la page détail d'une annonce.
   address   String?
@@ -134,4 +137,13 @@ model Contract {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Administrateur de la plateforme (modération). Créé par script CLI, pas en self-service.
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
