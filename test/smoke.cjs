@@ -139,6 +139,10 @@ async function main() {
     ok(r.text.includes(keyword), 'Annonce visible (filtre département)');
     r = await req(pub, 'GET', `/annonces?q=${keyword}`);
     ok(r.text.includes(keyword), 'Annonce trouvée par recherche');
+    r = await req(pub, 'GET', `/annonces?q=${keyword.toLowerCase()}`);
+    ok(r.text.includes(keyword), 'A2 : recherche par mot-clé en minuscules trouve l’annonce');
+    r = await req(pub, 'GET', '/annonces?q=MARSEILLE');
+    ok(r.text.includes(keyword), 'A2 : recherche ville « MARSEILLE » insensible à la casse');
 
     // 4) Carte de localisation (page détail)
     r = await req(pub, 'GET', `/annonces/${listing.id}`);
