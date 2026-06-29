@@ -106,6 +106,8 @@ async function main() {
     ok((await mailer.sendApplicationConfirmation('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationConfirmation (dev) OK');
     ok((await mailer.sendApplicationAccepted('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationAccepted (dev) OK');
     ok((await mailer.sendApplicationRejected('t@test.test', 'T', 'Titre', 'abc')) === true, 'B : mailer.sendApplicationRejected (dev) OK');
+    // Échappement HTML du texte utilisateur dans le corps des emails (anti-injection).
+    ok(mailer.esc('<script>&"x') === '&lt;script&gt;&amp;&quot;x', 'B : esc() échappe le HTML du corps des emails');
     // Interception pour vérifier le CÂBLAGE depuis les contrôleurs (le même objet exports
     // est partagé avec les contrôleurs, donc réassigner ses propriétés est visible).
     const mailCalls = [];
