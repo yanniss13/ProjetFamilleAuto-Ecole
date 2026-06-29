@@ -90,7 +90,7 @@
         {% if errors.applicantAddress %}<p class="field-error">{{ errors.applicantAddress }}</p>{% endif %}
       </div>
 
-      <h2>Identité du candidat <span class="muted" style="font-weight:400;font-size:0.9rem">(optionnel, repris dans le contrat)</span></h2>
+      <h2>Identité du candidat <span class="muted label-note">(optionnel, repris dans le contrat)</span></h2>
 
       <div class="form-group">
         <label for="birthDate">Date de naissance</label>
@@ -146,7 +146,7 @@
     <p class="form-footer">
       <a href="/mes-annonces/{{ listing.id }}/candidatures">Retour aux candidatures</a>
     </p>
-    <p class="muted" style="font-size:0.8rem">
+    <p class="muted fine-print">
       Le contrat généré est un modèle indicatif, à faire valider juridiquement avant signature.
     </p>
   </section>

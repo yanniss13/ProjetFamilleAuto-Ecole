@@ -35,7 +35,7 @@
                 </form>
               {% endif %}
               <form action="/mes-annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
-                    onsubmit="return confirm('Supprimer cette annonce et ses candidatures ?');">
+                    data-confirm="Supprimer cette annonce et ses candidatures ?">
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                 <button type="submit" class="btn btn-small btn-danger">Supprimer</button>
               </form>

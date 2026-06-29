@@ -16,9 +16,19 @@ const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 if (isProd) app.set('trust proxy', 1);
 
-// En-têtes HTTP de sécurité. CSP désactivée pour l'instant (évolution V2 : voir
-// docs/DESIGN.md) afin de ne pas casser les éventuels handlers inline.
-app.use(helmet({ contentSecurityPolicy: false }));
+// En-têtes HTTP de sécurité, dont une Content-Security-Policy stricte (defaults helmet :
+// default-src/script-src/style-src 'self', pas d'inline). On autorise en plus les tuiles
+// OpenStreetMap chargées par Leaflet sur la page détail d'une annonce.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'img-src': ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
+      },
+    },
+  })
+);
 
 // Moteur de vues Twig. autoescape activé : toute {{ variable }} est échappée
 // (anti-XSS stocké). Aucune vue n'utilise |raw.

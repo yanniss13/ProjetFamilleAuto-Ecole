@@ -137,6 +137,8 @@ async function main() {
     const pub = makeJar();
     r = await req(pub, 'GET', '/annonces?departement=13');
     ok(r.text.includes(keyword), 'Annonce visible (filtre département)');
+    ok(/default-src 'self'/.test(r.headers.get('content-security-policy') || ''),
+      'A4 : en-tête Content-Security-Policy présent et strict');
     r = await req(pub, 'GET', `/annonces?q=${keyword}`);
     ok(r.text.includes(keyword), 'Annonce trouvée par recherche');
     r = await req(pub, 'GET', `/annonces?q=${keyword.toLowerCase()}`);
