@@ -3,18 +3,28 @@ const listingService = require('../services/listingService');
 const { validateListing } = require('../validators/listingValidator');
 const { parseId, notFound } = require('../utils/http');
 const { deleteStored } = require('../config/storage');
+const { parsePage, paginate, pageUrl } = require('../utils/pagination');
 
 // ----------------------------- Public -----------------------------
 
-// GET /annonces  (?departement=, ?q=)
+// GET /annonces  (?departement=, ?q=, ?page=)
 async function browse(req, res, next) {
   try {
     const { departement, q } = req.query;
-    const listings = await listingService.findPublic({ department: departement, q });
+    const page = parsePage(req.query.page);
+    const { items, total } = await listingService.findPublic({ department: departement, q, page });
+    const { page: current, pageCount } = paginate(page, total);
+    const query = { departement: departement || '', q: q || '' };
     res.render('listings/index', {
       title: 'Annonces',
-      listings,
-      filters: { departement: departement || '', q: q || '' },
+      listings: items,
+      filters: query,
+      pagination: {
+        page: current,
+        pageCount,
+        prevUrl: current > 1 ? pageUrl('/annonces', query, current - 1) : null,
+        nextUrl: current < pageCount ? pageUrl('/annonces', query, current + 1) : null,
+      },
     });
   } catch (err) {
     next(err);
