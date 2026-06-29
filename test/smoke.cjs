@@ -24,6 +24,7 @@ process.env.GEOCODING_DISABLED = '1'; // pas d'appel réseau Nominatim en test
 const app = require('../src/app');
 const prisma = require('../src/config/prisma');
 const { STORAGE_DIR } = require('../src/config/storage');
+const applicationService = require('../src/services/applicationService');
 
 const PORT = 4055;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -177,6 +178,15 @@ async function main() {
     ok(jean.cvPath.startsWith('cv/') && jean.idCardPath.startsWith('id/'), 'Chemins CV (cv/) et CNI (id/) stockés');
     ok(jean.licensePath.startsWith('license/') && jean.teachingCardPath.startsWith('teaching/'), 'Chemins permis (license/) et carte (teaching/) stockés');
     ok(jean.status === 'pending', 'Candidature en statut "pending" par défaut');
+
+    // B (Task 1) : jeton de suivi
+    ok(typeof jean.trackingToken === 'string' && /^[0-9a-f]{64}$/.test(jean.trackingToken),
+      'B : candidature dotée d’un trackingToken (64 hex)');
+    const byTok = await applicationService.findByTrackingToken(jean.trackingToken);
+    ok(byTok && byTok.id === jean.id && byTok.listing && byTok.listing.school,
+      'B : findByTrackingToken retrouve la candidature (avec annonce + école)');
+    ok((await applicationService.findByTrackingToken('inexistant')) === null,
+      'B : findByTrackingToken renvoie null pour un jeton inconnu');
 
     // Fichiers présents dans le stockage PRIVÉ, et ABSENTS de public/
     const cvAbs = path.join(STORAGE_DIR, jean.cvPath);

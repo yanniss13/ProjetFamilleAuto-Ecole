@@ -7,6 +7,7 @@ const { validateApplication } = require('../validators/applicationValidator');
 const mailer = require('../services/mailer');
 const { relPathOf } = require('../middlewares/upload');
 const { resolveStored } = require('../config/storage');
+const { generateOpaqueToken } = require('../services/tokens');
 const { parseId, notFound } = require('../utils/http');
 const { parsePage, paginate, pageUrl } = require('../utils/pagination');
 
@@ -65,12 +66,14 @@ async function apply(req, res, next) {
       });
     }
 
+    const trackingToken = generateOpaqueToken();
     await applicationService.createForListing(id, {
       ...value,
       cvPath: relPathOf(cvFile),
       idCardPath: relPathOf(idFile),
       licensePath: relPathOf(licenseFile),
       teachingCardPath: relPathOf(teachingFile),
+      trackingToken,
     });
 
     await mailer.sendApplicationNotification(listing.school.email, listing.title, value.applicantName);
