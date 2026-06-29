@@ -188,6 +188,14 @@ async function main() {
     ok((await applicationService.findByTrackingToken('inexistant')) === null,
       'B : findByTrackingToken renvoie null pour un jeton inconnu');
 
+    // B (Task 2) : page de suivi publique (candidature encore en attente à ce stade)
+    let trk = await req(pub, 'GET', `/suivi/${jean.trackingToken}`);
+    ok(trk.status === 200 && trk.text.includes(keyword), 'B : page de suivi rend l’annonce');
+    ok(/En attente/.test(trk.text), 'B : statut « En attente » affiché');
+    ok(!trk.text.includes('jean@example.test'), 'B : page de suivi ne fuit pas l’email du candidat');
+    trk = await req(pub, 'GET', '/suivi/zzdoesnotexist');
+    ok(trk.status === 404, 'B : jeton de suivi inconnu -> 404');
+
     // Fichiers présents dans le stockage PRIVÉ, et ABSENTS de public/
     const cvAbs = path.join(STORAGE_DIR, jean.cvPath);
     const idAbs = path.join(STORAGE_DIR, jean.idCardPath);
@@ -234,6 +242,8 @@ async function main() {
     ok(jeanAfter.status === 'accepted', 'Candidature passée en "accepted"');
     ok(jeanAfter.contract && jeanAfter.contract.type === 'freelance', 'Contrat créé (freelance)');
     ok(jeanAfter.contract.teachingAuthNumber === 'AE-2024-12345' && jeanAfter.contract.licenseNumber === '13AB45678' && jeanAfter.contract.birthPlace === 'Lyon (69)', 'Données d’identité (état civil, autorisation, permis) enregistrées sur le contrat');
+    trk = await req(pub, 'GET', `/suivi/${jean.trackingToken}`);
+    ok(/Acceptée/.test(trk.text), 'B : suivi reflète « Acceptée » après acceptation');
     const pdfAbs = path.join(STORAGE_DIR, jeanAfter.contract.pdfPath);
     ok(fs.existsSync(pdfAbs) && fs.readFileSync(pdfAbs).slice(0, 4).toString() === '%PDF', 'PDF de contrat généré (en-tête %PDF)');
 
@@ -242,6 +252,8 @@ async function main() {
     ok(r.status === 302, 'Refus de la candidature Marie');
     const marieAfter = await prisma.application.findUnique({ where: { id: marie.id } });
     ok(marieAfter.status === 'rejected', 'Candidature Marie en "rejected"');
+    trk = await req(pub, 'GET', `/suivi/${marie.trackingToken}`);
+    ok(/Refusée/.test(trk.text), 'B : suivi reflète « Refusée » après refus');
 
     // 9) Téléchargement + envoi du contrat
     r = await req(jarA, 'GET', `${apBase}/contrat/telecharger`);

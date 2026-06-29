@@ -7,6 +7,7 @@ const listingRoutes = require('./listingRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const manageRoutes = require('./manageRoutes');
 const accountRoutes = require('./accountRoutes');
+const trackingRoutes = require('./trackingRoutes');
 const requireAuth = require('../middlewares/requireAuth');
 const loadSchool = require('../middlewares/loadSchool');
 
@@ -18,6 +19,7 @@ router.get('/', pageController.home);
 // Public : auth (inscription/connexion/...) et annonces.
 router.use(authRoutes);
 router.use('/annonces', listingRoutes);
+router.use('/suivi', trackingRoutes);
 
 // Espace auto-école : session obligatoire + école courante chargée. Montés sous des
 // préfixes distincts pour que les gardes ne s'appliquent QU'à ces routes.
