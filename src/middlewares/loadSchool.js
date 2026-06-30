@@ -8,6 +8,12 @@ module.exports = async function loadSchool(req, res, next) {
     if (!school) {
       return req.session.destroy(() => res.redirect('/connexion'));
     }
+    if (school.suspended) {
+      return req.session.destroy(() => {
+        // Pas de flash ici (session détruite) : la page de connexion suffit.
+        res.redirect('/connexion');
+      });
+    }
     req.school = school;
     res.locals.currentSchool = school;
     next();
