@@ -139,6 +139,14 @@ async function login(req, res, next) {
       });
     }
 
+    if (school.suspended) {
+      return res.status(403).render('auth/login', {
+        title: 'Connexion',
+        errors: { global: 'Votre compte a été suspendu. Contactez l’administrateur.' },
+        values,
+      });
+    }
+
     // Régénération de session à la connexion (anti fixation de session).
     req.session.regenerate((err) => {
       if (err) return next(err);

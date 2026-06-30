@@ -25,7 +25,7 @@ function withLower(data) {
 // Recherche insensible à la casse via les colonnes normalisées `*Lower`, identique
 // sous SQLite (dev) et PostgreSQL (prod).
 async function findPublic({ department, q, page = 1 } = {}) {
-  const where = { status: 'open' };
+  const where = { status: 'open', school: { suspended: false } };
   if (department) where.department = department;
   if (q) {
     const term = q.toLowerCase();
@@ -49,7 +49,7 @@ async function findPublic({ department, q, page = 1 } = {}) {
 
 function findPublicById(id) {
   return prisma.listing.findFirst({
-    where: { id, status: 'open' },
+    where: { id, status: 'open', school: { suspended: false } },
     include: { school: true },
   });
 }

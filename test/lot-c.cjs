@@ -140,6 +140,38 @@ async function main() {
     rc = await req(adminJar, 'GET', '/admin');
     ok(/Auto-écoles/.test(rc.text) && /stat-value/.test(rc.text), 'C : dashboard affiche des compteurs');
 
+    // C (Task 5) : effets de la suspension
+    const pubKeyword = `SuspKw${STAMP}`;
+    const suspListing = await prisma.listing.create({
+      data: { title: `${pubKeyword} annonce`, description: 'visible', city: 'Nice', department: '06', schoolId: sRow.id, titleLower: `${pubKeyword} annonce`.toLowerCase(), descriptionLower: 'visible', cityLower: 'nice' },
+    });
+    const anon = makeJar();
+    let rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
+    ok(rs.text.includes(pubKeyword), 'C : annonce visible avant suspension');
+
+    rs = await req(adminJar, 'POST', `/admin/ecoles/${sRow.id}/suspendre`, form({ _csrf: await adminCsrf(adminJar) }));
+    ok(rs.status === 302, 'C : suspension -> redirection');
+    rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
+    ok(!rs.text.includes(pubKeyword), 'C : annonce masquée du public après suspension');
+    rs = await req(anon, 'GET', `/annonces/${suspListing.id}`);
+    ok(rs.status === 404, 'C : détail d’annonce d’école suspendue -> 404');
+
+    // connexion bloquée (école déjà emailVerified en Task 3)
+    const blocked = makeJar();
+    rs = await req(blocked, 'GET', '/connexion');
+    let csrfB = csrfFrom(rs.text);
+    rs = await req(blocked, 'POST', '/connexion', form({ _csrf: csrfB, email: sEmail, password: 'motdepasse123' }));
+    ok(rs.status === 403 && /suspendu/i.test(rs.text), 'C : connexion d’une école suspendue refusée (403)');
+
+    // réactivation
+    rs = await req(adminJar, 'POST', `/admin/ecoles/${sRow.id}/reactiver`, form({ _csrf: await adminCsrf(adminJar) }));
+    rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
+    ok(rs.text.includes(pubKeyword), 'C : annonce de nouveau visible après réactivation');
+    rs = await req(blocked, 'GET', '/connexion');
+    csrfB = csrfFrom(rs.text);
+    rs = await req(blocked, 'POST', '/connexion', form({ _csrf: csrfB, email: sEmail, password: 'motdepasse123' }));
+    ok(rs.status === 302 && rs.location === '/tableau-de-bord', 'C : connexion de nouveau possible après réactivation');
+
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {
     // Nettoyage : fichiers des candidatures + écoles + admins de test.
