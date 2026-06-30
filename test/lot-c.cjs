@@ -147,12 +147,12 @@ async function main() {
     });
     const anon = makeJar();
     let rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
-    ok(rs.text.includes(pubKeyword), 'C : annonce visible avant suspension');
+    ok(rs.text.includes(`/annonces/${suspListing.id}"`), 'C : annonce visible avant suspension');
 
     rs = await req(adminJar, 'POST', `/admin/ecoles/${sRow.id}/suspendre`, form({ _csrf: await adminCsrf(adminJar) }));
     ok(rs.status === 302, 'C : suspension -> redirection');
     rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
-    ok(!rs.text.includes(pubKeyword), 'C : annonce masquée du public après suspension');
+    ok(!rs.text.includes(`/annonces/${suspListing.id}"`), 'C : annonce masquée du public après suspension');
     rs = await req(anon, 'GET', `/annonces/${suspListing.id}`);
     ok(rs.status === 404, 'C : détail d’annonce d’école suspendue -> 404');
 
@@ -166,7 +166,7 @@ async function main() {
     // réactivation
     rs = await req(adminJar, 'POST', `/admin/ecoles/${sRow.id}/reactiver`, form({ _csrf: await adminCsrf(adminJar) }));
     rs = await req(anon, 'GET', `/annonces?q=${pubKeyword}`);
-    ok(rs.text.includes(pubKeyword), 'C : annonce de nouveau visible après réactivation');
+    ok(rs.text.includes(`/annonces/${suspListing.id}"`), 'C : annonce de nouveau visible après réactivation');
     rs = await req(blocked, 'GET', '/connexion');
     csrfB = csrfFrom(rs.text);
     rs = await req(blocked, 'POST', '/connexion', form({ _csrf: csrfB, email: sEmail, password: 'motdepasse123' }));
