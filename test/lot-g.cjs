@@ -135,6 +135,34 @@ async function main() {
       fs.unlinkSync(absStored(rel));
     }
 
+    // --- 3. page « Signatures » du PDF ---
+    {
+      const { buildContractPdf } = require('../src/services/contractPdf');
+      const signatureImage = require('../src/services/signatureImage');
+      const relSig = await signatureImage.saveSignature(signatureImage.decodeSignature(SIGNATURE_PNG));
+
+      const fakeSchool = { businessName: 'PDF École', siret: '12345678901234', email: 'e@x.fr', phone: null };
+      const fakeApplicant = { applicantName: 'PDF Candidat', applicantEmail: 'c@x.fr', applicantPhone: null };
+      const fakeListing = { title: 'Annonce PDF', city: 'Pau', department: '64' };
+      const terms = { startDate: new Date('2026-08-01'), grossSalary: '2000€ brut/mois', workplace: 'Pau' };
+
+      const base = await buildContractPdf({ type: 'cdi', school: fakeSchool, applicant: fakeApplicant, listing: fakeListing, terms });
+      ok(base.subarray(0, 4).toString() === '%PDF', 'pdf : sans signatures, PDF valide (compat)');
+
+      const signed = await buildContractPdf({
+        type: 'cdi', school: fakeSchool, applicant: fakeApplicant, listing: fakeListing, terms,
+        signatures: {
+          school: { imagePath: absStored(relSig), signedAt: new Date(), name: 'PDF École' },
+          applicant: { imagePath: absStored(relSig), signedAt: new Date(), name: 'PDF Candidat' },
+          proposedHash: 'a'.repeat(64),
+        },
+      });
+      ok(signed.subarray(0, 4).toString() === '%PDF' && signed.length > base.length,
+        'pdf : avec signatures, page supplémentaire générée');
+
+      fs.unlinkSync(absStored(relSig));
+    }
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
