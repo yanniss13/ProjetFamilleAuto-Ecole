@@ -177,11 +177,14 @@ async function main() {
     rc = await req(schoolJar, 'POST', '/mes-annonces', form({
       _csrf: csrfFrom(rc.text), title: `Moniteur Moto ${STAMP}`, description: 'poste complet', city: 'Marseille', department: '13',
     }));
+    // La base peut contenir d'autres alertes legitimes sur le departement 13 (donnees
+    // de demo du Lot K, essais manuels) : on ne compte que NOS destinataires (STAMP).
+    const notres = () => alertMails.filter((m) => m.email.includes(String(STAMP)));
     ok(rc.status === 302 && rc.location === '/mes-annonces', 'publication : annonce creee');
-    ok(await eventually(() => alertMails.length >= 2), 'alerte : emails partis apres la publication');
+    ok(await eventually(() => notres().length >= 2), 'alerte : emails partis apres la publication');
     await new Promise((r2) => setTimeout(r2, 150)); // laisse retomber d'eventuels envois en trop
-    ok(alertMails.length === 2, 'alerte : exactement 2 destinataires');
-    const dests = alertMails.map((m) => m.email);
+    ok(notres().length === 2, 'alerte : exactement 2 destinataires (parmi les alertes du test)');
+    const dests = notres().map((m) => m.email);
     ok(dests.includes(aA.email) && dests.includes(aB.email), 'alerte : sans mot-cle + mot-cle « moto » notifies');
     ok(!dests.includes(aC.email) && !dests.includes(aD.email), 'alerte : non confirmee et autre departement exclues');
     ok(alertMails.every((m) => typeof m.unsubscribeToken === 'string' && m.unsubscribeToken.length >= 32),
@@ -192,7 +195,7 @@ async function main() {
     rc = await req(schoolJar, 'POST', '/mes-annonces', form({
       _csrf: csrfFrom(rc.text), title: `Moniteur voiture ${STAMP}`, description: 'poste', city: 'Marseille', department: '13',
     }));
-    ok(await eventually(() => alertMails.length === 1) && alertMails[0].email === aA.email,
+    ok(await eventually(() => notres().length === 1) && notres()[0].email === aA.email,
       'alerte : mot-cle non matche -> seule l alerte sans mot-cle est notifiee');
 
     mailer.sendListingAlert = async () => { throw new Error('panne smtp simulee'); };
