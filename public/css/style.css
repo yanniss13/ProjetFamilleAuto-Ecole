@@ -273,4 +273,11 @@ body {
   max-width: 100%;
   display: block;
 }
-.signature-actions { margin-top: 0.25rem; }
+.signature-actions {
+  margin-top: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.signature-import-input { display: none; }

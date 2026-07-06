@@ -146,9 +146,11 @@
         <canvas id="signature-canvas" data-signature-pad width="420" height="140" class="signature-pad"></canvas>
         <div class="signature-actions">
           <button type="button" class="btn btn-small" data-signature-clear>Effacer</button>
+          <button type="button" class="btn btn-small" data-signature-import-trigger>Importer une signature</button>
+          <input type="file" class="signature-import-input" data-signature-import accept="image/png,image/jpeg">
         </div>
         <input type="hidden" name="signatureData" id="signatureData">
-        <p class="field-error" data-signature-error hidden>Veuillez dessiner votre signature avant de valider.</p>
+        <p class="field-error" data-signature-error hidden>Veuillez dessiner ou importer votre signature avant de valider.</p>
         {% if errors.signatureData %}<p class="field-error">{{ errors.signatureData }}</p>{% endif %}
       </div>
 
