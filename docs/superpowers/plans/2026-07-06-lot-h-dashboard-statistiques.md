@@ -55,7 +55,7 @@
 **Interfaces :**
 - Produit : `listingService.incrementViews(id: number): Promise<void>` — n'échoue jamais (catch interne). `Listing.viewsCount: Int @default(0)`.
 
-- [ ] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
+- [x] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
 
 Créer `test/lot-h.cjs` avec exactement ce contenu :
 
@@ -172,12 +172,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Étape 2 : vérifier que le test échoue (RED)**
+- [x] **Étape 2 : vérifier que le test échoue (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ ECHEC : schema : viewsCount vaut 0 par defaut` (la colonne n'existe pas encore, `l1.viewsCount` vaut `undefined`).
 
-- [ ] **Étape 3 : ajouter la colonne au schéma**
+- [x] **Étape 3 : ajouter la colonne au schéma**
 
 Dans `prisma/schema.prisma`, modèle `Listing`, juste APRÈS la ligne `status       String  @default("open") // "open" | "closed"`, ajouter :
 
@@ -188,7 +188,7 @@ Dans `prisma/schema.prisma`, modèle `Listing`, juste APRÈS la ligne `status   
   viewsCount Int @default(0)
 ```
 
-- [ ] **Étape 4 : générer et appliquer la migration (recette diff + deploy — PAS `migrate dev`)**
+- [x] **Étape 4 : générer et appliquer la migration (recette diff + deploy — PAS `migrate dev`)**
 
 ```powershell
 npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script
@@ -212,7 +212,7 @@ npx prisma generate
 
 Attendu : migration appliquée, client régénéré, sans erreur.
 
-- [ ] **Étape 5 : implémenter `incrementViews` dans le service**
+- [x] **Étape 5 : implémenter `incrementViews` dans le service**
 
 Dans `src/services/listingService.js`, juste APRÈS la fonction `findPublicById`, ajouter :
 
@@ -226,7 +226,7 @@ function incrementViews(id) {
 
 Et ajouter `incrementViews` à l'objet `module.exports` (après `findPublicById`... l'ordre exact n'importe pas, mais il doit y figurer).
 
-- [ ] **Étape 6 : appeler l'incrément dans le contrôleur public**
+- [x] **Étape 6 : appeler l'incrément dans le contrôleur public**
 
 Dans `src/controllers/listingController.js`, fonction `show`, juste APRÈS la ligne `if (!listing) return notFound(res);`, ajouter :
 
@@ -236,12 +236,12 @@ Dans `src/controllers/listingController.js`, fonction `show`, juste APRÈS la li
 
 (PAS de `await` — c'est le point de la spec.)
 
-- [ ] **Étape 7 : vérifier que le test passe (GREEN)**
+- [x] **Étape 7 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 3 assertions.`
 
-- [ ] **Étape 8 : brancher le fichier dans `npm test`**
+- [x] **Étape 8 : brancher le fichier dans `npm test`**
 
 Dans `package.json`, remplacer la valeur du script `"test"` par :
 
