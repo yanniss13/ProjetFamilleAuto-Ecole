@@ -144,7 +144,7 @@ async function findFilePathsForListing(schoolId, id) {
   const paths = [];
   for (const a of apps) {
     paths.push(a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath);
-    if (a.contract) paths.push(a.contract.pdfPath);
+    if (a.contract) paths.push(a.contract.pdfPath, a.contract.schoolSignaturePath, a.contract.applicantSignaturePath, a.contract.signedPdfPath);
   }
   return paths.filter(Boolean);
 }
@@ -157,7 +157,7 @@ async function findAnyFilePathsForListing(id) {
   const paths = [];
   for (const a of apps) {
     paths.push(a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath);
-    if (a.contract) paths.push(a.contract.pdfPath);
+    if (a.contract) paths.push(a.contract.pdfPath, a.contract.schoolSignaturePath, a.contract.applicantSignaturePath, a.contract.signedPdfPath);
   }
   return paths.filter(Boolean);
 }

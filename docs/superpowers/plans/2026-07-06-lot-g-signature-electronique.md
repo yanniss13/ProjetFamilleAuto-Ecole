@@ -1334,7 +1334,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Modify: `package.json`, `AGENTS.md`
 - Modify: `test/lot-g.cjs`
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 7. nettoyage disque ---
@@ -1366,12 +1366,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     fs.unlinkSync(absStored(relSig2));
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `❌ ÉCHEC : nettoyage : refus -> tous les fichiers...` (les nouveaux chemins ne sont pas supprimés)
 
-- [ ] **Step 3 : refus** — dans `src/controllers/contractController.js`, fonction `reject`, remplacer :
+- [x] **Step 3 : refus** — dans `src/controllers/contractController.js`, fonction `reject`, remplacer :
 
 ```js
     if (application.contract) {
@@ -1398,7 +1398,7 @@ par :
     }
 ```
 
-- [ ] **Step 4 : collecteurs** — dans `src/services/listingService.js`, dans `findFilePathsForListing` ET `findAnyFilePathsForListing`, remplacer la ligne :
+- [x] **Step 4 : collecteurs** — dans `src/services/listingService.js`, dans `findFilePathsForListing` ET `findAnyFilePathsForListing`, remplacer la ligne :
 
 ```js
     if (a.contract) paths.push(a.contract.pdfPath);
@@ -1412,7 +1412,7 @@ par :
 
 (les deux occurrences — le `filter(Boolean)` existant élimine les null).
 
-- [ ] **Step 5 : intégration** :
+- [x] **Step 5 : intégration** :
 
 (a) dans `package.json`, ajouter ` && node test/lot-g.cjs` à la fin du script `"test"`.
 
@@ -1434,14 +1434,14 @@ et dans « Pièges connus », ajouter :
   `applicantSignaturePath` ET `signedPdfPath`.
 ```
 
-- [ ] **Step 6 : vérifier le succès**
+- [x] **Step 6 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 46 ✓, `✅ Lot G tests réussis — 46 assertions.`
 Run : `npm test`
 Attendu : les 8 fichiers verts (65 + 9 + 25 + 15 + 21 + 33 + 21 + 46).
 
-- [ ] **Step 7 : commit**
+- [x] **Step 7 : commit**
 
 ```bash
 git add src/controllers/contractController.js src/services/listingService.js package.json AGENTS.md test/lot-g.cjs
