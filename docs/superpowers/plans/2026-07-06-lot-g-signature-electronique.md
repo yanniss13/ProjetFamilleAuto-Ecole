@@ -822,7 +822,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `mailer.sendSignatureInvitation(applicantEmail, applicantName, listingTitle, token)` ; `mailer.sendSignedContract(to, name, listingTitle, pdfPath)` ; `mailer.sendContractToApplicant` SUPPRIMÉ. Vue candidatures : bouton « Envoyer pour signature », mention « en attente de signature », branche « contrat signé » (lien `contrat/telecharger-signe`, route en Task 6).
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 5. invitation à signer ---
@@ -839,12 +839,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
       'invitation : états visibles côté école');
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `❌ ÉCHEC : invitation : email au candidat...` (l'espion `sendSignatureInvitation` n'est jamais appelé)
 
-- [ ] **Step 3 : mailer** — dans `src/services/mailer.js` :
+- [x] **Step 3 : mailer** — dans `src/services/mailer.js` :
 
 (a) remplacer intégralement la fonction `sendContractToApplicant` par :
 
@@ -883,7 +883,7 @@ function sendSignedContract(to, name, listingTitle, pdfPath) {
   sendSignedContract,
 ```
 
-- [ ] **Step 4 : contrôleur** — dans `src/controllers/contractController.js`, remplacer intégralement la fonction `sendContract` par :
+- [x] **Step 4 : contrôleur** — dans `src/controllers/contractController.js`, remplacer intégralement la fonction `sendContract` par :
 
 ```js
 // POST .../:appId/contrat/envoyer  (invitation à signer en ligne — plus de PDF joint :
@@ -914,7 +914,7 @@ async function sendContract(req, res, next) {
 }
 ```
 
-- [ ] **Step 5 : vue candidatures** — dans `views/dashboard/applications.twig`, remplacer le bloc `{% if a.status == 'accepted' and a.contract %} ... {% endif %}` (celui qui contient « Télécharger le contrat ») par :
+- [x] **Step 5 : vue candidatures** — dans `views/dashboard/applications.twig`, remplacer le bloc `{% if a.status == 'accepted' and a.contract %} ... {% endif %}` (celui qui contient « Télécharger le contrat ») par :
 
 ```twig
           {% if a.status == 'accepted' and a.contract %}
@@ -937,12 +937,12 @@ async function sendContract(req, res, next) {
           {% endif %}
 ```
 
-- [ ] **Step 6 : vérifier le succès**
+- [x] **Step 6 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 26 ✓.
 
-- [ ] **Step 7 : commit**
+- [x] **Step 7 : commit**
 
 ```bash
 git add src/services/mailer.js src/controllers/contractController.js views/dashboard/applications.twig test/lot-g.cjs

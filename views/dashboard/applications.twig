@@ -52,14 +52,19 @@
 
           {% if a.status == 'accepted' and a.contract %}
             <div class="application-actions section">
-              <a href="{{ base }}/contrat/telecharger" class="btn btn-small btn-primary">Télécharger le contrat</a>
-              <a href="{{ base }}/accepter" class="btn btn-small">Modifier le contrat</a>
-              <form action="{{ base }}/contrat/envoyer" method="post" class="inline-form">
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                <button type="submit" class="btn btn-small">Envoyer au candidat</button>
-              </form>
-              {% if a.contract.sentToApplicantAt %}
-                <span class="muted">Envoyé le {{ a.contract.sentToApplicantAt|date('d/m/Y à H:i') }}</span>
+              {% if a.contract.applicantSignedAt %}
+                <span class="badge badge-available">✍️ Contrat signé le {{ a.contract.applicantSignedAt|date('d/m/Y à H:i') }}</span>
+                <a href="{{ base }}/contrat/telecharger-signe" class="btn btn-small btn-primary">Télécharger le contrat signé</a>
+              {% else %}
+                <a href="{{ base }}/contrat/telecharger" class="btn btn-small btn-primary">Télécharger le contrat</a>
+                <a href="{{ base }}/accepter" class="btn btn-small">Modifier le contrat</a>
+                <form action="{{ base }}/contrat/envoyer" method="post" class="inline-form">
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                  <button type="submit" class="btn btn-small">Envoyer pour signature</button>
+                </form>
+                {% if a.contract.sentToApplicantAt %}
+                  <span class="muted">Invitation envoyée le {{ a.contract.sentToApplicantAt|date('d/m/Y à H:i') }} — en attente de signature du candidat</span>
+                {% endif %}
               {% endif %}
             </div>
           {% endif %}
