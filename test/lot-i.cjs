@@ -83,6 +83,40 @@ async function main() {
     const s3 = await alertService.subscribe(`i.moniteur2.${STAMP}@example.test`, '75', '');
     ok(s3.alert.keyword === null && s3.alert.keywordLower === '', 'subscribe : sans mot-cle -> keyword null, keywordLower vide');
 
+    // --- 2. inscription publique (formulaire + email de confirmation) ---
+    const mailer = require('../src/services/mailer');
+    const confirmCalls = [];
+    mailer.sendAlertConfirmation = async (email, department, keyword, rawToken) => {
+      confirmCalls.push({ email, department, keyword, rawToken });
+      return true;
+    };
+
+    let r = await get('/alertes');
+    ok(r.status === 200 && r.text.includes('name="email"') && r.text.includes('name="department"') && r.text.includes('name="keyword"'),
+      'alertes : formulaire public avec les trois champs');
+    r = await get('/alertes?departement=13&q=moto');
+    ok(r.text.includes('value="13"') && r.text.includes('value="moto"'), 'alertes : formulaire pre-rempli depuis la query string');
+
+    const jarI = makeJar();
+    let rf = await req(jarI, 'GET', '/alertes');
+    rf = await req(jarI, 'POST', '/alertes', form({ _csrf: csrfFrom(rf.text), email: `i.form.${STAMP}@example.test`, department: '13', keyword: 'CDI' }));
+    ok(rf.status === 302 && rf.location === '/alertes', 'alertes : POST -> redirection (PRG)');
+    rf = await req(jarI, 'GET', '/alertes');
+    ok(rf.text.includes('Si votre adresse est valide'), 'alertes : message neutre affiche');
+    ok(confirmCalls.length === 1 && confirmCalls[0].email === `i.form.${STAMP}@example.test`
+      && typeof confirmCalls[0].rawToken === 'string',
+      'alertes : email de confirmation envoye avec le jeton');
+    const created = await prisma.alert.findFirst({ where: { email: `i.form.${STAMP}@example.test` } });
+    ok(created && created.confirmedAt === null && created.confirmTokenHash !== confirmCalls[0].rawToken,
+      'alertes : jeton stocke hache (jamais en clair)');
+
+    rf = await req(jarI, 'GET', '/alertes');
+    rf = await req(jarI, 'POST', '/alertes', form({ _csrf: csrfFrom(rf.text), email: 'pas-un-email', department: '13', keyword: '' }));
+    ok(rf.status === 400 && rf.text.includes('email n’est pas valide'), 'alertes : email invalide -> 400 + formulaire');
+    rf = await req(jarI, 'GET', '/alertes');
+    rf = await req(jarI, 'POST', '/alertes', form({ _csrf: csrfFrom(rf.text), email: `i.form.${STAMP}@example.test`, department: 'ZZ', keyword: '' }));
+    ok(rf.status === 400, 'alertes : departement invalide -> 400');
+
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

@@ -162,6 +162,22 @@ function sendApplicationRejected(applicantEmail, applicantName, listingTitle, to
   );
 }
 
+// Confirme l'abonnement à une alerte (double opt-in) : l'alerte n'est active
+// qu'après le clic. Le jeton part en clair dans le lien, seul son hash est en base.
+function sendAlertConfirmation(email, department, keyword, rawToken) {
+  const link = `${APP_URL}/alertes/confirmer/${rawToken}`;
+  return send(
+    email,
+    'Confirmez votre alerte MoniteurConnect',
+    `<p>Vous avez demandé une alerte email pour les annonces du département
+     <strong>${esc(department)}</strong>${keyword ? ` (mot-clé « ${esc(keyword)} »)` : ''}.</p>
+     <p>Confirmez pour l’activer :</p>
+     <p><a href="${link}">Activer mon alerte</a></p>
+     <p>Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet email.</p>`,
+    { link }
+  );
+}
+
 module.exports = {
   send,
   sendVerification,
@@ -172,6 +188,7 @@ module.exports = {
   sendApplicationConfirmation,
   sendApplicationAccepted,
   sendApplicationRejected,
+  sendAlertConfirmation,
   maskEmail,
   esc,
   APP_URL,

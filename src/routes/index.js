@@ -6,6 +6,7 @@ const pageController = require('../controllers/pageController');
 const siretController = require('../controllers/siretController');
 const authRoutes = require('./authRoutes');
 const listingRoutes = require('./listingRoutes');
+const alertRoutes = require('./alertRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const manageRoutes = require('./manageRoutes');
 const accountRoutes = require('./accountRoutes');
@@ -30,6 +31,7 @@ router.get('/api/siret/:siret', siretLimiter, siretController.check);
 // Public : auth (inscription/connexion/...) et annonces.
 router.use(authRoutes);
 router.use('/annonces', listingRoutes);
+router.use('/alertes', alertRoutes);
 router.use('/suivi', trackingRoutes);
 router.use('/admin', adminRoutes);
 

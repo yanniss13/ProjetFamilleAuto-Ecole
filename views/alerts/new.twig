@@ -1,0 +1,31 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Créer une alerte email</h1>
+    <p class="muted">Recevez un email dès qu’une nouvelle annonce correspond à vos critères.
+      Un lien de confirmation vous sera envoyé — l’alerte n’est active qu’après votre clic.</p>
+
+    <form action="/alertes" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" value="{{ values.email }}" required>
+        {% if errors.email %}<p class="field-error">{{ errors.email }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="department">Département</label>
+        <input id="department" name="department" type="text" value="{{ values.department }}" placeholder="ex. 13, 75, 2A" required>
+        {% if errors.department %}<p class="field-error">{{ errors.department }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="keyword">Mot-clé (optionnel)</label>
+        <input id="keyword" name="keyword" type="text" value="{{ values.keyword }}" placeholder="ex. CDI, moto…">
+        {% if errors.keyword %}<p class="field-error">{{ errors.keyword }}</p>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary">Créer l’alerte</button>
+    </form>
+
+    <p class="form-footer"><a href="/annonces">Retour aux annonces</a></p>
+  </section>
+{% endblock %}
