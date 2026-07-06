@@ -235,6 +235,11 @@ async function main() {
     ok(r6.text.includes('Contrats signés') && r6.text.includes('id="chart-schools-weekly"') && r6.text.includes('id="chart-applications-weekly"'),
       'admin : tuile contrats signes + conteneurs des deux graphiques');
 
+    // --- 7. script statique des graphiques ---
+    const r7 = await get('/js/dashboard-charts.js');
+    ok(r7.status === 200 && r7.text.includes('createElementNS'), 'charts : script servi, SVG construit en DOM');
+    ok(!r7.text.includes('innerHTML'), 'charts : aucune insertion HTML (CSP + anti-XSS)');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
