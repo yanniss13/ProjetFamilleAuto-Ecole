@@ -35,11 +35,6 @@ function updateStatus(applicationId, status) {
   return prisma.application.update({ where: { id: applicationId }, data: { status } });
 }
 
-// Total des candidatures reçues par une école (toutes annonces confondues).
-function countBySchool(schoolId) {
-  return prisma.application.count({ where: { listing: { schoolId } } });
-}
-
 // Candidature retrouvée par son jeton de suivi public (page /suivi). Inclut annonce + école
 // (pour l'affichage) et le contrat (pour savoir s'il a été envoyé).
 function findByTrackingToken(token) {
@@ -59,7 +54,6 @@ module.exports = {
   findForOwnedListing,
   findOwnedById,
   updateStatus,
-  countBySchool,
   findByTrackingToken,
   countAllGlobal,
 };

@@ -198,6 +198,26 @@ async function main() {
     ok(plat.schoolsWeekly.length === 12 && plat.applicationsWeekly.length === 12, 'forPlatform : deux series de 12 semaines');
     ok(plat.schoolsWeekly[11].count >= 3 && plat.applicationsWeekly[11].count >= 5, 'forPlatform : creations de la semaine comptees');
 
+    // --- 5. tableau de bord ecole ---
+    const jar = makeJar();
+    let r5 = await req(jar, 'GET', '/connexion');
+    r5 = await req(jar, 'POST', '/connexion', form({ _csrf: csrfFrom(r5.text), email: schoolA.email, password: 'motdepasse123' }));
+    r5 = await req(jar, 'GET', '/tableau-de-bord');
+    ok(r5.status === 200 && r5.text.includes('id="stats-data"'), 'ecole : bloc de donnees #stats-data present');
+    ok(r5.text.includes('/js/dashboard-charts.js'), 'ecole : script des graphiques reference');
+    const m5 = r5.text.match(/<script type="application\/json" id="stats-data">([\s\S]*?)<\/script>/);
+    const dash = JSON.parse(m5[1]);
+    ok(dash.tiles.applications === 4 && dash.tiles.totalViews === 14 && dash.tiles.acceptRate === 25,
+      'ecole : JSON - tuiles exactes');
+    ok(dash.funnel.length === 4 && dash.funnel[0].label === 'Vues', 'ecole : JSON - entonnoir de 4 etapes');
+    ok(!m5[1].includes('Lot H annonce vedette'), 'ecole : les titres d annonces ne transitent pas par le JSON');
+    ok(r5.text.includes('Top annonces') && r5.text.includes(`Lot H annonce vedette ${STAMP}`),
+      'ecole : tableau top annonces avec le titre (via Twig)');
+    ok(r5.text.includes('id="chart-weekly"') && r5.text.includes('id="chart-funnel"'),
+      'ecole : conteneurs des graphiques presents');
+    ok(r5.text.includes('Taux d’acceptation') && r5.text.includes('Contrats signés'),
+      'ecole : libelles des nouvelles tuiles');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

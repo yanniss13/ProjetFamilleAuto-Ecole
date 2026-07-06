@@ -7,18 +7,53 @@
   </section>
 
   <section class="stats-grid">
-    <div class="stat-card">
-      <span class="stat-value">{{ stats.listings }}</span>
-      <span class="stat-label">Annonces</span>
+    <div class="stat-card"><span class="stat-value">{{ stats.tiles.openListings }}</span><span class="stat-label">Annonces ouvertes</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.tiles.totalViews }}</span><span class="stat-label">Vues</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.tiles.applications }}</span><span class="stat-label">Candidatures</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.tiles.acceptRate }} %</span><span class="stat-label">Taux d’acceptation</span></div>
+    <div class="stat-card"><span class="stat-value">{{ stats.tiles.signedContracts }}</span><span class="stat-label">Contrats signés</span></div>
+  </section>
+
+  <section class="charts-grid">
+    <div class="chart-card">
+      <h2>Candidatures par semaine</h2>
+      <div id="chart-weekly" class="chart"></div>
     </div>
-    <div class="stat-card">
-      <span class="stat-value">{{ stats.applications }}</span>
-      <span class="stat-label">Candidatures reçues</span>
+    <div class="chart-card">
+      <h2>Entonnoir de recrutement</h2>
+      <div id="chart-funnel" class="chart"></div>
     </div>
   </section>
+
+  {% if stats.topListings|length > 0 %}
+    <section class="top-listings">
+      <h2>Top annonces</h2>
+      <table class="data-table">
+        <thead><tr><th>Annonce</th><th>Vues</th><th>Candidatures</th><th>Conversion</th></tr></thead>
+        <tbody>
+          {% for l in stats.topListings %}
+            <tr>
+              <td><a href="/annonces/{{ l.id }}">{{ l.title }}</a></td>
+              <td>{{ l.views }}</td>
+              <td>{{ l.applications }}</td>
+              <td>{{ l.conversionRate }} %</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
 
   <div class="dashboard-actions">
     <a href="/mes-annonces" class="btn btn-primary">Gérer mes annonces</a>
     <a href="/mes-annonces/nouvelle" class="btn">Publier une annonce</a>
   </div>
+
+  {# Bloc de DONNÉES (non exécutable, hors CSP script-src). JSON échappé côté
+     serveur (« < » -> séquence unicode) : usage documenté de |raw, cf. app.js. #}
+  <script type="application/json" id="stats-data">{{ statsJson|raw }}</script>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/dashboard-charts.js" defer></script>
 {% endblock %}
