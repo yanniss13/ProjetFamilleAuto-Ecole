@@ -48,7 +48,7 @@
 **Interfaces :**
 - Produit : `Application.rejectedAt: DateTime?` — posé par `updateStatus(id, 'rejected')`, remis à null par tout autre statut. `PurgeRun { id, ranAt, unconfirmedAlerts, rejectedApplications, expiredTokens }`.
 
-- [ ] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
+- [x] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
 
 Créer `test/lot-j.cjs` avec exactement ce contenu :
 
@@ -164,12 +164,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `❌ ECHEC : updateStatus : refus -> rejectedAt pose` (la colonne n'existe pas encore, `row.rejectedAt` vaut `undefined`).
 
-- [ ] **Étape 3 : modifier le schéma**
+- [x] **Étape 3 : modifier le schéma**
 
 Dans `prisma/schema.prisma` :
 
@@ -197,7 +197,7 @@ model PurgeRun {
 }
 ```
 
-- [ ] **Étape 4 : générer et appliquer la migration (recette diff + deploy)**
+- [x] **Étape 4 : générer et appliquer la migration (recette diff + deploy)**
 
 ```powershell
 npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script
@@ -212,7 +212,7 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-- [ ] **Étape 5 : `updateStatus` pose/efface `rejectedAt`**
+- [x] **Étape 5 : `updateStatus` pose/efface `rejectedAt`**
 
 Dans `src/services/applicationService.js`, remplacer la fonction `updateStatus` par :
 
@@ -228,12 +228,12 @@ function updateStatus(applicationId, status) {
 }
 ```
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `✅ Lot J tests reussis - 3 assertions.`
 
-- [ ] **Étape 7 : brancher dans `npm test`**
+- [x] **Étape 7 : brancher dans `npm test`**
 
 Dans `package.json`, remplacer la valeur du script `"test"` par :
 
@@ -241,7 +241,7 @@ Dans `package.json`, remplacer la valeur du script `"test"` par :
 "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs"
 ```
 
-- [ ] **Étape 8 : suite complète puis commit**
+- [x] **Étape 8 : suite complète puis commit**
 
 Lancer : `npm test` — tout doit être vert.
 

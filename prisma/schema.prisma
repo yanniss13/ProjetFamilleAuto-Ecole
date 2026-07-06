@@ -99,6 +99,10 @@ model Application {
   teachingCardPath String? // chemin relatif de la carte/autorisation d'enseigner sous storage/
   status           String  @default("pending") // "pending" | "accepted" | "rejected"
 
+  // Date du refus (Lot J) : point de départ du délai de purge RGPD des candidatures
+  // refusées. Null pour les lignes refusées avant ce lot (repli sur createdAt).
+  rejectedAt DateTime?
+
   // Jeton opaque (256 bits, en clair) servant de clé à la page de suivi publique du
   // candidat. Voir docs/superpowers/specs/2026-06-29-lot-b-notifications-suivi-design.md.
   trackingToken String? @unique
@@ -200,4 +204,14 @@ model Alert {
 
   @@unique([email, department, keywordLower])
   @@index([department])
+}
+
+// Journal des purges RGPD (Lot J) : une ligne par exécution, avec les compteurs
+// par catégorie — trace de conformité affichée sur le dashboard admin.
+model PurgeRun {
+  id                   Int      @id @default(autoincrement())
+  ranAt                DateTime @default(now())
+  unconfirmedAlerts    Int
+  rejectedApplications Int
+  expiredTokens        Int
 }
