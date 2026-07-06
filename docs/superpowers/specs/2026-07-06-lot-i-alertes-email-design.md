@@ -75,7 +75,8 @@ Dans le périmètre :
     confirmation ; existante non confirmée → régénère le jeton (renvoi de l'email) ;
     existante confirmée → ne fait rien (le message public reste le même). Renvoie
     `{ alert, rawConfirmToken | null }` ;
-  - `confirmByTokenHash(hash)` — pose `confirmedAt` si null, renvoie l'alerte ;
+  - `confirmByToken(rawToken)` — hashe le jeton, pose `confirmedAt` si null,
+    renvoie l'alerte (`null` si jeton inconnu) ;
   - `findByUnsubscribeToken(token)` / `deleteByUnsubscribeToken(token)` ;
   - `notifyNewListing(listing)` — **ne lève jamais** (catch interne, fire-and-forget
     côté appelant) : sélectionne les alertes `confirmedAt != null` du département de
