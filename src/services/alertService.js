@@ -48,4 +48,14 @@ async function confirmByToken(rawToken) {
   return prisma.alert.update({ where: { id: alert.id }, data: { confirmedAt: new Date() } });
 }
 
-module.exports = { subscribe, confirmByToken };
+function findByUnsubscribeToken(token) {
+  return prisma.alert.findUnique({ where: { unsubscribeToken: token } });
+}
+
+// Suppression réelle de la ligne (RGPD) — pas de corbeille, pas de soft delete.
+async function deleteByUnsubscribeToken(token) {
+  const { count } = await prisma.alert.deleteMany({ where: { unsubscribeToken: token } });
+  return count > 0;
+}
+
+module.exports = { subscribe, confirmByToken, findByUnsubscribeToken, deleteByUnsubscribeToken };

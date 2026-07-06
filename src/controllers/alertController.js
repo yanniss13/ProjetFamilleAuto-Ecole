@@ -49,4 +49,27 @@ async function confirm(req, res, next) {
   }
 }
 
-module.exports = { newForm, create, confirm };
+// GET /alertes/desabonner/:token — page avec bouton : les webmails/antivirus
+// préchargent les liens, on ne supprime JAMAIS au simple GET.
+async function unsubscribeForm(req, res, next) {
+  try {
+    const alert = await alertService.findByUnsubscribeToken(req.params.token);
+    if (!alert) return notFound(res);
+    res.render('alerts/unsubscribe', { title: 'Se désabonner', alert, token: req.params.token });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// POST /alertes/desabonner/:token — suppression réelle (RGPD).
+async function unsubscribe(req, res, next) {
+  try {
+    const deleted = await alertService.deleteByUnsubscribeToken(req.params.token);
+    if (!deleted) return notFound(res);
+    res.render('alerts/unsubscribed', { title: 'Alerte supprimée' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { newForm, create, confirm, unsubscribeForm, unsubscribe };
