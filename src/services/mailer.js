@@ -95,16 +95,29 @@ function sendApplicationNotification(schoolEmail, listingTitle, applicantName) {
   );
 }
 
-// Envoie le contrat (PDF) au candidat en pièce jointe (déclenché manuellement par l'école).
-function sendContractToApplicant(applicantEmail, applicantName, listingTitle, pdfPath) {
+// Invite le candidat à lire et signer son contrat en ligne (page de suivi).
+function sendSignatureInvitation(applicantEmail, applicantName, listingTitle, token) {
+  const link = `${APP_URL}/suivi/${token}`;
   return send(
     applicantEmail,
-    `Votre contrat — ${listingTitle}`,
+    `Votre contrat est prêt à signer — ${listingTitle}`,
     `<p>Bonjour ${esc(applicantName)},</p>
-     <p>Votre candidature à l'annonce « ${esc(listingTitle)} » a été acceptée. Vous trouverez votre
-     contrat en pièce jointe.</p>
-     <p>Merci de le relire ; en cas de question, répondez directement à l'auto-école.</p>`,
-    { attachments: [{ filename: 'contrat.pdf', path: pdfPath, contentType: 'application/pdf' }] }
+     <p>L'auto-école a établi et signé votre contrat pour « ${esc(listingTitle)} ».
+     Lisez-le puis signez-le en ligne depuis votre page de suivi :</p>
+     <p><a href="${link}">Lire et signer mon contrat</a></p>`,
+    { link }
+  );
+}
+
+// Envoie le contrat signé par les deux parties (PDF final) à un destinataire.
+function sendSignedContract(to, name, listingTitle, pdfPath) {
+  return send(
+    to,
+    `Contrat signé — ${listingTitle}`,
+    `<p>Bonjour ${esc(name)},</p>
+     <p>Le contrat lié à « ${esc(listingTitle)} » a été signé par les deux parties.
+     Vous trouverez le document final en pièce jointe — conservez-le précieusement.</p>`,
+    { attachments: [{ filename: 'contrat-signe.pdf', path: pdfPath, contentType: 'application/pdf' }] }
   );
 }
 
@@ -154,7 +167,8 @@ module.exports = {
   sendVerification,
   sendReset,
   sendApplicationNotification,
-  sendContractToApplicant,
+  sendSignatureInvitation,
+  sendSignedContract,
   sendApplicationConfirmation,
   sendApplicationAccepted,
   sendApplicationRejected,

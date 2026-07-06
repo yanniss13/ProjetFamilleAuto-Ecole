@@ -214,6 +214,19 @@ async function main() {
     ok(!fs.existsSync(absStored(fakeApplicantSig)) && !fs.existsSync(absStored(fakeSignedPdf)),
       'école : ré-édition -> anciens fichiers supprimés du disque');
 
+    // --- 5. invitation à signer ---
+    r = await req(jarE, 'GET', `${apBase}/accepter`);
+    r = await req(jarE, 'POST', `${apBase}/contrat/envoyer`, form({ _csrf: csrfFrom(r.text) }));
+    ok(r.status === 302, 'invitation : envoi -> redirection');
+    const invit = mailCalls.find((c) => c[0] === 'invitation');
+    ok(invit && invit[1] === application.applicantEmail && invit[4] === application.trackingToken,
+      'invitation : email au candidat avec le jeton de suivi');
+    contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
+    ok(contract.sentToApplicantAt instanceof Date, 'invitation : date d’envoi enregistrée');
+    r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    ok(r.text.includes('Envoyer pour signature') && /en attente de signature/i.test(r.text),
+      'invitation : états visibles côté école');
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

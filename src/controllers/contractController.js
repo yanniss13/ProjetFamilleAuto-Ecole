@@ -216,27 +216,26 @@ async function downloadContract(req, res, next) {
   }
 }
 
-// POST .../:appId/contrat/envoyer  (email du PDF au candidat)
+// POST .../:appId/contrat/envoyer  (invitation à signer en ligne — plus de PDF joint :
+// le candidat lit et signe depuis sa page de suivi, le PDF final signé partira ensuite)
 async function sendContract(req, res, next) {
   try {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
     if (!application.contract) return notFound(res);
-    const abs = resolveStored(application.contract.pdfPath);
-    if (!abs || !fs.existsSync(abs)) return notFound(res);
 
-    const ok = await mailer.sendContractToApplicant(
+    const ok = await mailer.sendSignatureInvitation(
       application.applicantEmail,
       application.applicantName,
       application.listing.title,
-      abs
+      application.trackingToken
     );
 
     if (ok) {
       await contractService.markSent(application.contract.id);
-      req.flash('success', 'Contrat envoyé au candidat.');
+      req.flash('success', 'Invitation à signer envoyée au candidat.');
     } else {
-      req.flash('error', "L'envoi du contrat au candidat a échoué. Réessayez plus tard.");
+      req.flash('error', "L'envoi de l'invitation a échoué. Réessayez plus tard.");
     }
     res.redirect(candidaturesUrl(application));
   } catch (err) {
