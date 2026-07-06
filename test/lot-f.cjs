@@ -121,6 +121,27 @@ async function main() {
       }
     }
 
+    // --- 3. endpoint interne /api/siret ---
+    let r = await get('/api/siret/abc');
+    ok(r.status === 400 && JSON.parse(r.text).status === 'invalid', 'api : format invalide -> 400 invalid');
+
+    r = await get('/api/siret/12345678901234'); // SIRET_LOOKUP_DISABLED=1 -> error
+    ok(r.status === 200 && JSON.parse(r.text).status === 'error', 'api : service court-circuite -> error (jamais 500)');
+
+    {
+      const siretService = require('../src/services/siret');
+      const orig = siretService.lookupSiret;
+      try {
+        siretService.lookupSiret = async () => ({ status: 'verified', name: 'AUTO-ECOLE DEMO', address: '2 RUE Y 13002 MARSEILLE' });
+        r = await get('/api/siret/12345678901234');
+        const body = JSON.parse(r.text);
+        ok(body.status === 'verified' && body.name === 'AUTO-ECOLE DEMO' && body.address === '2 RUE Y 13002 MARSEILLE',
+          'api : relaie status/nom/adresse du service, rien d autre');
+      } finally {
+        siretService.lookupSiret = orig;
+      }
+    }
+
     console.log(`\n✅ Lot F tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

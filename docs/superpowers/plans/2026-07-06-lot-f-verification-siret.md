@@ -347,7 +347,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `siretService.lookupSiret` (Task 2), `normalizeSiret` (`src/validators/schoolValidator.js`, existant).
 - Produces: `GET /api/siret/:siret` → JSON `{ status, name, address }` (`400 { status: 'invalid' }` si ≠ 14 chiffres ; `429 { status: 'rate_limited' }` au-delà de 30 req/15 min/IP). Consommé par `public/js/siret-check.js` (Task 4).
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 3. endpoint interne /api/siret ---
@@ -372,12 +372,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-f.cjs`
 Attendu : `❌ ÉCHEC : api : format invalide -> 400 invalid` (la route n'existe pas → 404 HTML)
 
-- [ ] **Step 3 : contrôleur** — créer `src/controllers/siretController.js` :
+- [x] **Step 3 : contrôleur** — créer `src/controllers/siretController.js` :
 
 ```js
 // Relais interne de la vérification SIRET : la CSP (connect-src 'self') interdit au
@@ -403,7 +403,7 @@ async function check(req, res, next) {
 module.exports = { check };
 ```
 
-- [ ] **Step 4 : route** — dans `src/routes/index.js` :
+- [x] **Step 4 : route** — dans `src/routes/index.js` :
 
 (a) compléter les requires :
 
@@ -424,12 +424,12 @@ const siretLimiter = rateLimit({
 router.get('/api/siret/:siret', siretLimiter, siretController.check);
 ```
 
-- [ ] **Step 5 : vérifier le succès**
+- [x] **Step 5 : vérifier le succès**
 
 Run : `node test/lot-f.cjs`
 Attendu : 14 ✓.
 
-- [ ] **Step 6 : commit**
+- [x] **Step 6 : commit**
 
 ```bash
 git add src/controllers/siretController.js src/routes/index.js test/lot-f.cjs
