@@ -453,7 +453,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `siretService.lookupSiret` (Task 2), colonnes Sirene (Task 1), endpoint (Task 3).
 - Produces: `School.siretStatus/siretVerifiedName/siretCheckedAt` renseignés à l'inscription (`error` → `unverified`) ; classes CSS `.field-hint`, `.field-hint-ok`, `.field-hint-warn`.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 4. inscription : statut Sirene stocké + page équipée ---
@@ -497,12 +497,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-f.cjs`
 Attendu : `❌ ÉCHEC : inscription : statut verified...` (colonnes non renseignées)
 
-- [ ] **Step 3 : contrôleur** — dans `src/controllers/authController.js` :
+- [x] **Step 3 : contrôleur** — dans `src/controllers/authController.js` :
 
 (a) compléter les requires (sous `const geocoder = ...`) :
 
@@ -526,7 +526,7 @@ const siretService = require('../services/siret');
         siretCheckedAt: new Date(),
 ```
 
-- [ ] **Step 4 : vue** — dans `views/auth/register.twig` :
+- [x] **Step 4 : vue** — dans `views/auth/register.twig` :
 
 (a) remplacer le groupe SIRET par :
 
@@ -550,7 +550,7 @@ const siretService = require('../services/siret');
 {% endblock %}
 ```
 
-- [ ] **Step 5 : JS** — créer `public/js/siret-check.js` :
+- [x] **Step 5 : JS** — créer `public/js/siret-check.js` :
 
 ```js
 // Vérification SIRET en direct sur le formulaire d'inscription : à 14 chiffres saisis
@@ -602,7 +602,7 @@ const siretService = require('../services/siret');
 })();
 ```
 
-- [ ] **Step 6 : styles** — ajouter en fin de `public/css/style.css` :
+- [x] **Step 6 : styles** — ajouter en fin de `public/css/style.css` :
 
 ```css
 /* ---------- Lot F : vérification SIRET ---------- */
@@ -611,7 +611,7 @@ const siretService = require('../services/siret');
 .field-hint-warn { color: #b45309; }
 ```
 
-- [ ] **Step 7 : couper le réseau Sirene dans les AUTRES fichiers de test** — les
+- [x] **Step 7 : couper le réseau Sirene dans les AUTRES fichiers de test** — les
 inscriptions de `test/smoke.cjs`, `test/lot-c.cjs`, `test/correctifs.cjs` et
 `test/ameliorations.cjs` passeraient désormais par `lookupSiret` (appel réseau réel,
 jusqu'à 4 s de timeout chacun). Dans CHACUN de ces 4 fichiers, ajouter à la suite des
@@ -621,14 +621,14 @@ autres `process.env.*` d'en-tête :
 process.env.SIRET_LOOKUP_DISABLED = '1';
 ```
 
-- [ ] **Step 8 : vérifier le succès**
+- [x] **Step 8 : vérifier le succès**
 
 Run : `node test/lot-f.cjs`
 Attendu : 17 ✓.
 Run : `npm test`
 Attendu : suite complète verte, sans ralentissement des inscriptions.
 
-- [ ] **Step 9 : commit**
+- [x] **Step 9 : commit**
 
 ```bash
 git add src/controllers/authController.js views/auth/register.twig public/js/siret-check.js public/css/style.css test/lot-f.cjs test/smoke.cjs test/lot-c.cjs test/correctifs.cjs test/ameliorations.cjs

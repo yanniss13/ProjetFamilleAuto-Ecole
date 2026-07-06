@@ -7,6 +7,7 @@ const schoolService = require('../services/schoolService');
 const tokens = require('../services/tokens');
 const mailer = require('../services/mailer');
 const geocoder = require('../services/geocoder');
+const siretService = require('../services/siret');
 
 // Durées de validité des jetons (cf. emails).
 const VERIFY_TTL_MS = 24 * 60 * 60 * 1000; // 24 h
@@ -52,6 +53,10 @@ async function register(req, res, next) {
     const passwordHash = await password.hash(value.password);
     const { raw, hash } = tokens.generateToken();
 
+    // Verification Sirene (jamais bloquante) : statut + nom officiel stockes avec le
+    // compte. Une panne ("error") est stockee comme "unverified".
+    const sirene = await siretService.lookupSiret(value.siret);
+
     let school;
     try {
       school = await schoolService.create({
@@ -60,6 +65,9 @@ async function register(req, res, next) {
         siret: value.siret,
         phone: value.phone,
         address: value.address,
+        siretStatus: sirene.status === 'error' ? 'unverified' : sirene.status,
+        siretVerifiedName: sirene.name,
+        siretCheckedAt: new Date(),
         passwordHash,
         verifyTokenHash: hash,
         verifyTokenExpiry: new Date(Date.now() + VERIFY_TTL_MS),

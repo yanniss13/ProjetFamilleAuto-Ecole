@@ -26,6 +26,8 @@
         <label for="siret">SIRET</label>
         <input id="siret" name="siret" type="text" inputmode="numeric"
                value="{{ values.siret|default('') }}" required>
+        {# État de la vérification Sirene en direct (rempli par siret-check.js). #}
+        <p id="siret-status" class="field-hint" aria-live="polite" hidden></p>
         {% if errors.siret %}<p class="field-error">{{ errors.siret }}</p>{% endif %}
       </div>
 
@@ -60,4 +62,8 @@
 
     <p class="form-footer">Déjà inscrit ? <a href="/connexion">Se connecter</a></p>
   </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/siret-check.js" defer></script>
 {% endblock %}

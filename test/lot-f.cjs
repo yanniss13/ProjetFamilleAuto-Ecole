@@ -142,6 +142,46 @@ async function main() {
       }
     }
 
+    // --- 4. inscription : statut Sirene stocke + page equipee ---
+    {
+      const siretService = require('../src/services/siret');
+      const origLookup = siretService.lookupSiret;
+      try {
+        siretService.lookupSiret = async () => ({ status: 'verified', name: 'AUTO-ECOLE OFFICIELLE', address: null });
+        const jar = makeJar();
+        let rr = await req(jar, 'GET', '/inscription');
+        const email1 = `f.ok.${STAMP}@example.test`;
+        await req(jar, 'POST', '/inscription', form({
+          _csrf: csrfFrom(rr.text), businessName: 'F Ok', email: email1,
+          siret: `1${String(STAMP).slice(-13).padStart(13, '0')}`,
+          password: 'motdepasse123', passwordConfirm: 'motdepasse123',
+        }));
+        const s1 = await prisma.school.findUnique({ where: { email: email1 } });
+        createdSchoolIds.push(s1.id);
+        ok(s1.siretStatus === 'verified' && s1.siretVerifiedName === 'AUTO-ECOLE OFFICIELLE' && s1.siretCheckedAt instanceof Date,
+          'inscription : statut verified + nom officiel + date stockes');
+
+        siretService.lookupSiret = async () => ({ status: 'error', name: null, address: null });
+        const jar2 = makeJar();
+        rr = await req(jar2, 'GET', '/inscription');
+        const email2 = `f.err.${STAMP}@example.test`;
+        await req(jar2, 'POST', '/inscription', form({
+          _csrf: csrfFrom(rr.text), businessName: 'F Err', email: email2,
+          siret: `2${String(STAMP).slice(-13).padStart(13, '0')}`,
+          password: 'motdepasse123', passwordConfirm: 'motdepasse123',
+        }));
+        const s2 = await prisma.school.findUnique({ where: { email: email2 } });
+        createdSchoolIds.push(s2.id);
+        ok(s2 && s2.siretStatus === 'unverified', 'inscription : API en panne -> compte cree, statut unverified');
+      } finally {
+        siretService.lookupSiret = origLookup;
+      }
+
+      r = await get('/inscription');
+      ok(r.text.includes('id="siret-status"') && r.text.includes('/js/siret-check.js'),
+        'inscription : zone d etat + script de verification presents');
+    }
+
     console.log(`\n✅ Lot F tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
