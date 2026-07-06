@@ -2,6 +2,7 @@
 // + articles) est choisi selon le type de contrat. Les modèles sont INDICATIFS et portent
 // un avertissement : ils doivent être validés juridiquement avant signature.
 const PDFDocument = require('pdfkit');
+const { formatHash } = require('../utils/hash');
 
 const TYPE_LABEL = {
   freelance: 'Contrat de prestation de services',
@@ -27,7 +28,7 @@ function fmtDate(d) {
 }
 
 // Construit le PDF et le résout en Buffer (réutilisable pour disque + pièce jointe email).
-function buildContractPdf({ type, school, applicant, listing, terms }) {
+function buildContractPdf({ type, school, applicant, listing, terms, signatures = null }) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: 'A4', margin: 56 });
     const chunks = [];
@@ -154,18 +155,55 @@ function buildContractPdf({ type, school, applicant, listing, terms }) {
       ).fillColor('#000');
     }
 
-    // Signatures
-    doc.moveDown(1.2);
-    doc.font('Helvetica').fontSize(10).text('Fait à ____________________, le ____________________, en deux exemplaires originaux.');
-    doc.moveDown(1.5);
-    const y = doc.y;
-    doc.fontSize(10).text(`${parties.a}`, 56, y);
-    doc.text(`${parties.b}`, 320, y);
-    doc.moveDown(0.3);
-    doc.fontSize(8).fillColor('#777')
-      .text('(signature précédée de « Lu et approuvé »)', 56, doc.y)
-      .text('(signature précédée de « Lu et approuvé »)', 320, doc.y)
-      .fillColor('#000');
+    // Signatures : manuscrites (PDF historique, sans param `signatures`) ou
+    // électroniques (page dédiée avec images, horodatages et empreinte).
+    if (!signatures) {
+      doc.moveDown(1.2);
+      doc.font('Helvetica').fontSize(10).text('Fait à ____________________, le ____________________, en deux exemplaires originaux.');
+      doc.moveDown(1.5);
+      const y = doc.y;
+      doc.fontSize(10).text(`${parties.a}`, 56, y);
+      doc.text(`${parties.b}`, 320, y);
+      doc.moveDown(0.3);
+      doc.fontSize(8).fillColor('#777')
+        .text('(signature précédée de « Lu et approuvé »)', 56, doc.y)
+        .text('(signature précédée de « Lu et approuvé »)', 320, doc.y)
+        .fillColor('#000');
+    } else {
+      doc.addPage();
+      doc.font('Helvetica-Bold').fontSize(14).text('Signatures électroniques', 56, 70, { width: 480, align: 'center' });
+
+      const drawBox = (x, title, sig) => {
+        doc.font('Helvetica-Bold').fontSize(10).fillColor('#000').text(title, x, 130, { width: 210 });
+        doc.rect(x, 160, 210, 110).strokeColor('#999').stroke();
+        if (sig) {
+          const signedAt = sig.signedAt instanceof Date ? sig.signedAt : new Date(sig.signedAt);
+          doc.image(sig.imagePath, x + 10, 170, { fit: [190, 70] });
+          doc.font('Helvetica').fontSize(9).fillColor('#333')
+            .text(sig.name, x, 278, { width: 210 })
+            .text(`Signé le ${signedAt.toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}`, x, 290, { width: 210 })
+            .fillColor('#000');
+        } else {
+          doc.font('Helvetica-Oblique').fontSize(9).fillColor('#999')
+            .text('En attente de signature', x + 10, 205, { width: 190, align: 'center' })
+            .fillColor('#000');
+        }
+      };
+      drawBox(56, `${parties.a} — ${school.businessName}`, signatures.school);
+      drawBox(326, `${parties.b} — ${applicant.applicantName}`, signatures.applicant);
+
+      if (signatures.proposedHash) {
+        doc.font('Helvetica').fontSize(8).fillColor('#777').text(
+          `Empreinte SHA-256 du contrat proposé (avant contreseing) : ${formatHash(signatures.proposedHash)}`,
+          56, 330, { width: 480 }
+        ).fillColor('#000');
+      }
+      doc.font('Helvetica-Oblique').fontSize(8).fillColor('#999').text(
+        'Signature électronique simple (art. 25 du règlement eIDAS) réalisée via MoniteurConnect : ' +
+        'images de signature, horodatages et empreintes du document sont conservés par la plateforme.',
+        56, 355, { width: 480, align: 'justify' }
+      ).fillColor('#000');
+    }
 
     // Avertissement
     doc.moveDown(2);

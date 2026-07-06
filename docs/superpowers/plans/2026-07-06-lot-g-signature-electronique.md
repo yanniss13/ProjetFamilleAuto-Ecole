@@ -382,7 +382,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   `{ school: { imagePath, signedAt, name } | null, applicant: { imagePath, signedAt, name } | null, proposedHash: string | null }`.
   Sans `signatures` : PDF actuel inchangé (bloc de signature manuscrite). Avec : page finale « Signatures électroniques » (cadres école/candidat, image + nom + horodatage, « En attente de signature » si absent, empreinte du PDF proposé si fournie).
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 3. page « Signatures » du PDF ---
@@ -414,12 +414,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `❌ ÉCHEC : pdf : avec signatures...` (paramètre ignoré → même taille) — ou passe si la taille varie ; dans ce cas vérifier visuellement que l'échec vient bien de l'absence de page (le step 3 reste requis).
 
-- [ ] **Step 3 : implémentation** — dans `src/services/contractPdf.js` :
+- [x] **Step 3 : implémentation** — dans `src/services/contractPdf.js` :
 
 (a) en tête, sous `const PDFDocument = require('pdfkit');` :
 
@@ -486,12 +486,12 @@ function buildContractPdf({ type, school, applicant, listing, terms, signatures 
     }
 ```
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 12 ✓.
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/services/contractPdf.js test/lot-g.cjs
