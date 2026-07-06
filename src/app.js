@@ -8,6 +8,8 @@ const helmet = require('helmet');
 const flash = require('./middlewares/flash');
 const csrf = require('./middlewares/csrf');
 const routes = require('./routes');
+const prisma = require('./config/prisma');
+const PrismaSessionStore = require('./config/sessionStore');
 
 const app = express();
 
@@ -43,8 +45,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Session (SESSION_SECRET garanti présent par le fail-fast de server.js).
+// Store persistant en base (table Session) : survit aux redémarrages et
+// fonctionne en multi-process, contrairement au MemoryStore par défaut.
 app.use(
   session({
+    store: new PrismaSessionStore(prisma),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,

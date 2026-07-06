@@ -80,8 +80,9 @@ const MINIMAL_PDF = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrail
 const TINY_PNG = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000002000154a24f8d0000000049454e44ae426082', 'hex');
 
 // Construit le multipart d'une candidature (CV PDF + 3 pièces image : CNI, permis, carte).
-function applicationForm(name, email) {
+function applicationForm(name, email, csrfToken) {
   const fd = new FormData();
+  fd.append('_csrf', csrfToken);
   fd.append('applicantName', name);
   fd.append('applicantEmail', email);
   fd.append('applicantPhone', '0611223344');
@@ -171,20 +172,21 @@ async function main() {
     const csrfPub = csrfFrom(r.text);
     {
       const fd = new FormData();
+      fd.append('_csrf', csrfPub);
       fd.append('applicantName', 'Sans CNI');
       fd.append('applicantEmail', 'sanscni@example.test');
       fd.append('message', 'Test sans pièce.');
       fd.append('cv', new Blob([MINIMAL_PDF], { type: 'application/pdf' }), 'cv.pdf');
-      r = await req(pub, 'POST', `/annonces/${listing.id}/postuler?_csrf=${encodeURIComponent(csrfPub)}`, { body: fd });
+      r = await req(pub, 'POST', `/annonces/${listing.id}/postuler`, { body: fd });
       ok(r.status === 400 && /pièce d'identité/i.test(r.text), 'Candidature sans pièce d’identité rejetée (400)');
     }
 
     // 5) Deux candidatures complètes (CV + CNI)
-    r = await req(pub, 'POST', `/annonces/${listing.id}/postuler?_csrf=${encodeURIComponent(csrfPub)}`, { body: applicationForm('Jean Moniteur', 'jean@example.test') });
+    r = await req(pub, 'POST', `/annonces/${listing.id}/postuler`, { body: applicationForm('Jean Moniteur', 'jean@example.test', csrfPub) });
     ok(r.status === 302, 'Candidature Jean (CV + CNI) déposée');
     const conf = mailCalls.find((c) => c[0] === 'confirmation' && c[1] === 'jean@example.test');
     ok(conf && typeof conf[4] === 'string' && conf[4].length === 64, 'B : email de confirmation au candidat avec lien de suivi');
-    r = await req(pub, 'POST', `/annonces/${listing.id}/postuler?_csrf=${encodeURIComponent(csrfPub)}`, { body: applicationForm('Marie Conduite', 'marie@example.test') });
+    r = await req(pub, 'POST', `/annonces/${listing.id}/postuler`, { body: applicationForm('Marie Conduite', 'marie@example.test', csrfPub) });
     ok(r.status === 302, 'Candidature Marie (CV + CNI) déposée');
 
     const apps = await prisma.application.findMany({ where: { listingId: listing.id }, orderBy: { id: 'asc' } });

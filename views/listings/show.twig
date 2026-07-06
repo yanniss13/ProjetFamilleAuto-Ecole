@@ -27,9 +27,10 @@
 
   <section class="form-card">
     <h2>Postuler à cette annonce</h2>
-    {# Multipart : le jeton CSRF passe en query (corps non parsé au middleware csrf). #}
-    <form action="/annonces/{{ listing.id }}/postuler?_csrf={{ csrfToken }}"
+    <form action="/annonces/{{ listing.id }}/postuler"
           method="post" enctype="multipart/form-data" novalidate>
+      {# Multipart : le jeton est un champ du formulaire, vérifié après multer. #}
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
       {% if errors.files %}<div class="flash flash-error" role="alert">{{ errors.files }}</div>{% endif %}
       <div class="form-group">
         <label for="applicantName">Nom</label>
