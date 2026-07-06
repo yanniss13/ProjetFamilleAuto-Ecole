@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const STORAGE_DIR = path.join(__dirname, '..', '..', 'storage');
-const SUBDIRS = { cv: 'cv', id: 'id', license: 'license', teaching: 'teaching', contracts: 'contracts' };
+const SUBDIRS = { cv: 'cv', id: 'id', license: 'license', teaching: 'teaching', contracts: 'contracts', signatures: 'signatures' };
 
 // Crée l'arborescence au démarrage (idempotent).
 for (const sub of Object.values(SUBDIRS)) {

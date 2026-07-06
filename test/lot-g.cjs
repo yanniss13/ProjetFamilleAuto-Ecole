@@ -1,0 +1,132 @@
+/**
+ * Tests du Lot G — signature électronique du contrat.
+ * Spec : docs/superpowers/specs/2026-07-06-lot-g-signature-electronique-design.md
+ */
+'use strict';
+process.env.NODE_ENV = process.env.NODE_ENV === 'production' ? 'development' : process.env.NODE_ENV || 'test';
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'lotg-test-secret-not-for-prod';
+process.env.SMTP_HOST = '';
+process.env.GEOCODING_DISABLED = '1';
+process.env.SIRET_LOOKUP_DISABLED = '1';
+
+const path = require('path');
+const fs = require('fs');
+const prisma = require('../src/config/prisma');
+const app = require('../src/app');
+const mailer = require('../src/services/mailer');
+const passwordUtil = require('../src/utils/password');
+const { STORAGE_DIR } = require('../src/config/storage');
+
+const PORT = 4063;
+const BASE = `http://127.0.0.1:${PORT}`;
+const STAMP = Date.now();
+
+// Fixture : vrai PNG 1×1 (~85 octets) au format data URL, comme un export de canvas.
+const PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+const SIGNATURE_PNG = `data:image/png;base64,${PNG_B64}`;
+
+let passed = 0;
+function ok(cond, label) {
+  if (!cond) throw new Error(`ÉCHEC : ${label}`);
+  passed += 1;
+  console.log(`  ✓ ${label}`);
+}
+function makeJar() { return { cookie: '' }; }
+function storeCookies(jar, res) {
+  const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
+  for (const c of sc) jar.cookie = c.split(';')[0];
+}
+async function req(jar, method, urlPath, { body, headers = {} } = {}) {
+  const res = await fetch(BASE + urlPath, {
+    method, redirect: 'manual',
+    headers: { ...(jar.cookie ? { cookie: jar.cookie } : {}), ...headers }, body,
+  });
+  storeCookies(jar, res);
+  const text = await res.text();
+  return { status: res.status, location: res.headers.get('location'), text };
+}
+function csrfFrom(html) {
+  const m = html.match(/name="csrf-token" content="([^"]+)"/);
+  if (!m) throw new Error('Jeton CSRF introuvable.');
+  return m[1];
+}
+function form(obj) {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(obj)) p.append(k, v);
+  return { body: p.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
+}
+function absStored(rel) { return path.join(STORAGE_DIR, rel); }
+
+const createdSchoolIds = [];
+
+async function main() {
+  let server;
+  try {
+    server = app.listen(PORT);
+    await new Promise((r) => server.once('listening', r));
+
+    // Interception du mailer (même objet exports que les contrôleurs).
+    const mailCalls = [];
+    mailer.sendApplicationAccepted = (...a) => { mailCalls.push(['accepted', ...a]); return true; };
+    mailer.sendApplicationRejected = (...a) => { mailCalls.push(['rejected', ...a]); return true; };
+    mailer.sendSignatureInvitation = (...a) => { mailCalls.push(['invitation', ...a]); return true; };
+    mailer.sendSignedContract = (...a) => { mailCalls.push(['signed', ...a]); return true; };
+
+    // Données de base : école connectée + annonce + candidature acceptable.
+    const school = await prisma.school.create({
+      data: {
+        email: `g.school.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: 'G École', siret: `7${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(school.id);
+    const listing = await prisma.listing.create({
+      data: {
+        title: `LotG annonce ${STAMP}`, description: 'd', city: 'Pau', department: '64',
+        schoolId: school.id, titleLower: `lotg annonce ${STAMP}`, descriptionLower: 'd', cityLower: 'pau',
+      },
+    });
+    const application = await prisma.application.create({
+      data: {
+        listingId: listing.id, applicantName: 'G Candidat', applicantEmail: `g.cand.${STAMP}@example.test`,
+        message: 'm', trackingToken: `g${STAMP}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`.slice(0, 64),
+      },
+    });
+
+    // --- 1. colonnes de signature (nulles par défaut) + sous-dossier storage ---
+    const c0 = await prisma.contract.create({
+      data: {
+        applicationId: application.id, type: 'cdi', startDate: new Date('2026-08-01'),
+        grossSalary: '2000€', workplace: 'Pau', pdfPath: 'contracts/lotg-placeholder.pdf',
+      },
+    });
+    ok(c0.schoolSignaturePath === null && c0.schoolSignedAt === null
+      && c0.applicantSignaturePath === null && c0.applicantSignedAt === null
+      && c0.proposedPdfHash === null && c0.signedPdfPath === null && c0.signedPdfHash === null,
+      'schema : 7 colonnes de signature nulles par défaut');
+    ok(fs.existsSync(path.join(STORAGE_DIR, 'signatures')), 'storage : sous-dossier signatures créé');
+    await prisma.contract.delete({ where: { id: c0.id } });
+
+    console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
+  } finally {
+    if (server) await new Promise((r) => server.close(r));
+    // Nettoyage : fichiers privés rattachés aux écoles de test, puis cascade en base.
+    if (createdSchoolIds.length) {
+      const apps = await prisma.application.findMany({
+        where: { listing: { schoolId: { in: createdSchoolIds } } }, include: { contract: true },
+      });
+      for (const a of apps) {
+        const rels = [a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath];
+        if (a.contract) rels.push(a.contract.pdfPath, a.contract.signedPdfPath, a.contract.schoolSignaturePath, a.contract.applicantSignaturePath);
+        for (const rel of rels) {
+          if (rel) { try { if (fs.existsSync(absStored(rel))) fs.unlinkSync(absStored(rel)); } catch {} }
+        }
+      }
+      await prisma.school.deleteMany({ where: { id: { in: createdSchoolIds } } });
+    }
+    await prisma.$disconnect();
+  }
+}
+
+main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });

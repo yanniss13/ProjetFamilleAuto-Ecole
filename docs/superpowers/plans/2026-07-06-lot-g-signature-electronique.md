@@ -54,7 +54,7 @@
 **Interfaces:**
 - Produces: colonnes `schoolSignaturePath`, `schoolSignedAt`, `applicantSignaturePath`, `applicantSignedAt`, `proposedPdfHash`, `signedPdfPath`, `signedPdfHash` (toutes nullables) ; `SUBDIRS.signatures === 'signatures'`.
 
-- [ ] **Step 1 : test qui échoue** — créer `test/lot-g.cjs` :
+- [x] **Step 1 : test qui échoue** — créer `test/lot-g.cjs` :
 
 ```js
 /**
@@ -191,12 +191,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : erreur Prisma « Unknown argument » ou `❌ ÉCHEC : schema : 7 colonnes...`
 
-- [ ] **Step 3 : schéma** — dans `prisma/schema.prisma`, modèle `Contract`, insérer après la ligne `sentToApplicantAt DateTime?` :
+- [x] **Step 3 : schéma** — dans `prisma/schema.prisma`, modèle `Contract`, insérer après la ligne `sentToApplicantAt DateTime?` :
 
 ```prisma
   // Signature électronique (Lot G) : images PNG des signatures sous storage/signatures/,
@@ -211,7 +211,7 @@ Attendu : erreur Prisma « Unknown argument » ou `❌ ÉCHEC : schema : 7 colon
   signedPdfHash          String? // SHA-256 hex du PDF final
 ```
 
-- [ ] **Step 4 : sous-dossier de stockage** — dans `src/config/storage.js`, remplacer :
+- [x] **Step 4 : sous-dossier de stockage** — dans `src/config/storage.js`, remplacer :
 
 ```js
 const SUBDIRS = { cv: 'cv', id: 'id', license: 'license', teaching: 'teaching', contracts: 'contracts' };
@@ -223,7 +223,7 @@ par :
 const SUBDIRS = { cv: 'cv', id: 'id', license: 'license', teaching: 'teaching', contracts: 'contracts', signatures: 'signatures' };
 ```
 
-- [ ] **Step 5 : migration (recette non-interactive)**
+- [x] **Step 5 : migration (recette non-interactive)**
 
 ```bash
 npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script
@@ -236,12 +236,12 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-- [ ] **Step 6 : vérifier le succès**
+- [x] **Step 6 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 2 ✓.
 
-- [ ] **Step 7 : commit**
+- [x] **Step 7 : commit**
 
 ```bash
 git add prisma/schema.prisma prisma/migrations src/config/storage.js test/lot-g.cjs

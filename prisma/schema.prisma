@@ -139,6 +139,17 @@ model Contract {
   pdfPath           String // chemin relatif du PDF sous storage/contracts/
   sentToApplicantAt DateTime?
 
+  // Signature électronique (Lot G) : images PNG des signatures sous storage/signatures/,
+  // horodatages, et empreintes SHA-256 (preuve d'intégrité entre la signature de l'école
+  // et le contreseing du candidat). État dérivé : signé <=> applicantSignedAt non nul.
+  schoolSignaturePath    String?
+  schoolSignedAt         DateTime?
+  applicantSignaturePath String?
+  applicantSignedAt      DateTime?
+  proposedPdfHash        String? // SHA-256 hex du PDF proposé (signé école seulement)
+  signedPdfPath          String? // PDF final contresigné, sous storage/contracts/
+  signedPdfHash          String? // SHA-256 hex du PDF final
+
   applicationId Int         @unique
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
