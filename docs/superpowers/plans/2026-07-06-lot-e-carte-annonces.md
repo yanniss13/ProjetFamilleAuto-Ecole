@@ -867,7 +867,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: `test/lot-e.cjs` complet (Tasks 1-4).
 
-- [ ] **Step 1 : brancher le test dans la suite** — dans `package.json`, remplacer :
+- [x] **Step 1 : brancher le test dans la suite** — dans `package.json`, remplacer :
 
 ```json
 "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs"
@@ -879,14 +879,16 @@ par :
 "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/lot-e.cjs"
 ```
 
-- [ ] **Step 2 : suite complète**
+- [x] **Step 2 : suite complète**
 
 Run : `npm test`
 Attendu : les 6 fichiers verts (65 + 9 + 25 + 15 + 21 + 33 assertions), aucun ÉCHEC.
 
-- [ ] **Step 3 : vérification visuelle (recommandée)** — `npm run dev`, ouvrir `http://localhost:3000/annonces?vue=carte` : carte France avec marqueurs, popup au clic, puis une recherche « Marseille / 50 km » (nécessite une école géocodée en base ; sinon vérifier l'état vide + cercle).
+- [x] **Step 3 : vérification visuelle (recommandée)** — `npm run dev`, ouvrir `http://localhost:3000/annonces?vue=carte` : carte France avec marqueurs, popup au clic, puis une recherche « Marseille / 50 km » (nécessite une école géocodée en base ; sinon vérifier l'état vide + cercle).
 
-- [ ] **Step 4 : commit**
+  Note d'exécution : navigateur intégré et Playwright local indisponibles dans cette session ; contrôle HTTP local effectué sur `/annonces?vue=carte` (200, `#listings-map`, `#map-data`, assets Leaflet/JS présents).
+
+- [x] **Step 4 : commit**
 
 ```bash
 git add package.json
