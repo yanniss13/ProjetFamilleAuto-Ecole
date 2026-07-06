@@ -117,6 +117,20 @@ async function main() {
     rf = await req(jarI, 'POST', '/alertes', form({ _csrf: csrfFrom(rf.text), email: `i.form.${STAMP}@example.test`, department: 'ZZ', keyword: '' }));
     ok(rf.status === 400, 'alertes : departement invalide -> 400');
 
+    // --- 3. confirmation (double opt-in, idempotente) ---
+    const rawToken = confirmCalls[0].rawToken;
+    r = await get(`/alertes/confirmer/${rawToken}`);
+    ok(r.status === 200 && r.text.includes('activée'), 'confirmation : alerte activee');
+    const confirmed = await prisma.alert.findFirst({ where: { email: `i.form.${STAMP}@example.test` } });
+    ok(confirmed.confirmedAt instanceof Date, 'confirmation : confirmedAt pose');
+    r = await get(`/alertes/confirmer/${rawToken}`);
+    ok(r.status === 200 && r.text.includes('activée'), 'confirmation : re-clic idempotent (toujours succes)');
+    r = await get(`/alertes/confirmer/jetoninconnu${STAMP}`);
+    ok(r.status === 404, 'confirmation : jeton inconnu -> 404');
+
+    const sDup = await alertService.subscribe(`i.form.${STAMP}@example.test`, '13', 'cdi');
+    ok(sDup.rawConfirmToken === null, 'subscribe : doublon deja confirme -> aucun nouveau jeton');
+
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
