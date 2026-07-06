@@ -173,8 +173,9 @@ async function main() {
 
     r = await req(jarE, 'GET', `${apBase}/accepter`);
     const csrfE = csrfFrom(r.text);
-    ok(r.text.includes('data-signature-pad') && r.text.includes('/js/signature-pad.js'),
-      'école : pad de signature présent sur le formulaire de contrat');
+    ok(r.text.includes('data-signature-pad') && r.text.includes('/js/signature-pad.js')
+      && r.text.includes('data-signature-import') && r.text.includes('Importer une signature'),
+      'école : pad de signature présent avec import d’image');
 
     const termsForm = {
       _csrf: csrfE, type: 'cdi', startDate: '2026-08-01', grossSalary: '2200€ brut/mois',
@@ -240,8 +241,9 @@ async function main() {
       'candidat : bloc « à signer » sur la page de suivi');
     r = await req(pub, 'GET', `${suivi}/signer`);
     const csrfP = csrfFrom(r.text);
-    ok(r.status === 200 && r.text.includes('data-signature-pad') && /J'ai lu et j'accepte/i.test(r.text),
-      'candidat : page de signature (pad + case d’acceptation)');
+    ok(r.status === 200 && r.text.includes('data-signature-pad') && r.text.includes('data-signature-import')
+      && r.text.includes('Importer une signature') && /J'ai lu et j'accepte/i.test(r.text),
+      'candidat : page de signature (pad + import + case d’acceptation)');
 
     r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, signatureData: SIGNATURE_PNG }));
     ok(r.status === 400, 'candidat : case « j’ai lu et j’accepte » obligatoire');

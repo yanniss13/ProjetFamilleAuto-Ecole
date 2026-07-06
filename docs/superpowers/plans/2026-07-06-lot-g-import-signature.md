@@ -32,7 +32,7 @@
 - Produces: attributs `data-signature-import-trigger` et `data-signature-import` consommés par `public/js/signature-pad.js`.
 - Preserves: champ caché `#signatureData`, canvas `data-signature-pad`, bouton `data-signature-clear`.
 
-- [ ] **Step 1 : test qui échoue**
+- [x] **Step 1 : test qui échoue**
 
 Dans `test/lot-g.cjs`, remplacer l'assertion école :
 
@@ -64,13 +64,13 @@ par :
       'candidat : page de signature (pad + import + case d’acceptation)');
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 
 Attendu : échec sur `école : pad de signature présent avec import d’image`.
 
-- [ ] **Step 3 : vues**
+- [x] **Step 3 : vues**
 
 Dans `views/dashboard/contract_form.twig`, remplacer le bloc :
 
@@ -96,7 +96,7 @@ par :
 
 Dans `views/tracking/sign.twig`, appliquer exactement le même remplacement au bloc `.signature-actions` et au message `[data-signature-error]`.
 
-- [ ] **Step 4 : styles**
+- [x] **Step 4 : styles**
 
 Dans `public/css/style.css`, remplacer :
 
@@ -117,13 +117,13 @@ par :
 .signature-import-input { display: none; }
 ```
 
-- [ ] **Step 5 : vérifier le succès**
+- [x] **Step 5 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 
 Attendu : `✅ Lot G tests réussis — 46 assertions.`
 
-- [ ] **Step 6 : commit**
+- [x] **Step 6 : commit**
 
 ```bash
 git add views/dashboard/contract_form.twig views/tracking/sign.twig public/css/style.css test/lot-g.cjs docs/superpowers/plans/2026-07-06-lot-g-import-signature.md
