@@ -304,6 +304,11 @@ async function main() {
       'nettoyage : chemins de signatures et PDF signé collectés pour la suppression');
     fs.unlinkSync(absStored(relSig2));
 
+    // --- G+. import image dans le pad ---
+    const padJs = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'signature-pad.js'), 'utf8');
+    ok(padJs.includes('FileReader') && padJs.includes('drawImage') && padJs.includes('MAX_IMPORT_BYTES'),
+      'signature : JS du pad sait importer une image dans le canvas');
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
