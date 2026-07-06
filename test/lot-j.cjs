@@ -94,6 +94,66 @@ async function main() {
     createdPurgeRunIds.push(run0.id);
     ok(run0.ranAt instanceof Date, 'schema : PurgeRun avec date automatique');
 
+    // --- 2. runPurge : les trois categories ---
+    const mkAlert = (email, confirmedAt, createdAt) => prisma.alert.create({
+      data: { email, department: '44', keywordLower: '', confirmedAt, createdAt, unsubscribeToken: crypto.randomBytes(32).toString('hex') },
+    });
+    const alOld = await mkAlert(`j.al.old.${STAMP}@example.test`, null, daysAgo(10));
+    const alRecent = await mkAlert(`j.al.recent.${STAMP}@example.test`, null, daysAgo(2));
+    const alConf = await mkAlert(`j.al.conf.${STAMP}@example.test`, daysAgo(29), daysAgo(30));
+
+    const mkFile = (rel) => { fs.writeFileSync(path.join(STORAGE_DIR, rel), 'contenu de test'); return rel; };
+    const cvRel = mkFile(`cv/lot-j-${STAMP}.pdf`);
+    const idRel = mkFile(`id/lot-j-${STAMP}.pdf`);
+    const mkAppJ = (data) => prisma.application.create({
+      data: { applicantName: 'M', applicantEmail: `j.cand.${STAMP}@example.test`, message: 'm', listingId: listJ.id, ...data },
+    });
+    const appOldRej = await mkAppJ({ status: 'rejected', cvPath: cvRel, idCardPath: idRel });
+    await prisma.application.update({ where: { id: appOldRej.id }, data: { rejectedAt: daysAgo(200), createdAt: daysAgo(210) } });
+    const appLegacy = await mkAppJ({ status: 'rejected' }); // rejectedAt null : refus anterieur au Lot J
+    await prisma.application.update({ where: { id: appLegacy.id }, data: { createdAt: daysAgo(200) } });
+    const appRecentRej = await mkAppJ({ status: 'rejected' });
+    await prisma.application.update({ where: { id: appRecentRej.id }, data: { rejectedAt: daysAgo(10), createdAt: daysAgo(15) } });
+    const appOldAcc = await mkAppJ({ status: 'accepted' });
+    await prisma.application.update({ where: { id: appOldAcc.id }, data: { createdAt: daysAgo(300) } });
+    const appOldPend = await mkAppJ({ status: 'pending' });
+    await prisma.application.update({ where: { id: appOldPend.id }, data: { createdAt: daysAgo(300) } });
+
+    const schoolTok = await prisma.school.create({
+      data: {
+        email: `j.tok.${STAMP}@example.test`, passwordHash: 'x', businessName: `Jetons ${STAMP}`,
+        siret: `0${String(STAMP).slice(-13).padStart(13, '0')}`,
+        verifyTokenHash: `vh${STAMP}`, verifyTokenExpiry: daysAgo(1),
+        resetTokenHash: `rh${STAMP}`, resetTokenExpiry: new Date(Date.now() + 60 * 60 * 1000),
+      },
+    });
+    createdSchoolIds.push(schoolTok.id);
+
+    const purgeService = require('../src/services/purgeService');
+    const res2 = await purgeService.runPurge();
+    ok((await prisma.alert.findUnique({ where: { id: alOld.id } })) === null, 'purge : vieille alerte non confirmee supprimee');
+    ok(Boolean(await prisma.alert.findUnique({ where: { id: alRecent.id } }))
+      && Boolean(await prisma.alert.findUnique({ where: { id: alConf.id } })),
+      'purge : alerte recente et alerte confirmee conservees');
+    ok((await prisma.application.findUnique({ where: { id: appOldRej.id } })) === null, 'purge : vieille candidature refusee supprimee');
+    ok(!fs.existsSync(path.join(STORAGE_DIR, cvRel)) && !fs.existsSync(path.join(STORAGE_DIR, idRel)),
+      'purge : fichiers de la candidature purges du disque');
+    ok((await prisma.application.findUnique({ where: { id: appLegacy.id } })) === null,
+      'purge : refusee sans rejectedAt (repli createdAt) supprimee');
+    ok(Boolean(await prisma.application.findUnique({ where: { id: appRecentRej.id } })), 'purge : refusee recente conservee');
+    ok(Boolean(await prisma.application.findUnique({ where: { id: appOldAcc.id } }))
+      && Boolean(await prisma.application.findUnique({ where: { id: appOldPend.id } })),
+      'purge : acceptee et en attente conservees meme anciennes');
+    const tokRow = await prisma.school.findUnique({ where: { id: schoolTok.id } });
+    ok(tokRow.verifyTokenHash === null && tokRow.verifyTokenExpiry === null, 'purge : jeton de verification expire nettoye');
+    ok(tokRow.resetTokenHash === `rh${STAMP}` && tokRow.resetTokenExpiry instanceof Date, 'purge : jeton de reset encore valide conserve');
+    ok(res2.unconfirmedAlerts >= 1 && res2.rejectedApplications >= 2 && res2.expiredTokens >= 1, 'purge : compteurs renvoyes');
+    const latest = await purgeService.findLatestRun();
+    ok(latest && latest.unconfirmedAlerts === res2.unconfirmedAlerts
+      && latest.rejectedApplications === res2.rejectedApplications && latest.expiredTokens === res2.expiredTokens,
+      'purge : PurgeRun ecrite et findLatestRun coherente');
+    createdPurgeRunIds.push(latest.id);
+
     console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

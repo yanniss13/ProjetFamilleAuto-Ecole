@@ -261,7 +261,7 @@ git commit -m "J: colonne rejectedAt et journal PurgeRun"
 **Interfaces :**
 - Produit : `purgeService.runPurge(): Promise<{ unconfirmedAlerts, rejectedApplications, expiredTokens }>` — supprime, journalise dans `PurgeRun`, renvoie les compteurs, PEUT lever (l'appelant décide). `purgeService.findLatestRun(): Promise<PurgeRun | null>`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);`` :
 
@@ -327,12 +327,12 @@ Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     createdPurgeRunIds.push(latest.id);
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `❌ Cannot find module '../src/services/purgeService'`.
 
-- [ ] **Étape 3 : créer le service**
+- [x] **Étape 3 : créer le service**
 
 Créer `src/services/purgeService.js` :
 
@@ -420,12 +420,12 @@ function findLatestRun() {
 module.exports = { runPurge, findLatestRun };
 ```
 
-- [ ] **Étape 4 : vérifier que le test passe (GREEN)**
+- [x] **Étape 4 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `✅ Lot J tests reussis - 14 assertions.`
 
-- [ ] **Étape 5 : committer**
+- [x] **Étape 5 : committer**
 
 ```powershell
 git add src/services/purgeService.js test/lot-j.cjs
