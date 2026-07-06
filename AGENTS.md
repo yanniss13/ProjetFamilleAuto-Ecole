@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (8 fichiers `.cjs`, ~235 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (8 fichiers `.cjs`, ~236 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 
@@ -78,8 +78,9 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `geocodeCached` (à créer en Lot E, cache 24 h). `GEOCODING_DISABLED=1` dans les tests.
 - **API Sirene** (vérification SIRET) : relais interne `/api/siret/:siret` uniquement
   (CSP) ; `SIRET_LOOKUP_DISABLED=1` dans les tests ; cache 1 h dans `src/services/siret.js`.
-- **Signatures** (Lot G) : PNG de pad validés par `src/services/signatureImage.js`
-  (data URL, magic bytes, 200 Ko max), stockés sous `storage/signatures/` ; toute
+- **Signatures** (Lot G) : dessin ou import PNG/JPEG dans le pad canvas, puis PNG
+  validé par `src/services/signatureImage.js` (data URL, magic bytes, 200 Ko max),
+  stocké sous `storage/signatures/` ; toute
   suppression de contrat doit nettoyer `pdfPath`, `schoolSignaturePath`,
   `applicantSignaturePath` ET `signedPdfPath`.
 - **Emails** : sans `SMTP_HOST`, mode dev = lien loggé en console ; `mailer.send`

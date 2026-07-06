@@ -145,7 +145,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `data-signature-import-trigger`, `data-signature-import`, `data-signature-error`.
 - Produces: import client d'une image PNG/JPEG dans le canvas ; au submit, `signatureData` reste un PNG data URL.
 
-- [ ] **Step 1 : test qui échoue**
+- [x] **Step 1 : test qui échoue**
 
 Dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
@@ -156,13 +156,13 @@ Dans `test/lot-g.cjs`, insérer avant le `console.log` final :
       'signature : JS du pad sait importer une image dans le canvas');
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 
 Attendu : échec sur `signature : JS du pad sait importer une image dans le canvas`.
 
-- [ ] **Step 3 : implémentation JS**
+- [x] **Step 3 : implémentation JS**
 
 Dans `public/js/signature-pad.js`, remplacer tout le fichier par :
 
@@ -300,7 +300,7 @@ Dans `public/js/signature-pad.js`, remplacer tout le fichier par :
 })();
 ```
 
-- [ ] **Step 4 : mise à jour AGENTS**
+- [x] **Step 4 : mise à jour AGENTS**
 
 Dans `AGENTS.md`, remplacer :
 
@@ -319,7 +319,7 @@ par :
 
 et remplacer `~235 assertions` par `~236 assertions`.
 
-- [ ] **Step 5 : vérifier le succès**
+- [x] **Step 5 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 
@@ -329,7 +329,7 @@ Run : `npm test`
 
 Attendu : suite complète verte (8 fichiers).
 
-- [ ] **Step 6 : commit**
+- [x] **Step 6 : commit**
 
 ```bash
 git add public/js/signature-pad.js test/lot-g.cjs AGENTS.md docs/superpowers/plans/2026-07-06-lot-g-import-signature.md
