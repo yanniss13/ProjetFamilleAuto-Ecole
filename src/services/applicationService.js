@@ -44,16 +44,10 @@ function findByTrackingToken(token) {
   });
 }
 
-// Total des candidatures, toutes écoles confondues (dashboard admin).
-function countAllGlobal() {
-  return prisma.application.count();
-}
-
 module.exports = {
   createForListing,
   findForOwnedListing,
   findOwnedById,
   updateStatus,
   findByTrackingToken,
-  countAllGlobal,
 };

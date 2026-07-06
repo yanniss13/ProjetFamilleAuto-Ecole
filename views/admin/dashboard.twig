@@ -8,14 +8,34 @@
 
   {% if stats %}
     <section class="stats-grid">
-      <div class="stat-card"><span class="stat-value">{{ stats.schools }}</span><span class="stat-label">Auto-écoles</span></div>
-      <div class="stat-card"><span class="stat-value">{{ stats.listings }}</span><span class="stat-label">Annonces</span></div>
-      <div class="stat-card"><span class="stat-value">{{ stats.applications }}</span><span class="stat-label">Candidatures</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.tiles.schools }}</span><span class="stat-label">Auto-écoles</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.tiles.listings }}</span><span class="stat-label">Annonces</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.tiles.applications }}</span><span class="stat-label">Candidatures</span></div>
+      <div class="stat-card"><span class="stat-value">{{ stats.tiles.signedContracts }}</span><span class="stat-label">Contrats signés</span></div>
     </section>
+
+    <section class="charts-grid">
+      <div class="chart-card">
+        <h2>Inscriptions d’auto-écoles par semaine</h2>
+        <div id="chart-schools-weekly" class="chart"></div>
+      </div>
+      <div class="chart-card">
+        <h2>Candidatures par semaine</h2>
+        <div id="chart-applications-weekly" class="chart"></div>
+      </div>
+    </section>
+
+    {# Bloc de DONNÉES (non exécutable, hors CSP script-src). JSON échappé côté
+       serveur (« < » -> séquence unicode) : usage documenté de |raw, cf. app.js. #}
+    <script type="application/json" id="stats-data">{{ statsJson|raw }}</script>
   {% endif %}
 
   <div class="dashboard-actions">
     <a href="/admin/ecoles" class="btn btn-primary">Auto-écoles</a>
     <a href="/admin/annonces" class="btn">Annonces</a>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/dashboard-charts.js" defer></script>
 {% endblock %}

@@ -1,7 +1,7 @@
 // Espace d'administration : supervision et modération (protégé par requireAdmin + loadAdmin).
 const listingService = require('../services/listingService');
 const schoolService = require('../services/schoolService');
-const applicationService = require('../services/applicationService');
+const statsService = require('../services/statsService');
 const { deleteStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
 
@@ -14,12 +14,13 @@ function isRecordNotFound(err) {
 // GET /admin
 async function dashboard(req, res, next) {
   try {
-    const [schools, listings, applications] = await Promise.all([
-      schoolService.countAll(),
-      listingService.countAll(),
-      applicationService.countAllGlobal(),
-    ]);
-    res.render('admin/dashboard', { title: 'Administration', stats: { schools, listings, applications } });
+    const stats = await statsService.forPlatform();
+    res.render('admin/dashboard', {
+      title: 'Administration',
+      stats,
+      // Même échappement de « < » que le tableau de bord école (bloc #stats-data + |raw).
+      statsJson: JSON.stringify(stats).replace(/</g, '\\u003c'),
+    });
   } catch (err) {
     next(err);
   }
