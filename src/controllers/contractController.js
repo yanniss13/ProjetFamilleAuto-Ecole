@@ -216,6 +216,20 @@ async function downloadContract(req, res, next) {
   }
 }
 
+// GET .../:appId/contrat/telecharger-signe  (PDF final signé, école)
+async function downloadSignedContract(req, res, next) {
+  try {
+    const application = await loadOwnedApplication(req, res);
+    if (!application) return;
+    if (!application.contract || !application.contract.signedPdfPath) return notFound(res);
+    const abs = resolveStored(application.contract.signedPdfPath);
+    if (!abs || !fs.existsSync(abs)) return notFound(res);
+    return res.download(abs, `contrat-signe-${application.id}.pdf`);
+  } catch (err) {
+    next(err);
+  }
+}
+
 // POST .../:appId/contrat/envoyer  (invitation à signer en ligne — plus de PDF joint :
 // le candidat lit et signe depuis sa page de suivi, le PDF final signé partira ensuite)
 async function sendContract(req, res, next) {
@@ -243,4 +257,4 @@ async function sendContract(req, res, next) {
   }
 }
 
-module.exports = { reject, acceptForm, accept, downloadContract, sendContract };
+module.exports = { reject, acceptForm, accept, downloadContract, downloadSignedContract, sendContract };

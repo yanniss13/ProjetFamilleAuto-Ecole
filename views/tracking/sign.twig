@@ -1,0 +1,52 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Signer votre contrat</h1>
+    <p class="muted">
+      Annonce : <strong>{{ application.listing.title }}</strong>
+      — {{ application.listing.school.businessName }}
+    </p>
+    <p>
+      Type de contrat : <strong>{{ contract.type }}</strong> ·
+      Rémunération : <strong>{{ contract.grossSalary }}</strong> ·
+      Lieu : <strong>{{ contract.workplace }}</strong>
+    </p>
+    <p>
+      <a class="btn" href="/suivi/{{ application.trackingToken }}/contrat">Lire le contrat complet (PDF)</a>
+    </p>
+    <p class="fine-print">Empreinte SHA-256 du document que vous signez : {{ proposedHash }}</p>
+
+    <form action="/suivi/{{ application.trackingToken }}/signer" method="post" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="accept" value="1">
+          J'ai lu et j'accepte le contrat proposé.
+        </label>
+        {% if errors.accept %}<p class="field-error">{{ errors.accept }}</p>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="signature-canvas">Votre signature</label>
+        <p class="muted">Dessinez votre signature ci-dessous (souris ou doigt).</p>
+        <canvas id="signature-canvas" data-signature-pad width="420" height="140" class="signature-pad"></canvas>
+        <div class="signature-actions">
+          <button type="button" class="btn btn-small" data-signature-clear>Effacer</button>
+        </div>
+        <input type="hidden" name="signatureData" id="signatureData">
+        <p class="field-error" data-signature-error hidden>Veuillez dessiner votre signature avant de valider.</p>
+        {% if errors.signatureData %}<p class="field-error">{{ errors.signatureData }}</p>{% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Signer le contrat</button>
+    </form>
+
+    <p class="form-footer"><a href="/suivi/{{ application.trackingToken }}">Retour au suivi</a></p>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/signature-pad.js" defer></script>
+{% endblock %}

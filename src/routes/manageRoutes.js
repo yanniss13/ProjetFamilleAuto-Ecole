@@ -27,6 +27,7 @@ router.post('/:id/candidatures/:appId/refuser', contractController.reject);
 router.get('/:id/candidatures/:appId/accepter', contractController.acceptForm);
 router.post('/:id/candidatures/:appId/accepter', contractController.accept);
 router.get('/:id/candidatures/:appId/contrat/telecharger', contractController.downloadContract);
+router.get('/:id/candidatures/:appId/contrat/telecharger-signe', contractController.downloadSignedContract);
 router.post('/:id/candidatures/:appId/contrat/envoyer', contractController.sendContract);
 
 module.exports = router;
