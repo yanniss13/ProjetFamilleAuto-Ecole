@@ -39,6 +39,13 @@ model School {
   resetTokenHash    String?   @unique
   resetTokenExpiry  DateTime?
 
+  // Vérification Sirene (Lot F) : statut du SIRET au répertoire, nom officiel et date
+  // du dernier contrôle. Jamais bloquant : « unverified » par défaut (comptes existants
+  // inclus) ; une panne de l'API est stockée comme « unverified ».
+  siretStatus       String    @default("unverified") // "verified" | "not_found" | "closed" | "unverified"
+  siretVerifiedName String?
+  siretCheckedAt    DateTime?
+
   listings Listing[]
 
   createdAt DateTime @default(now())
