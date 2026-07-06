@@ -23,6 +23,11 @@ function deleteForApplication(applicationId) {
   return prisma.contract.delete({ where: { applicationId } });
 }
 
+// Contreseing du candidat : fige la signature, le PDF final et son empreinte.
+function signByApplicant(id, data) {
+  return prisma.contract.update({ where: { id }, data });
+}
+
 // Dernier contrat saisi par une école : sert à pré-remplir les champs « côté école »
 // (adresse) sans ressaisie. Scopé via la chaîne application -> listing -> schoolId.
 function findLatestBySchool(schoolId) {
@@ -32,4 +37,4 @@ function findLatestBySchool(schoolId) {
   });
 }
 
-module.exports = { findByApplicationId, upsertForApplication, markSent, deleteForApplication, findLatestBySchool };
+module.exports = { findByApplicationId, upsertForApplication, markSent, deleteForApplication, signByApplicant, findLatestBySchool };

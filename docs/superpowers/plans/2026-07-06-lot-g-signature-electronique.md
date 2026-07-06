@@ -968,7 +968,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: tout ce qui précède.
 - Produces: `GET /suivi/:token/contrat` (PDF proposé, final si signé) ; `GET|POST /suivi/:token/signer` ; `contractService.signByApplicant(id, data)` ; `GET /mes-annonces/:id/candidatures/:appId/contrat/telecharger-signe` (école).
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 6. contreseing du candidat ---
@@ -1019,12 +1019,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     ok(/Contrat signé/.test(r.text), 'école : badge « contrat signé » sur la liste');
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `❌ ÉCHEC : candidat : lecture du PDF proposé...` (route inexistante → 404)
 
-- [ ] **Step 3 : service** — dans `src/services/contractService.js`, ajouter avant `module.exports` :
+- [x] **Step 3 : service** — dans `src/services/contractService.js`, ajouter avant `module.exports` :
 
 ```js
 // Contreseing du candidat : fige la signature, le PDF final et son empreinte.
@@ -1035,7 +1035,7 @@ function signByApplicant(id, data) {
 
 et l'ajouter à `module.exports`.
 
-- [ ] **Step 4 : contrôleur candidat** — créer `src/controllers/signatureController.js` :
+- [x] **Step 4 : contrôleur candidat** — créer `src/controllers/signatureController.js` :
 
 ```js
 // Contreseing du contrat par le candidat, authentifié par son jeton de suivi (aucun
@@ -1167,7 +1167,7 @@ async function sign(req, res, next) {
 module.exports = { downloadContract, showSign, sign };
 ```
 
-- [ ] **Step 5 : routes** :
+- [x] **Step 5 : routes** :
 
 (a) remplacer intégralement `src/routes/trackingRoutes.js` par :
 
@@ -1204,7 +1204,7 @@ module.exports = router;
 router.get('/:id/candidatures/:appId/contrat/telecharger-signe', contractController.downloadSignedContract);
 ```
 
-- [ ] **Step 6 : téléchargement signé côté école** — dans `src/controllers/contractController.js`, ajouter après la fonction `downloadContract` :
+- [x] **Step 6 : téléchargement signé côté école** — dans `src/controllers/contractController.js`, ajouter après la fonction `downloadContract` :
 
 ```js
 // GET .../:appId/contrat/telecharger-signe  (PDF final signé, école)
@@ -1224,7 +1224,7 @@ async function downloadSignedContract(req, res, next) {
 
 et l'ajouter à `module.exports`.
 
-- [ ] **Step 7 : vues** :
+- [x] **Step 7 : vues** :
 
 (a) dans `views/tracking/show.twig`, remplacer le bloc `{% if application.status == 'accepted' %} ... {% endif %}` (celui qui parle du contrat transmis par email) par :
 
@@ -1310,12 +1310,12 @@ et l'ajouter à `module.exports`.
 {% endblock %}
 ```
 
-- [ ] **Step 8 : vérifier le succès**
+- [x] **Step 8 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 41 ✓.
 
-- [ ] **Step 9 : commit**
+- [x] **Step 9 : commit**
 
 ```bash
 git add src/controllers/signatureController.js src/controllers/contractController.js src/services/contractService.js src/routes/trackingRoutes.js src/routes/manageRoutes.js views/tracking/show.twig views/tracking/sign.twig views/dashboard/applications.twig test/lot-g.cjs

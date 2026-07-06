@@ -227,6 +227,53 @@ async function main() {
     ok(r.text.includes('Envoyer pour signature') && /en attente de signature/i.test(r.text),
       'invitation : états visibles côté école');
 
+    // --- 6. contreseing du candidat ---
+    const pub = makeJar();
+    const suivi = `/suivi/${application.trackingToken}`;
+    r = await req(pub, 'GET', `${suivi}/contrat`);
+    ok(r.status === 200 && r.text.startsWith('%PDF'), 'candidat : lecture du PDF proposé via le jeton');
+    r = await req(makeJar(), 'GET', `/suivi/${'0'.repeat(64)}/contrat`);
+    ok(r.status === 404, 'candidat : mauvais jeton -> 404');
+
+    r = await req(pub, 'GET', suivi);
+    ok(r.text.includes(`${suivi}/signer`) && /signer le contrat/i.test(r.text),
+      'candidat : bloc « à signer » sur la page de suivi');
+    r = await req(pub, 'GET', `${suivi}/signer`);
+    const csrfP = csrfFrom(r.text);
+    ok(r.status === 200 && r.text.includes('data-signature-pad') && /J'ai lu et j'accepte/i.test(r.text),
+      'candidat : page de signature (pad + case d’acceptation)');
+
+    r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, signatureData: SIGNATURE_PNG }));
+    ok(r.status === 400, 'candidat : case « j’ai lu et j’accepte » obligatoire');
+    r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, accept: '1', signatureData: 'data:image/png;base64,@@' }));
+    ok(r.status === 400, 'candidat : signature invalide refusée');
+
+    r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, accept: '1', signatureData: SIGNATURE_PNG }));
+    ok(r.status === 302 && r.location === suivi, 'candidat : signature acceptée -> retour suivi');
+    contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
+    ok(contract.applicantSignedAt instanceof Date && contract.applicantSignaturePath
+      && fs.existsSync(absStored(contract.applicantSignaturePath)),
+      'candidat : signature stockée + horodatage');
+    ok(contract.signedPdfPath && fs.existsSync(absStored(contract.signedPdfPath))
+      && contract.signedPdfHash === sha256Hex(fs.readFileSync(absStored(contract.signedPdfPath))),
+      'candidat : PDF final généré, empreinte exacte');
+    const signedMails = mailCalls.filter((c) => c[0] === 'signed').map((c) => c[1]);
+    ok(signedMails.includes(application.applicantEmail) && signedMails.includes(school.email),
+      'candidat : PDF signé envoyé aux DEUX parties');
+
+    r = await req(pub, 'GET', suivi);
+    ok(/Contrat signé/.test(r.text) && r.text.includes(`${suivi}/contrat`),
+      'candidat : suivi affiche « signé » + téléchargement');
+    r = await req(pub, 'GET', `${suivi}/contrat`);
+    ok(r.status === 200 && r.text.startsWith('%PDF'), 'candidat : télécharge le PDF final');
+    r = await req(pub, 'GET', `${suivi}/signer`);
+    ok(r.status === 302, 'candidat : page de signature refusée une fois signé (redirection)');
+
+    r = await req(jarE, 'GET', `${apBase}/contrat/telecharger-signe`);
+    ok(r.status === 200 && r.text.startsWith('%PDF'), 'école : télécharge le PDF signé');
+    r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    ok(/Contrat signé/.test(r.text), 'école : badge « contrat signé » sur la liste');
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
