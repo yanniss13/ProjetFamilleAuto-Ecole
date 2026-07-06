@@ -25,6 +25,7 @@ router.post('/deconnexion', adminAuthController.logout);
 // Protégé (tout ce qui suit).
 router.use(requireAdmin, loadAdmin);
 router.get('/', adminController.dashboard);
+router.post('/purge', adminController.purge);
 router.get('/ecoles', adminController.schools);
 router.get('/annonces', adminController.listings);
 router.post('/annonces/:id/supprimer', adminController.removeListing);

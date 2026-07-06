@@ -2,6 +2,7 @@
 const listingService = require('../services/listingService');
 const schoolService = require('../services/schoolService');
 const statsService = require('../services/statsService');
+const purgeService = require('../services/purgeService');
 const { deleteStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
 
@@ -14,10 +15,11 @@ function isRecordNotFound(err) {
 // GET /admin
 async function dashboard(req, res, next) {
   try {
-    const stats = await statsService.forPlatform();
+    const [stats, lastPurge] = await Promise.all([statsService.forPlatform(), purgeService.findLatestRun()]);
     res.render('admin/dashboard', {
       title: 'Administration',
       stats,
+      lastPurge,
       // Même échappement de « < » que le tableau de bord école (bloc #stats-data + |raw).
       statsJson: JSON.stringify(stats).replace(/</g, '\\u003c'),
     });
@@ -102,4 +104,16 @@ async function reactivateSchool(req, res, next) {
   }
 }
 
-module.exports = { dashboard, schools, listings, removeListing, suspendSchool, reactivateSchool };
+// POST /admin/purge — purge manuelle (démo ou besoin ponctuel), mêmes règles que
+// la purge planifiée.
+async function purge(req, res, next) {
+  try {
+    const c = await purgeService.runPurge();
+    req.flash('success', `Purge effectuée : ${c.unconfirmedAlerts} alerte(s), ${c.rejectedApplications} candidature(s), ${c.expiredTokens} jeton(s).`);
+    res.redirect('/admin');
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { dashboard, schools, listings, removeListing, suspendSchool, reactivateSchool, purge };
