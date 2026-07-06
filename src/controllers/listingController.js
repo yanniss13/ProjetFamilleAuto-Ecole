@@ -31,12 +31,19 @@ async function browse(req, res, next) {
     }
 
     const query = { departement: departement || '', q: q || '', ville, rayon: ville ? String(rayon) : '' };
+    // Lien « créer une alerte » pré-rempli avec la recherche courante (URL encodée
+    // côté serveur, échappée par Twig à l'affichage).
+    const alertParams = new URLSearchParams();
+    if (query.departement) alertParams.set('departement', query.departement);
+    if (query.q) alertParams.set('q', query.q);
+    const alerteUrl = alertParams.toString() ? `/alertes?${alertParams.toString()}` : '/alertes';
     const common = {
       title: 'Annonces',
       filters: { departement: query.departement, q: query.q, ville, rayon },
       rayons: RAYONS,
       vue,
       villeIntrouvable,
+      alerteUrl,
       listeUrl: pageUrl('/annonces', query, 1),
       carteUrl: pageUrl('/annonces', { ...query, vue: 'carte' }, 1),
     };
