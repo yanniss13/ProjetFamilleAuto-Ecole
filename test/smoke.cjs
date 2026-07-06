@@ -79,6 +79,8 @@ function form(obj) {
 
 const MINIMAL_PDF = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n', 'utf8');
 const TINY_PNG = Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000002000154a24f8d0000000049454e44ae426082', 'hex');
+// Signature de pad (Lot G) : vrai PNG 1×1 en data URL, requis pour accepter un contrat.
+const SIGNATURE_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 // Construit le multipart d'une candidature (CV PDF + 3 pièces image : CNI, permis, carte).
 function applicationForm(name, email, csrfToken) {
@@ -252,7 +254,7 @@ async function main() {
       providerSiret: '99999999999999', extraClauses: 'Mission renouvelable.',
       birthDate: '1990-05-12', birthPlace: 'Lyon (69)', nationality: 'Française',
       teachingAuthNumber: 'AE-2024-12345', teachingAuthValidUntil: '2030-01-01',
-      licenseNumber: '13AB45678', licenseCategories: 'B, A2',
+      licenseNumber: '13AB45678', licenseCategories: 'B, A2', signatureData: SIGNATURE_PNG,
     }));
     ok(r.status === 302, 'Acceptation + génération du contrat');
     ok(mailCalls.some((c) => c[0] === 'accepted' && c[1] === 'jean@example.test'), 'B : email d’acceptation envoyé au candidat');

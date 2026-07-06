@@ -163,6 +163,57 @@ async function main() {
       fs.unlinkSync(absStored(relSig));
     }
 
+    // --- 4. signature école à l'acceptation ---
+    const { sha256Hex } = require('../src/utils/hash');
+    const jarE = makeJar();
+    let r = await req(jarE, 'GET', '/connexion');
+    r = await req(jarE, 'POST', '/connexion', form({ _csrf: csrfFrom(r.text), email: school.email, password: 'motdepasse123' }));
+    ok(r.status === 302, 'école : connexion OK');
+    const apBase = `/mes-annonces/${listing.id}/candidatures/${application.id}`;
+
+    r = await req(jarE, 'GET', `${apBase}/accepter`);
+    const csrfE = csrfFrom(r.text);
+    ok(r.text.includes('data-signature-pad') && r.text.includes('/js/signature-pad.js'),
+      'école : pad de signature présent sur le formulaire de contrat');
+
+    const termsForm = {
+      _csrf: csrfE, type: 'cdi', startDate: '2026-08-01', grossSalary: '2200€ brut/mois',
+      workplace: 'Pau', schoolAddress: '1 rue G', applicantAddress: '2 rue G',
+    };
+    r = await req(jarE, 'POST', `${apBase}/accepter`, form(termsForm)); // sans signature
+    ok(r.status === 400 && /signature/i.test(r.text), 'école : acceptation sans signature refusée (400)');
+    ok(!(await prisma.contract.findUnique({ where: { applicationId: application.id } })),
+      'école : aucun contrat créé sans signature');
+
+    r = await req(jarE, 'POST', `${apBase}/accepter`, form({ ...termsForm, signatureData: SIGNATURE_PNG }));
+    ok(r.status === 302, 'école : acceptation avec signature OK');
+    let contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
+    ok(contract.schoolSignaturePath && fs.existsSync(absStored(contract.schoolSignaturePath))
+      && contract.schoolSignedAt instanceof Date,
+      'école : PNG de signature stocké + horodatage');
+    ok(contract.proposedPdfHash === sha256Hex(fs.readFileSync(absStored(contract.pdfPath))),
+      'école : empreinte du PDF proposé exacte (recalculée)');
+
+    // Ré-édition : les champs candidat/signés (posés artificiellement) sont invalidés
+    // et les fichiers correspondants supprimés.
+    const fakeApplicantSig = 'signatures/lotg-fake-sig.png';
+    const fakeSignedPdf = 'contracts/lotg-fake-signed.pdf';
+    fs.writeFileSync(absStored(fakeApplicantSig), 'x');
+    fs.writeFileSync(absStored(fakeSignedPdf), 'x');
+    await prisma.contract.update({
+      where: { id: contract.id },
+      data: { applicantSignaturePath: fakeApplicantSig, applicantSignedAt: new Date(), signedPdfPath: fakeSignedPdf, signedPdfHash: 'h' },
+    });
+    r = await req(jarE, 'GET', `${apBase}/accepter`);
+    r = await req(jarE, 'POST', `${apBase}/accepter`, form({ ...termsForm, _csrf: csrfFrom(r.text), signatureData: SIGNATURE_PNG }));
+    ok(r.status === 302, 'école : ré-édition du contrat OK');
+    contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
+    ok(contract.applicantSignaturePath === null && contract.applicantSignedAt === null
+      && contract.signedPdfPath === null && contract.signedPdfHash === null,
+      'école : ré-édition -> signature candidat et PDF signé invalidés');
+    ok(!fs.existsSync(absStored(fakeApplicantSig)) && !fs.existsSync(absStored(fakeSignedPdf)),
+      'école : ré-édition -> anciens fichiers supprimés du disque');
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

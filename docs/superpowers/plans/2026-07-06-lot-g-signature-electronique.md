@@ -516,7 +516,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `decodeSignature`/`saveSignature` (Task 2), `sha256Hex` (Task 2), `buildContractPdf(signatures)` (Task 3).
 - Produces: à l'acceptation, `Contract.schoolSignaturePath/schoolSignedAt/proposedPdfHash` renseignés, PDF proposé signé école ; ré-édition = invalidation des champs candidat/signés + suppression des anciens fichiers ; champ de formulaire `signatureData` requis.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 4. signature école à l'acceptation ---
@@ -571,12 +571,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
       'école : ré-édition -> anciens fichiers supprimés du disque');
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `❌ ÉCHEC : école : pad de signature présent...`
 
-- [ ] **Step 3 : contrôleur** — dans `src/controllers/contractController.js` :
+- [x] **Step 3 : contrôleur** — dans `src/controllers/contractController.js` :
 
 (a) compléter les requires :
 
@@ -665,7 +665,7 @@ async function accept(req, res, next) {
 }
 ```
 
-- [ ] **Step 4 : formulaire** — dans `views/dashboard/contract_form.twig` :
+- [x] **Step 4 : formulaire** — dans `views/dashboard/contract_form.twig` :
 
 (a) insérer AVANT la ligne `<button type="submit" ...>` :
 
@@ -692,7 +692,7 @@ async function accept(req, res, next) {
 {% endblock %}
 ```
 
-- [ ] **Step 5 : pad JS** — créer `public/js/signature-pad.js` :
+- [x] **Step 5 : pad JS** — créer `public/js/signature-pad.js` :
 
 ```js
 // Pad de signature (canvas) partagé : formulaire de contrat (école) et page de
@@ -760,7 +760,7 @@ async function accept(req, res, next) {
 })();
 ```
 
-- [ ] **Step 6 : styles** — ajouter en fin de `public/css/style.css` :
+- [x] **Step 6 : styles** — ajouter en fin de `public/css/style.css` :
 
 ```css
 /* ---------- Lot G : signature électronique ---------- */
@@ -775,7 +775,7 @@ async function accept(req, res, next) {
 .signature-actions { margin-top: 0.25rem; }
 ```
 
-- [ ] **Step 7 : adapter le smoke test** — dans `test/smoke.cjs` :
+- [x] **Step 7 : adapter le smoke test** — dans `test/smoke.cjs` :
 
 (a) sous la ligne `const MINIMAL_PDF = ...` (ou à proximité des fixtures existantes), ajouter :
 
@@ -793,14 +793,14 @@ const SIGNATURE_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAY
 (Le POST d'acceptation invalide — sans date — reste sans signature : il vérifie
 toujours le 400, dont le message de date.)
 
-- [ ] **Step 8 : vérifier le succès**
+- [x] **Step 8 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 22 ✓.
 Run : `node test/smoke.cjs`
 Attendu : 65 ✓ (inchangé).
 
-- [ ] **Step 9 : commit**
+- [x] **Step 9 : commit**
 
 ```bash
 git add src/controllers/contractController.js views/dashboard/contract_form.twig public/js/signature-pad.js public/css/style.css test/smoke.cjs test/lot-g.cjs
