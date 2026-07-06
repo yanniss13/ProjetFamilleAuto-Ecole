@@ -5,9 +5,9 @@
 
   <form action="/annonces" method="get" class="filter-bar">
     {% if vue == 'carte' %}<input type="hidden" name="vue" value="carte">{% endif %}
-    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville...)">
+    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville…)">
     <input type="text" name="departement" value="{{ filters.departement }}" placeholder="Département (ex. 13)">
-    <input type="text" name="ville" value="{{ filters.ville }}" placeholder="Autour de... (ville)">
+    <input type="text" name="ville" value="{{ filters.ville }}" placeholder="Autour de… (ville)">
     <select name="rayon" aria-label="Rayon de recherche">
       {% for r in rayons %}
         <option value="{{ r }}" {% if filters.rayon == r %}selected{% endif %}>{{ r }} km</option>
@@ -22,13 +22,13 @@
   </div>
 
   {% if villeIntrouvable %}
-    <div class="flash flash-error" role="alert">Ville introuvable - le filtre de rayon a été ignoré.</div>
+    <div class="flash flash-error" role="alert">Ville introuvable — le filtre de rayon a été ignoré.</div>
   {% endif %}
 
   {% if vue == 'carte' %}
     <div id="listings-map"></div>
     {% if unlocatedCount > 0 %}
-      <p class="muted">{{ unlocatedCount }} annonce(s) sans localisation - consultez la vue liste.</p>
+      <p class="muted">{{ unlocatedCount }} annonce(s) sans localisation — consultez la vue liste.</p>
     {% endif %}
     {# Bloc de DONNÉES (non exécutable, hors CSP script-src). JSON échappé côté
        serveur ("<" -> séquence unicode) : unique usage documenté de |raw. #}

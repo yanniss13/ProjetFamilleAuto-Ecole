@@ -46,7 +46,7 @@
       var li = document.createElement('li');
       var a = document.createElement('a');
       a.href = '/annonces/' + encodeURIComponent(l.id);
-      a.textContent = l.title + ' - ' + l.city;
+      a.textContent = l.title + ' — ' + l.city;
       li.appendChild(a);
       ul.appendChild(li);
     });
