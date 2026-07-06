@@ -200,7 +200,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `lookupSiret(siret) -> Promise<{ status: 'verified'|'closed'|'not_found'|'error', name: string|null, address: string|null }>` — ne lève JAMAIS. Consommé par les Tasks 3 et 4.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 2. service siret (fetch simulé) ---
@@ -254,12 +254,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-f.cjs`
 Attendu : `Cannot find module '../src/services/siret'`
 
-- [ ] **Step 3 : implémentation** — créer `src/services/siret.js` :
+- [x] **Step 3 : implémentation** — créer `src/services/siret.js` :
 
 ```js
 // Vérification d'un SIRET au répertoire Sirene via l'API publique « Recherche
@@ -320,12 +320,12 @@ async function lookupSiret(siret) {
 module.exports = { lookupSiret };
 ```
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-f.cjs`
 Attendu : 11 ✓.
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/services/siret.js test/lot-f.cjs
