@@ -796,7 +796,7 @@ git commit -m "I: desabonnement en deux temps avec suppression reelle"
 - Consomme : les alertes confirmées (Tâches 1-3), `listingService.createForSchool` (existant — renvoie l'annonce créée avec ses colonnes `*Lower`).
 - Produit : `mailer.sendListingAlert(email, listing, unsubscribeToken)`, `alertService.notifyNewListing(listing): Promise<void>` — **ne lève jamais**, appelée SANS `await` depuis `listingController.create`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);`` :
 
@@ -858,12 +858,12 @@ Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(rc.status === 302 && rc.location === '/mes-annonces', 'alerte : une panne d envoi ne bloque jamais la publication');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ ECHEC : alerte : emails partis apres la publication` (la publication passe, mais rien n'est envoyé).
 
-- [ ] **Étape 3 : ajouter l'email d'alerte au mailer**
+- [x] **Étape 3 : ajouter l'email d'alerte au mailer**
 
 Dans `src/services/mailer.js`, juste APRÈS la fonction `sendAlertConfirmation`, ajouter :
 
@@ -887,7 +887,7 @@ function sendListingAlert(email, listing, unsubscribeToken) {
 
 Et ajouter `sendListingAlert,` dans l'objet `module.exports`.
 
-- [ ] **Étape 4 : ajouter `notifyNewListing` au service**
+- [x] **Étape 4 : ajouter `notifyNewListing` au service**
 
 Dans `src/services/alertService.js`, juste AVANT `module.exports`, ajouter :
 
@@ -913,7 +913,7 @@ async function notifyNewListing(listing) {
 Et remplacer l'export par :
 `module.exports = { subscribe, confirmByToken, findByUnsubscribeToken, deleteByUnsubscribeToken, notifyNewListing };`
 
-- [ ] **Étape 5 : déclencher depuis le contrôleur des annonces**
+- [x] **Étape 5 : déclencher depuis le contrôleur des annonces**
 
 Dans `src/controllers/listingController.js` :
 1. ajouter en tête, avec les autres requires : `const alertService = require('../services/alertService');`
@@ -932,12 +932,12 @@ par :
 
 (PAS de `await` sur `notifyNewListing` — c'est le point de la spec.)
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 33 assertions.`
 
-- [ ] **Étape 7 : suite complète puis commit**
+- [x] **Étape 7 : suite complète puis commit**
 
 Lancer : `npm test` — tout doit rester vert (les autres suites créent leurs annonces via Prisma directement, sans passer par `create`).
 

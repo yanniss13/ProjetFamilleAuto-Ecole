@@ -58,4 +58,21 @@ async function deleteByUnsubscribeToken(token) {
   return count > 0;
 }
 
-module.exports = { subscribe, confirmByToken, findByUnsubscribeToken, deleteByUnsubscribeToken };
+// Notifie les alertes confirmées correspondant à une annonce qui vient d'être
+// publiée. NE LÈVE JAMAIS : appelée en fire-and-forget depuis le contrôleur — la
+// publication ne dépend pas des emails, et un destinataire en erreur n'empêche
+// pas les autres (Promise.allSettled).
+async function notifyNewListing(listing) {
+  try {
+    const alerts = await prisma.alert.findMany({
+      where: { department: listing.department, confirmedAt: { not: null } },
+    });
+    const haystack = `${listing.titleLower || ''} ${listing.descriptionLower || ''} ${listing.cityLower || ''}`;
+    const matching = alerts.filter((a) => !a.keywordLower || haystack.includes(a.keywordLower));
+    await Promise.allSettled(matching.map((a) => mailer.sendListingAlert(a.email, listing, a.unsubscribeToken)));
+  } catch (err) {
+    console.error(`[alertes] notification impossible pour l'annonce ${listing && listing.id} : ${err.message}`);
+  }
+}
+
+module.exports = { subscribe, confirmByToken, findByUnsubscribeToken, deleteByUnsubscribeToken, notifyNewListing };
