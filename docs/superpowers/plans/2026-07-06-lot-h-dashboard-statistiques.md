@@ -540,7 +540,7 @@ git commit -m "H: statistiques d une ecole (tuiles, serie hebdo, entonnoir, top 
 **Interfaces :**
 - Produit : `statsService.forPlatform(): Promise<{ tiles, schoolsWeekly, applicationsWeekly }>` avec `tiles = { schools, listings, applications, signedContracts }` et deux séries de 12 buckets `{ label, count }` (inscriptions d'écoles, candidatures).
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -554,12 +554,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(plat.schoolsWeekly[11].count >= 3 && plat.applicationsWeekly[11].count >= 5, 'forPlatform : creations de la semaine comptees');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ statsService.forPlatform is not a function`.
 
-- [ ] **Étape 3 : implémenter `forPlatform`**
+- [x] **Étape 3 : implémenter `forPlatform`**
 
 Dans `src/services/statsService.js`, juste AVANT la ligne `module.exports`, ajouter :
 
@@ -590,7 +590,7 @@ Et remplacer la ligne d'export par :
 module.exports = { weeklyBuckets, rate, forSchool, forPlatform };
 ```
 
-- [ ] **Étape 4 : vérifier que le test passe (GREEN)**
+- [x] **Étape 4 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 26 assertions.`
