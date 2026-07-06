@@ -82,6 +82,7 @@ async function show(req, res, next) {
     if (!id) return notFound(res);
     const listing = await listingService.findPublicById(id);
     if (!listing) return notFound(res);
+    listingService.incrementViews(id); // fire-and-forget : le rendu n'attend pas le compteur
     res.render('listings/show', { title: listing.title, listing, errors: {}, values: {} });
   } catch (err) {
     next(err);

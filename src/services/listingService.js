@@ -76,6 +76,12 @@ function findPublicById(id) {
   });
 }
 
+// Incrément du compteur de vues (Lot H). Fire-and-forget : l'appelant n'attend pas,
+// et toute erreur est avalée — un compteur ne doit jamais casser l'affichage public.
+function incrementViews(id) {
+  return prisma.listing.updateMany({ where: { id }, data: { viewsCount: { increment: 1 } } }).catch(() => {});
+}
+
 // Données de la vue carte : annonces ouvertes filtrées, SANS pagination, groupées par
 // école géolocalisée (un marqueur par école). Renvoie aussi le nombre d'annonces dont
 // l'école n'a pas de coordonnées (mention « sans localisation » dans la vue).
@@ -171,4 +177,4 @@ function countAll() {
   return prisma.listing.count();
 }
 
-module.exports = { findPublic, findPublicById, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };
+module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };
