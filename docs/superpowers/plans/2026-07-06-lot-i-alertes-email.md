@@ -51,7 +51,7 @@
 **Interfaces :**
 - Produit : `alertService.subscribe(email, department, keyword): Promise<{ alert, rawConfirmToken: string | null }>` — crée l'alerte non confirmée avec jetons ; doublon `(email, department, keywordLower)` non confirmé → régénère le jeton ; doublon confirmé → `rawConfirmToken: null` sans modification. `keyword` vide → `keyword: null`, `keywordLower: ''`.
 
-- [ ] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
+- [x] **Étape 1 : écrire le fichier de test avec le harnais et la section 1**
 
 Créer `test/lot-i.cjs` avec exactement ce contenu :
 
@@ -155,12 +155,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ Cannot find module '../src/services/alertService'`.
 
-- [ ] **Étape 3 : ajouter le modèle au schéma**
+- [x] **Étape 3 : ajouter le modèle au schéma**
 
 À la FIN de `prisma/schema.prisma` (après le modèle `Admin`), ajouter :
 
@@ -189,7 +189,7 @@ model Alert {
 }
 ```
 
-- [ ] **Étape 4 : générer et appliquer la migration (recette diff + deploy — PAS `migrate dev`)**
+- [x] **Étape 4 : générer et appliquer la migration (recette diff + deploy — PAS `migrate dev`)**
 
 ```powershell
 npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script
@@ -204,7 +204,7 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-- [ ] **Étape 5 : créer le service avec `subscribe`**
+- [x] **Étape 5 : créer le service avec `subscribe`**
 
 Créer `src/services/alertService.js` :
 
@@ -253,12 +253,12 @@ async function subscribe(email, department, keyword) {
 module.exports = { subscribe };
 ```
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 7 assertions.`
 
-- [ ] **Étape 7 : brancher le fichier dans `npm test`**
+- [x] **Étape 7 : brancher le fichier dans `npm test`**
 
 Dans `package.json`, remplacer la valeur du script `"test"` par :
 
@@ -266,7 +266,7 @@ Dans `package.json`, remplacer la valeur du script `"test"` par :
 "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs"
 ```
 
-- [ ] **Étape 8 : suite complète puis commit**
+- [x] **Étape 8 : suite complète puis commit**
 
 Lancer : `npm test` — tout doit être vert.
 
