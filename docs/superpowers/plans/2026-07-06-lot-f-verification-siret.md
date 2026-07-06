@@ -56,7 +56,7 @@
 **Interfaces:**
 - Produces: colonnes `siretStatus String @default("unverified")`, `siretVerifiedName String?`, `siretCheckedAt DateTime?` — consommées par les Tasks 4 et 5.
 
-- [ ] **Step 1 : test qui échoue** — créer `test/lot-f.cjs` (harnais complet du projet, utilisé par toutes les tâches) :
+- [x] **Step 1 : test qui échoue** — créer `test/lot-f.cjs` (harnais complet du projet, utilisé par toutes les tâches) :
 
 ```js
 /**
@@ -144,12 +144,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-f.cjs`
 Attendu : `❌ ÉCHEC : schema : siretStatus par défaut "unverified"` (colonne inexistante → `undefined`)
 
-- [ ] **Step 3 : schéma** — dans `prisma/schema.prisma`, modèle `School`, insérer après le bloc `resetTokenHash`/`resetTokenExpiry` :
+- [x] **Step 3 : schéma** — dans `prisma/schema.prisma`, modèle `School`, insérer après le bloc `resetTokenHash`/`resetTokenExpiry` :
 
 ```prisma
   // Vérification Sirene (Lot F) : statut du SIRET au répertoire, nom officiel et date
@@ -160,7 +160,7 @@ Attendu : `❌ ÉCHEC : schema : siretStatus par défaut "unverified"` (colonne 
   siretCheckedAt    DateTime?
 ```
 
-- [ ] **Step 4 : migration (recette non-interactive)**
+- [x] **Step 4 : migration (recette non-interactive)**
 
 ```bash
 npx prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script
@@ -175,12 +175,12 @@ npx prisma migrate deploy
 npx prisma generate
 ```
 
-- [ ] **Step 5 : vérifier le succès**
+- [x] **Step 5 : vérifier le succès**
 
 Run : `node test/lot-f.cjs`
 Attendu : 2 ✓.
 
-- [ ] **Step 6 : commit**
+- [x] **Step 6 : commit**
 
 ```bash
 git add prisma/schema.prisma prisma/migrations test/lot-f.cjs
