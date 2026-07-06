@@ -616,7 +616,7 @@ git commit -m "H: statistiques plateforme (totaux + inscriptions et candidatures
 - Consomme : `statsService.forSchool` (Tâche 3).
 - Produit : la vue expose le bloc `<script type="application/json" id="stats-data">` et les conteneurs `#chart-weekly` et `#chart-funnel` que `public/js/dashboard-charts.js` (Tâche 7) lira.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -642,12 +642,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
       'ecole : libelles des nouvelles tuiles');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ ECHEC : ecole : bloc de donnees #stats-data present`.
 
-- [ ] **Étape 3 : réécrire le contrôleur**
+- [x] **Étape 3 : réécrire le contrôleur**
 
 Remplacer TOUT le contenu de `src/controllers/dashboardController.js` par :
 
@@ -679,7 +679,7 @@ module.exports = { index };
 
 ⚠️ La chaîne de remplacement contient un antislash échappé (DEUX antislashs dans le source, comme dans `listingController.browse` pour `mapJson`) : le JSON émis contient la séquence unicode, jamais un vrai `<`.
 
-- [ ] **Étape 4 : réécrire la vue**
+- [x] **Étape 4 : réécrire la vue**
 
 Remplacer TOUT le contenu de `views/dashboard/index.twig` par :
 
@@ -745,13 +745,13 @@ Remplacer TOUT le contenu de `views/dashboard/index.twig` par :
 {% endblock %}
 ```
 
-- [ ] **Étape 5 : supprimer le code mort des services**
+- [x] **Étape 5 : supprimer le code mort des services**
 
 Les anciens compteurs du tableau de bord ne sont plus appelés nulle part :
 - Dans `src/services/listingService.js` : supprimer la fonction `countBySchool` ET retirer `countBySchool` de `module.exports`.
 - Dans `src/services/applicationService.js` : supprimer la fonction `countBySchool` (avec son commentaire « Total des candidatures reçues... ») ET retirer `countBySchool` de `module.exports`.
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 34 assertions.`

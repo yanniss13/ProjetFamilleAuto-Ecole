@@ -136,10 +136,6 @@ function updateOwned(schoolId, id, data) {
 function deleteOwned(schoolId, id) {
   return prisma.listing.deleteMany({ where: { id, schoolId } });
 }
-function countBySchool(schoolId) {
-  return prisma.listing.count({ where: { schoolId } });
-}
-
 // Tous les chemins de fichiers privés rattachés à une annonce possédée par l'école :
 // pièces des candidatures + PDF de contrat. Sert au nettoyage disque avant suppression.
 async function findFilePathsForListing(schoolId, id) {
@@ -177,4 +173,4 @@ function countAll() {
   return prisma.listing.count();
 }
 
-module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, countBySchool, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };
+module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };
