@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (6 fichiers `.cjs`, ~168 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (8 fichiers `.cjs`, ~235 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 
@@ -24,13 +24,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   revu et validé — 33 assertions dans `test/lot-e.cjs`, plan entièrement coché).
 - **Lot F (vérification SIRET) : LIVRÉ le 2026-07-06** (exécuté par Codex, revu et
   validé — 21 assertions dans `test/lot-f.cjs`, plan entièrement coché).
-- **Prochain travail : Lot G (signature électronique du contrat).**
-  - Spec validée : `docs/superpowers/specs/2026-07-06-lot-g-signature-electronique-design.md`
-  - Plan PAS ENCORE COMMENCÉ, à exécuter tâche par tâche :
-    `docs/superpowers/plans/2026-07-06-lot-g-signature-electronique.md`
-    (7 tâches TDD avec le code exact de chaque étape ; cocher les cases `- [ ]` ; une
-    tâche = tests rouges → implémentation → tests verts → commit). Attention : la
-    Task 4 adapte aussi `test/smoke.cjs` (signature désormais requise à l'acceptation).
+- **Lot G (signature électronique du contrat) : LIVRÉ** — pad canvas école + candidat,
+  PDF final avec page de signatures (horodatages + empreintes SHA-256), invitation par
+  email, invalidation à la ré-édition. Tests : `test/lot-g.cjs`.
+- **Prochain travail : Lot H (dashboard statistiques)** — spec et plan à écrire.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
@@ -81,6 +78,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `geocodeCached` (à créer en Lot E, cache 24 h). `GEOCODING_DISABLED=1` dans les tests.
 - **API Sirene** (vérification SIRET) : relais interne `/api/siret/:siret` uniquement
   (CSP) ; `SIRET_LOOKUP_DISABLED=1` dans les tests ; cache 1 h dans `src/services/siret.js`.
+- **Signatures** (Lot G) : PNG de pad validés par `src/services/signatureImage.js`
+  (data URL, magic bytes, 200 Ko max), stockés sous `storage/signatures/` ; toute
+  suppression de contrat doit nettoyer `pdfPath`, `schoolSignaturePath`,
+  `applicantSignaturePath` ET `signedPdfPath`.
 - **Emails** : sans `SMTP_HOST`, mode dev = lien loggé en console ; `mailer.send`
   ne lève jamais (renvoie `false`). Échapper tout texte utilisateur avec `esc()`.
 - Windows : shell PowerShell 5.1 ; préférer les chemins via `path.join`, et `git add`

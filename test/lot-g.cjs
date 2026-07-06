@@ -274,6 +274,34 @@ async function main() {
     r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
     ok(/Contrat signé/.test(r.text), 'école : badge « contrat signé » sur la liste');
 
+    // --- 7. nettoyage disque ---
+    // Refus d'une candidature signée : contrat + signatures + PDF final supprimés.
+    const relsAvantRefus = [contract.pdfPath, contract.schoolSignaturePath, contract.applicantSignaturePath, contract.signedPdfPath];
+    ok(relsAvantRefus.every((rel) => rel && fs.existsSync(absStored(rel))), 'nettoyage : fichiers présents avant refus');
+    r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    r = await req(jarE, 'POST', `${apBase}/refuser`, form({ _csrf: csrfFrom(r.text) }));
+    ok(r.status === 302, 'nettoyage : refus -> redirection');
+    ok(relsAvantRefus.every((rel) => !fs.existsSync(absStored(rel))), 'nettoyage : refus -> tous les fichiers du contrat supprimés');
+    ok(!(await prisma.contract.findUnique({ where: { applicationId: application.id } })), 'nettoyage : contrat supprimé en base');
+
+    // Suppression d'annonce : les chemins de signature sont collectés aussi.
+    const listingService = require('../src/services/listingService');
+    const app2 = await prisma.application.create({
+      data: { listingId: listing.id, applicantName: 'G2', applicantEmail: `g2.${STAMP}@example.test`, message: 'm' },
+    });
+    const relSig2 = 'signatures/lotg-collect.png';
+    fs.writeFileSync(absStored(relSig2), 'x');
+    await prisma.contract.create({
+      data: {
+        applicationId: app2.id, type: 'cdi', startDate: new Date(), grossSalary: 'x', workplace: 'x',
+        pdfPath: 'contracts/lotg-collect.pdf', schoolSignaturePath: relSig2, signedPdfPath: 'contracts/lotg-collect-signe.pdf',
+      },
+    });
+    const collected = await listingService.findFilePathsForListing(school.id, listing.id);
+    ok(collected.includes(relSig2) && collected.includes('contracts/lotg-collect-signe.pdf'),
+      'nettoyage : chemins de signatures et PDF signé collectés pour la suppression');
+    fs.unlinkSync(absStored(relSig2));
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

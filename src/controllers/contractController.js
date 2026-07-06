@@ -11,7 +11,7 @@ const { buildContractPdf } = require('../services/contractPdf');
 const signatureImage = require('../services/signatureImage');
 const { sha256Hex } = require('../utils/hash');
 const mailer = require('../services/mailer');
-const { STORAGE_DIR, SUBDIRS, resolveStored } = require('../config/storage');
+const { STORAGE_DIR, SUBDIRS, resolveStored, deleteStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
 
 // Charge la candidature possédée par l'école courante, ou répond 404.
@@ -39,11 +39,13 @@ async function reject(req, res, next) {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
 
-    // Si un contrat avait été généré (candidature acceptée puis refusée), on le supprime
-    // avec son PDF — sinon il resterait téléchargeable/expédiable pour un candidat refusé.
+    // Si un contrat avait été généré (candidature acceptée puis refusée), on supprime
+    // PDF et signatures — sinon ils resteraient téléchargeables pour un candidat refusé.
     if (application.contract) {
-      const abs = resolveStored(application.contract.pdfPath);
-      if (abs) fs.unlink(abs, () => {});
+      const c = application.contract;
+      for (const rel of [c.pdfPath, c.schoolSignaturePath, c.applicantSignaturePath, c.signedPdfPath]) {
+        deleteStored(rel);
+      }
       await contractService.deleteForApplication(application.id);
     }
 
