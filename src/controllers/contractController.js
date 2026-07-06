@@ -8,6 +8,8 @@ const applicationService = require('../services/applicationService');
 const contractService = require('../services/contractService');
 const { validateContract } = require('../validators/contractValidator');
 const { buildContractPdf } = require('../services/contractPdf');
+const signatureImage = require('../services/signatureImage');
+const { sha256Hex } = require('../utils/hash');
 const mailer = require('../services/mailer');
 const { STORAGE_DIR, SUBDIRS, resolveStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
@@ -124,14 +126,17 @@ async function acceptForm(req, res, next) {
   }
 }
 
-// POST .../:appId/accepter  (valide les termes -> génère le PDF -> statut accepté)
+// POST .../:appId/accepter  (valide les termes + signature école -> PDF proposé -> accepté)
 async function accept(req, res, next) {
   try {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
 
     const { isValid, errors, value } = validateContract(req.body);
-    if (!isValid) {
+    // Signature de l'école obligatoire (dessinée dans le formulaire).
+    const sigBuf = signatureImage.decodeSignature(req.body.signatureData);
+    if (!sigBuf) errors.signatureData = 'La signature de l’auto-école est obligatoire — dessinez-la dans le cadre.';
+    if (!isValid || !sigBuf) {
       return res.status(400).render('dashboard/contract_form', {
         title: 'Établir le contrat',
         application,
@@ -141,30 +146,56 @@ async function accept(req, res, next) {
       });
     }
 
-    // Génère le PDF puis l'écrit dans le stockage privé.
+    const schoolSignaturePath = await signatureImage.saveSignature(sigBuf);
+    const schoolSignedAt = new Date();
+
+    // PDF « proposé » : contrat + page de signatures avec le cadre école rempli.
     const pdf = await buildContractPdf({
       type: value.type,
       school: application.listing.school,
       applicant: application,
       listing: application.listing,
       terms: value,
+      signatures: {
+        school: { imagePath: resolveStored(schoolSignaturePath), signedAt: schoolSignedAt, name: application.listing.school.businessName },
+        applicant: null,
+        proposedHash: null,
+      },
     });
+    const proposedPdfHash = sha256Hex(pdf);
     const filename = `${crypto.randomBytes(16).toString('hex')}.pdf`;
     const relPath = `${SUBDIRS.contracts}/${filename}`;
     await fs.promises.writeFile(path.join(STORAGE_DIR, SUBDIRS.contracts, filename), pdf);
 
-    // Supprime l'ancien PDF en cas de ré-édition.
-    if (application.contract && application.contract.pdfPath && application.contract.pdfPath !== relPath) {
-      const old = resolveStored(application.contract.pdfPath);
-      if (old) fs.unlink(old, () => {});
+    // Ré-édition : l'ancien PDF, l'ancienne signature école, et tout ce qui touche au
+    // contreseing candidat (signature + PDF final) sont supprimés — le candidat devra
+    // re-signer la nouvelle version.
+    if (application.contract) {
+      const old = application.contract;
+      for (const rel of [old.pdfPath, old.schoolSignaturePath, old.applicantSignaturePath, old.signedPdfPath]) {
+        if (rel) {
+          const abs = resolveStored(rel);
+          if (abs) fs.unlink(abs, () => {});
+        }
+      }
     }
 
-    await contractService.upsertForApplication(application.id, { ...value, pdfPath: relPath });
+    await contractService.upsertForApplication(application.id, {
+      ...value,
+      pdfPath: relPath,
+      schoolSignaturePath,
+      schoolSignedAt,
+      proposedPdfHash,
+      applicantSignaturePath: null,
+      applicantSignedAt: null,
+      signedPdfPath: null,
+      signedPdfHash: null,
+    });
     await applicationService.updateStatus(application.id, 'accepted');
     // Best-effort : informe le candidat de l'acceptation (lien de suivi rappelé).
     await mailer.sendApplicationAccepted(application.applicantEmail, application.applicantName, application.listing.title, application.trackingToken);
 
-    req.flash('success', 'Candidature acceptée et contrat généré.');
+    req.flash('success', 'Candidature acceptée et contrat signé côté école.');
     res.redirect(candidaturesUrl(application));
   } catch (err) {
     next(err);

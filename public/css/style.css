@@ -263,3 +263,14 @@ body {
   font-size: 0.85em;
   white-space: nowrap;
 }
+
+/* ---------- Lot G : signature électronique ---------- */
+.signature-pad {
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+  max-width: 100%;
+  display: block;
+}
+.signature-actions { margin-top: 0.25rem; }

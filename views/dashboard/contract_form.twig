@@ -140,6 +140,18 @@
         {% if errors.extraClauses %}<p class="field-error">{{ errors.extraClauses }}</p>{% endif %}
       </div>
 
+      <div class="form-group">
+        <label for="signature-canvas">Signature de l'auto-école</label>
+        <p class="muted">Dessinez votre signature ci-dessous (souris ou doigt) — elle sera apposée sur le contrat.</p>
+        <canvas id="signature-canvas" data-signature-pad width="420" height="140" class="signature-pad"></canvas>
+        <div class="signature-actions">
+          <button type="button" class="btn btn-small" data-signature-clear>Effacer</button>
+        </div>
+        <input type="hidden" name="signatureData" id="signatureData">
+        <p class="field-error" data-signature-error hidden>Veuillez dessiner votre signature avant de valider.</p>
+        {% if errors.signatureData %}<p class="field-error">{{ errors.signatureData }}</p>{% endif %}
+      </div>
+
       <button type="submit" class="btn btn-primary">Accepter & générer le contrat</button>
     </form>
 
@@ -150,4 +162,8 @@
       Le contrat généré est un modèle indicatif, à faire valider juridiquement avant signature.
     </p>
   </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/signature-pad.js" defer></script>
 {% endblock %}
