@@ -35,8 +35,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   (département + mot-clé), jeton de confirmation haché / désabonnement opaque,
   notification fire-and-forget à la publication (`alertService.notifyNewListing`),
   désabonnement en deux temps avec suppression réelle. Tests : `test/lot-i.cjs`.
-- **Prochain travail : Lot J (purge RGPD automatique)** — spec et plan à écrire.
-  À prévoir : purger aussi les alertes jamais confirmées (décision de la spec du Lot I).
+- **Prochain travail : Lot J (purge RGPD automatique)** — spec validée
+  (`docs/superpowers/specs/2026-07-07-lot-j-purge-rgpd-design.md`), plan à
+  exécuter tâche par tâche :
+  `docs/superpowers/plans/2026-07-07-lot-j-purge-rgpd.md`. Dernier lot de la
+  feuille de route démo E→J.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
