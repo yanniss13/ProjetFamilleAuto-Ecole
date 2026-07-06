@@ -173,6 +173,14 @@ async function main() {
     rs = await req(blocked, 'POST', '/connexion', form({ _csrf: csrfB, email: sEmail, password: 'motdepasse123' }));
     ok(rs.status === 302 && rs.location === '/tableau-de-bord', 'C : connexion de nouveau possible après réactivation');
 
+    // Nav consciente de la session sur les pages PUBLIQUES : un admin (ou une école)
+    // qui visite /annonces doit garder le lien vers son espace — sinon il se croit
+    // déconnecté et perd le chemin du back-office (correctif post-Lot K).
+    rs = await req(adminJar, 'GET', '/annonces');
+    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : nav publique — session admin gardée (lien Administration)');
+    rs = await req(blocked, 'GET', '/annonces');
+    ok(rs.status === 200 && rs.text.includes('href="/tableau-de-bord"'), 'C : nav publique — session école gardée (lien Tableau de bord)');
+
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {
     // Nettoyage : fichiers des candidatures + écoles + admins de test.
