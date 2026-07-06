@@ -292,7 +292,7 @@ git commit -m "I: modele Alert et abonnement double opt-in (jetons, doublons)"
 - Consomme : `alertService.subscribe` (Tâche 1).
 - Produit : `GET /alertes` (form, pré-rempli par `?departement=` et `?q=`), `POST /alertes` (PRG, message neutre), `mailer.sendAlertConfirmation(email, department, keyword, rawToken)`, `validateAlert(body): { isValid, errors, value: { email, department, keyword } }`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);`` :
 
@@ -334,12 +334,12 @@ Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
 
 ⚠️ Le libellé attendu `email n’est pas valide` contient l'apostrophe typographique `’` — le validateur doit l'utiliser (typographie française).
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ ECHEC : alertes : formulaire public avec les trois champs` (la route n'existe pas → 404).
 
-- [ ] **Étape 3 : créer le validateur**
+- [x] **Étape 3 : créer le validateur**
 
 Créer `src/validators/alertValidator.js` :
 
@@ -371,7 +371,7 @@ function validateAlert(body) {
 module.exports = { validateAlert };
 ```
 
-- [ ] **Étape 4 : ajouter l'email de confirmation au mailer**
+- [x] **Étape 4 : ajouter l'email de confirmation au mailer**
 
 Dans `src/services/mailer.js`, juste AVANT la ligne `module.exports = {`, ajouter :
 
@@ -395,7 +395,7 @@ function sendAlertConfirmation(email, department, keyword, rawToken) {
 
 Et ajouter `sendAlertConfirmation,` dans l'objet `module.exports`.
 
-- [ ] **Étape 5 : créer le contrôleur (deux premières actions)**
+- [x] **Étape 5 : créer le contrôleur (deux premières actions)**
 
 Créer `src/controllers/alertController.js` :
 
@@ -442,7 +442,7 @@ async function create(req, res, next) {
 module.exports = { newForm, create };
 ```
 
-- [ ] **Étape 6 : créer la vue du formulaire**
+- [x] **Étape 6 : créer la vue du formulaire**
 
 Créer `views/alerts/new.twig` :
 
@@ -480,7 +480,7 @@ Créer `views/alerts/new.twig` :
 {% endblock %}
 ```
 
-- [ ] **Étape 7 : créer le routeur et le monter**
+- [x] **Étape 7 : créer le routeur et le monter**
 
 Créer `src/routes/alertRoutes.js` :
 
@@ -515,12 +515,12 @@ Dans `src/routes/index.js` :
 router.use('/alertes', alertRoutes);
 ```
 
-- [ ] **Étape 8 : vérifier que le test passe (GREEN)**
+- [x] **Étape 8 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 15 assertions.`
 
-- [ ] **Étape 9 : committer**
+- [x] **Étape 9 : committer**
 
 ```powershell
 git add src/validators/alertValidator.js src/controllers/alertController.js src/routes/alertRoutes.js src/routes/index.js src/services/mailer.js views/alerts/new.twig test/lot-i.cjs
