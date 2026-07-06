@@ -169,8 +169,5 @@ function deleteAny(id) {
 function findAllWithSchool() {
   return prisma.listing.findMany({ orderBy: { createdAt: 'desc' }, include: { school: true } });
 }
-function countAll() {
-  return prisma.listing.count();
-}
 
-module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };
+module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool };

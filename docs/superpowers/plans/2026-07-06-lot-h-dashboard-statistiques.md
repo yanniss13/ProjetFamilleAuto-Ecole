@@ -780,7 +780,7 @@ git commit -m "H: tableau de bord ecole (tuiles, serie hebdo, entonnoir, top ann
 - Produit : la vue expose `#stats-data` et les conteneurs `#chart-schools-weekly` et `#chart-applications-weekly` (lus par la Tâche 7).
 - ⚠️ Contrainte héritée : `test/lot-c.cjs` exige que `/admin` contienne « Auto-écoles » et `stat-value` — la vue ci-dessous les conserve.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -803,12 +803,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
       'admin : tuile contrats signes + conteneurs des deux graphiques');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ ECHEC : admin : bloc de donnees + script presents`.
 
-- [ ] **Étape 3 : mettre à jour le contrôleur admin**
+- [x] **Étape 3 : mettre à jour le contrôleur admin**
 
 Dans `src/controllers/adminController.js` :
 
@@ -841,7 +841,7 @@ async function dashboard(req, res, next) {
 
 3. Le require de `applicationService` en tête de fichier ne sert plus à rien après ce changement (seul `countAllGlobal` l'utilisait) : supprimer la ligne `const applicationService = require('../services/applicationService');`. Les requires de `listingService` et `schoolService` restent (utilisés par les listes et la modération).
 
-- [ ] **Étape 4 : réécrire la vue admin**
+- [x] **Étape 4 : réécrire la vue admin**
 
 Remplacer TOUT le contenu de `views/admin/dashboard.twig` par :
 
@@ -889,14 +889,14 @@ Remplacer TOUT le contenu de `views/admin/dashboard.twig` par :
 {% endblock %}
 ```
 
-- [ ] **Étape 5 : supprimer le code mort des services**
+- [x] **Étape 5 : supprimer le code mort des services**
 
 Plus aucun appelant après ce changement :
 - Dans `src/services/listingService.js` : supprimer la fonction `countAll` ET la retirer de `module.exports`.
 - Dans `src/services/schoolService.js` : supprimer la fonction `countAll` ET la retirer de `module.exports`.
 - Dans `src/services/applicationService.js` : supprimer la fonction `countAllGlobal` (avec son commentaire) ET la retirer de `module.exports`.
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 38 assertions.`

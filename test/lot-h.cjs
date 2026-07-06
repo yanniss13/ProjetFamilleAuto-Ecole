@@ -218,6 +218,23 @@ async function main() {
     ok(r5.text.includes('Taux d’acceptation') && r5.text.includes('Contrats signés'),
       'ecole : libelles des nouvelles tuiles');
 
+    // --- 6. dashboard admin ---
+    const adminService = require('../src/services/adminService');
+    const admin = await adminService.create({ email: `h.admin.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('adminpass123') });
+    createdAdminIds.push(admin.id);
+    const adminJar = makeJar();
+    let r6 = await req(adminJar, 'GET', '/admin/connexion');
+    r6 = await req(adminJar, 'POST', '/admin/connexion', form({ _csrf: csrfFrom(r6.text), email: admin.email, password: 'adminpass123' }));
+    r6 = await req(adminJar, 'GET', '/admin');
+    ok(r6.status === 200 && r6.text.includes('id="stats-data"') && r6.text.includes('/js/dashboard-charts.js'),
+      'admin : bloc de donnees + script presents');
+    const m6 = r6.text.match(/<script type="application\/json" id="stats-data">([\s\S]*?)<\/script>/);
+    const padm = JSON.parse(m6[1]);
+    ok(padm.tiles.schools >= 3 && padm.tiles.signedContracts >= 1, 'admin : JSON - tuiles plateforme');
+    ok(padm.schoolsWeekly.length === 12 && padm.applicationsWeekly.length === 12, 'admin : JSON - deux series de 12 semaines');
+    ok(r6.text.includes('Contrats signés') && r6.text.includes('id="chart-schools-weekly"') && r6.text.includes('id="chart-applications-weekly"'),
+      'admin : tuile contrats signes + conteneurs des deux graphiques');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
