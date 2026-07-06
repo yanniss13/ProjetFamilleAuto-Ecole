@@ -179,3 +179,25 @@ model Admin {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+// Alerte email d'un moniteur (Lot I) : créée sans compte, active seulement après
+// confirmation par email (double opt-in). Le jeton de confirmation est HASHÉ
+// (comme verifyTokenHash de School) ; le jeton de désabonnement est opaque en
+// clair (comme trackingToken) pour reconstruire le lien dans chaque email.
+model Alert {
+  id           Int     @id @default(autoincrement())
+  email        String
+  department   String
+  keyword      String? // affiché tel que saisi
+  keywordLower String  @default("") // matching + unicité ("" = pas de mot-clé)
+
+  confirmTokenHash String?   @unique
+  confirmedAt      DateTime?
+
+  unsubscribeToken String @unique
+
+  createdAt DateTime @default(now())
+
+  @@unique([email, department, keywordLower])
+  @@index([department])
+}
