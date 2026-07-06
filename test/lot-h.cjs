@@ -97,6 +97,21 @@ async function main() {
     await listingService.incrementViews(0); // id inexistant : ne doit pas lever
     ok(true, 'vues : increment sur id inexistant absorbe sans erreur');
 
+    // --- 2. unitaires : weeklyBuckets et rate ---
+    const statsService = require('../src/services/statsService');
+    const buckets = statsService.weeklyBuckets([], 12);
+    ok(buckets.length === 12, 'weeklyBuckets : exactement 12 entrees');
+    ok(buckets.every((b) => b.count === 0), 'weeklyBuckets : semaines vides a 0');
+    ok(buckets.every((b) => /^\d{2}\/\d{2}$/.test(b.label)), 'weeklyBuckets : labels JJ/MM');
+    const b2 = statsService.weeklyBuckets([new Date(), new Date(), new Date(Date.now() - 8 * 24 * 3600 * 1000)], 12);
+    ok(b2[11].count === 2, 'weeklyBuckets : dates du jour dans la derniere semaine');
+    ok(b2[10].count + b2[9].count === 1, 'weeklyBuckets : date d il y a 8 jours dans une semaine precedente');
+    const b3 = statsService.weeklyBuckets([new Date(Date.now() - 100 * 24 * 3600 * 1000)], 12);
+    ok(b3.reduce((s, b) => s + b.count, 0) === 0, 'weeklyBuckets : date hors fenetre ignoree');
+    ok(statsService.rate(1, 4) === 25, 'rate : 1/4 -> 25');
+    ok(statsService.rate(0, 0) === 0, 'rate : total nul -> 0 (jamais NaN)');
+    ok(statsService.rate(3, 3) === 100, 'rate : 3/3 -> 100');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
