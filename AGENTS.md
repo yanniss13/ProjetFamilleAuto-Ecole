@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (9 fichiers `.cjs`, ~275 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (10 fichiers `.cjs`, ~310 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 
@@ -31,11 +31,12 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `statsService` (séries hebdo 12 semaines bornées à 84 jours, bucketing JS), tableau de bord
   école (5 tuiles, barres, entonnoir, top annonces) et admin (4 tuiles, 2 barres), SVG en DOM
   via le bloc `#stats-data`. Tests : `test/lot-h.cjs`.
-- **Prochain travail : Lot I (alertes email moniteurs) — EN COURS, reprendre à la
-  Tâche 3.** Tâches 1 et 2 livrées et commitées (`7a7fda8`, `cbbec24`) : modèle
-  `Alert` + `subscribe`, formulaire public + email de confirmation. Plan coché au
-  fur et à mesure : `docs/superpowers/plans/2026-07-06-lot-i-alertes-email.md`
-  (spec : `docs/superpowers/specs/2026-07-06-lot-i-alertes-email-design.md`).
+- **Lot I (alertes email moniteurs) : LIVRÉ** — abonnement public double opt-in
+  (département + mot-clé), jeton de confirmation haché / désabonnement opaque,
+  notification fire-and-forget à la publication (`alertService.notifyNewListing`),
+  désabonnement en deux temps avec suppression réelle. Tests : `test/lot-i.cjs`.
+- **Prochain travail : Lot J (purge RGPD automatique)** — spec et plan à écrire.
+  À prévoir : purger aussi les alertes jamais confirmées (décision de la spec du Lot I).
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
@@ -57,7 +58,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   utilisateur, messages de commit (préfixe du lot : `E: ...`), labels de tests.
 - **TDD obligatoire** : test écrit d'abord dans `test/<nom>.cjs`, vu échouer, puis
   implémentation minimale. Pas de framework : serveur dédié sur un port unique
-  (4057-4064 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
+  (4057-4065 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
   nettoyage en `finally`. Nouveau fichier de test → l'ajouter à `"test"` dans
   `package.json`.
 - Architecture : `routes → contrôleurs → services (Prisma) → vues Twig`. Toute requête
@@ -93,6 +94,9 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `applicantSignaturePath` ET `signedPdfPath`.
 - **Emails** : sans `SMTP_HOST`, mode dev = lien loggé en console ; `mailer.send`
   ne lève jamais (renvoie `false`). Échapper tout texte utilisateur avec `esc()`.
+- **Alertes email** (Lot I) : `notifyNewListing` est fire-and-forget et ne lève
+  jamais ; le mailer s'appelle toujours via l'objet (`mailer.sendListingAlert(...)`,
+  jamais destructuré) pour rester interceptable dans les tests.
 - Windows : shell PowerShell 5.1 ; préférer les chemins via `path.join`, et `git add`
   explicite (des fichiers personnels non suivis traînent à la racine — `contexte.md`,
   `*.xlsx` — ne PAS les commiter).

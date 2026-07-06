@@ -202,6 +202,12 @@ async function main() {
     }));
     ok(rc.status === 302 && rc.location === '/mes-annonces', 'alerte : une panne d envoi ne bloque jamais la publication');
 
+    // --- 6. points d'entree ---
+    r = await get('/annonces?departement=13&q=moto');
+    ok(r.text.includes('Créer une alerte') && r.text.includes('/alertes?departement=13&amp;q=moto'),
+      'annonces : lien « Creer une alerte » pre-rempli avec les filtres');
+    ok(r.text.includes('>Alertes<'), 'nav : entree publique Alertes');
+
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

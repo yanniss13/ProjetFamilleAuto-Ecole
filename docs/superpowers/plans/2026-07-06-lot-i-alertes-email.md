@@ -959,7 +959,7 @@ git commit -m "I: notification des alertes a la publication d une annonce (fire-
 **Interfaces :**
 - Consomme : `GET /alertes` avec pré-remplissage `?departement=&q=` (Tâche 2).
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);`` :
 
@@ -971,12 +971,12 @@ Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(r.text.includes('>Alertes<'), 'nav : entree publique Alertes');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ ECHEC : annonces : lien « Creer une alerte » pre-rempli avec les filtres`.
 
-- [ ] **Étape 3 : construire `alerteUrl` dans le contrôleur**
+- [x] **Étape 3 : construire `alerteUrl` dans le contrôleur**
 
 Dans `src/controllers/listingController.js`, fonction `browse`, juste AVANT la déclaration `const common = {`, ajouter :
 
@@ -991,7 +991,7 @@ Dans `src/controllers/listingController.js`, fonction `browse`, juste AVANT la d
 
 Et dans l'objet `common`, ajouter la propriété `alerteUrl,` (par exemple après `villeIntrouvable,`).
 
-- [ ] **Étape 4 : points d'entrée dans les vues**
+- [x] **Étape 4 : points d'entrée dans les vues**
 
 Dans `views/listings/index.twig`, juste APRÈS le `</div>` fermant de `<div class="view-toggle">`, ajouter :
 
@@ -1005,12 +1005,12 @@ Dans `views/partials/nav.twig`, juste APRÈS la ligne `<a href="/annonces">Annon
     <a href="/alertes">Alertes</a>
 ```
 
-- [ ] **Étape 5 : vérifier que le test passe (GREEN)**
+- [x] **Étape 5 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 35 assertions.`
 
-- [ ] **Étape 6 : mettre à jour `AGENTS.md` (passation)**
+- [x] **Étape 6 : mettre à jour `AGENTS.md` (passation)**
 
 1. Remplacer la ligne `- **Prochain travail : Lot I (alertes email moniteurs)** — spec et plan à écrire.` (ou sa variante pointant vers le plan) par :
 
@@ -1035,7 +1035,7 @@ Attendu : `✅ Lot I tests reussis - 35 assertions.`
   jamais destructuré) pour rester interceptable dans les tests.
 ```
 
-- [ ] **Étape 7 : suite complète puis commit final**
+- [x] **Étape 7 : suite complète puis commit final**
 
 Lancer : `npm test` — les 10 fichiers doivent être verts.
 

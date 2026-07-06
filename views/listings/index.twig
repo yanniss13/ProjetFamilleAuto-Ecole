@@ -20,6 +20,7 @@
     <a href="{{ listeUrl }}" class="btn btn-small {% if vue == 'liste' %}btn-primary{% endif %}">Liste</a>
     <a href="{{ carteUrl }}" class="btn btn-small {% if vue == 'carte' %}btn-primary{% endif %}">Carte</a>
   </div>
+  <p class="muted"><a href="{{ alerteUrl }}">Créer une alerte pour cette recherche</a> — recevez les prochaines annonces par email.</p>
 
   {% if villeIntrouvable %}
     <div class="flash flash-error" role="alert">Ville introuvable — le filtre de rayon a été ignoré.</div>
