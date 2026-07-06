@@ -31,8 +31,14 @@ function findOwnedById(schoolId, applicationId) {
   });
 }
 
+// Change le statut d'une candidature. rejectedAt trace la date du refus (point de
+// départ de la purge RGPD — Lot J) et s'efface si la candidature change encore de
+// statut : une refusée puis repêchée ne doit jamais partir à la purge.
 function updateStatus(applicationId, status) {
-  return prisma.application.update({ where: { id: applicationId }, data: { status } });
+  return prisma.application.update({
+    where: { id: applicationId },
+    data: { status, rejectedAt: status === 'rejected' ? new Date() : null },
+  });
 }
 
 // Candidature retrouvée par son jeton de suivi public (page /suivi). Inclut annonce + école
