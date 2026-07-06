@@ -151,7 +151,7 @@ async function accept(req, res, next) {
     });
     const filename = `${crypto.randomBytes(16).toString('hex')}.pdf`;
     const relPath = `${SUBDIRS.contracts}/${filename}`;
-    fs.writeFileSync(path.join(STORAGE_DIR, SUBDIRS.contracts, filename), pdf);
+    await fs.promises.writeFile(path.join(STORAGE_DIR, SUBDIRS.contracts, filename), pdf);
 
     // Supprime l'ancien PDF en cas de ré-édition.
     if (application.contract && application.contract.pdfPath && application.contract.pdfPath !== relPath) {

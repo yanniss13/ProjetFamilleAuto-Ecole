@@ -5,6 +5,12 @@ const applicationService = require('../services/applicationService');
 const { deleteStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
 
+// P2025 = « enregistrement introuvable » (Prisma). Seul ce cas vaut 404 : toute autre
+// erreur (base indisponible...) doit suivre le circuit d'erreur normal, pas être maquillée.
+function isRecordNotFound(err) {
+  return Boolean(err) && err.code === 'P2025';
+}
+
 // GET /admin
 async function dashboard(req, res, next) {
   try {
@@ -47,8 +53,9 @@ async function removeListing(req, res, next) {
     const filePaths = await listingService.findAnyFilePathsForListing(id);
     try {
       await listingService.deleteAny(id);
-    } catch {
-      return notFound(res); // annonce inexistante
+    } catch (err) {
+      if (isRecordNotFound(err)) return notFound(res); // annonce inexistante
+      throw err;
     }
     for (const rel of filePaths) deleteStored(rel);
     req.flash('success', 'Annonce retirée.');
@@ -65,8 +72,9 @@ async function suspendSchool(req, res, next) {
     if (!id) return notFound(res);
     try {
       await schoolService.setSuspended(id, true);
-    } catch {
-      return notFound(res);
+    } catch (err) {
+      if (isRecordNotFound(err)) return notFound(res);
+      throw err;
     }
     req.flash('success', 'Auto-école suspendue.');
     res.redirect('/admin/ecoles');
@@ -82,8 +90,9 @@ async function reactivateSchool(req, res, next) {
     if (!id) return notFound(res);
     try {
       await schoolService.setSuspended(id, false);
-    } catch {
-      return notFound(res);
+    } catch (err) {
+      if (isRecordNotFound(err)) return notFound(res);
+      throw err;
     }
     req.flash('success', 'Auto-école réactivée.');
     res.redirect('/admin/ecoles');

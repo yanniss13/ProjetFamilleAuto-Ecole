@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const listingController = require('../controllers/listingController');
 const applicationController = require('../controllers/applicationController');
 const { handleApplicationUpload } = require('../middlewares/upload');
+const { verifyAfterUpload } = require('../middlewares/csrf');
 
 const router = express.Router();
 
@@ -19,9 +20,9 @@ const applyLimiter = rateLimit({
 router.get('/', listingController.browse);
 router.get('/:id', listingController.show);
 
-// Candidature : multipart (CV + pièce d'identité). handleApplicationUpload (multer) parse
-// les fichiers ; le jeton CSRF transite en query (?_csrf=...) car le corps multipart n'est
-// pas parsé au middleware csrf.
-router.post('/:id/postuler', applyLimiter, handleApplicationUpload, applicationController.apply);
+// Candidature : multipart (CV + pièces). handleApplicationUpload (multer) parse le corps,
+// puis verifyAfterUpload contrôle le jeton CSRF (champ _csrf) — la vérification globale
+// est différée pour cette route (voir middlewares/csrf.js).
+router.post('/:id/postuler', applyLimiter, handleApplicationUpload, verifyAfterUpload, applicationController.apply);
 
 module.exports = router;

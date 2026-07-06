@@ -2,6 +2,9 @@
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 72; // limite bcrypt (octets)
 
+// Longueurs maximales des champs texte libres (254 = maximum RFC pour un email).
+const MAX = { businessName: 150, email: 254, phone: 30, address: 250 };
+
 function normalizeSiret(value) {
   return (value || '').replace(/\D/g, '');
 }
@@ -20,12 +23,16 @@ function validateRegister(body) {
   const passwordConfirm = body.passwordConfirm || '';
 
   if (!businessName) errors.businessName = 'La raison sociale est obligatoire.';
+  else if (businessName.length > MAX.businessName) errors.businessName = `La raison sociale ne doit pas dépasser ${MAX.businessName} caractères.`;
 
   if (!email) errors.email = "L'email est obligatoire.";
-  else if (!isValidEmail(email)) errors.email = "L'email n'est pas valide.";
+  else if (email.length > MAX.email || !isValidEmail(email)) errors.email = "L'email n'est pas valide.";
 
   if (!siret) errors.siret = 'Le SIRET est obligatoire.';
   else if (siret.length !== 14) errors.siret = 'Le SIRET doit contenir 14 chiffres.';
+
+  if (phone.length > MAX.phone) errors.phone = `Le téléphone ne doit pas dépasser ${MAX.phone} caractères.`;
+  if (address.length > MAX.address) errors.address = `L'adresse ne doit pas dépasser ${MAX.address} caractères.`;
 
   if (!password) errors.password = 'Le mot de passe est obligatoire.';
   else if (password.length < PASSWORD_MIN) errors.password = `Le mot de passe doit contenir au moins ${PASSWORD_MIN} caractères.`;
@@ -45,6 +52,8 @@ function validateProfile(body) {
   const errors = {};
   const phone = (body.phone || '').trim();
   const address = (body.address || '').trim();
+  if (phone.length > MAX.phone) errors.phone = `Le téléphone ne doit pas dépasser ${MAX.phone} caractères.`;
+  if (address.length > MAX.address) errors.address = `L'adresse ne doit pas dépasser ${MAX.address} caractères.`;
   return {
     isValid: Object.keys(errors).length === 0,
     errors,

@@ -52,23 +52,41 @@ async function register(req, res, next) {
     const passwordHash = await password.hash(value.password);
     const { raw, hash } = tokens.generateToken();
 
-    // Géocode l'adresse si fournie (non bloquant : échec -> coords nulles, carte masquée).
-    const { latitude, longitude } = await geocoder.coordsFor(value.address);
-
-    await schoolService.create({
-      businessName: value.businessName,
-      email: value.email,
-      siret: value.siret,
-      phone: value.phone,
-      address: value.address,
-      latitude,
-      longitude,
-      passwordHash,
-      verifyTokenHash: hash,
-      verifyTokenExpiry: new Date(Date.now() + VERIFY_TTL_MS),
-    });
+    let school;
+    try {
+      school = await schoolService.create({
+        businessName: value.businessName,
+        email: value.email,
+        siret: value.siret,
+        phone: value.phone,
+        address: value.address,
+        passwordHash,
+        verifyTokenHash: hash,
+        verifyTokenExpiry: new Date(Date.now() + VERIFY_TTL_MS),
+      });
+    } catch (err) {
+      // Course possible : un autre compte identique créé entre la pré-vérification et le
+      // create. La contrainte @unique répond P2002 -> même message qu'à la pré-vérification.
+      if (err && err.code === 'P2002') {
+        const target = String((err.meta && err.meta.target) || '');
+        if (target.includes('siret')) errors.siret = 'Un compte existe déjà avec ce SIRET.';
+        else errors.email = 'Un compte existe déjà avec cet email.';
+        return res.status(400).render('auth/register', { title: 'Inscription', errors, values });
+      }
+      throw err;
+    }
 
     await mailer.sendVerification(value.email, raw);
+
+    // Géocodage HORS du chemin de réponse (Nominatim peut prendre plusieurs secondes) :
+    // l'inscription répond tout de suite, les coordonnées sont enregistrées après coup.
+    // Échec silencieux -> coords nulles, la carte reste simplement masquée.
+    if (value.address) {
+      geocoder
+        .coordsFor(value.address)
+        .then((coords) => (coords.latitude != null ? schoolService.update(school.id, coords) : null))
+        .catch(() => {});
+    }
 
     req.flash('success', 'Compte créé. Vérifiez votre boîte mail pour confirmer votre adresse.');
     res.redirect('/connexion');
@@ -82,6 +100,14 @@ async function verifyEmail(req, res, next) {
     const hash = tokens.hashToken(req.params.token);
     const school = await schoolService.findByVerifyTokenHash(hash);
 
+    // Idempotent : les clients mail (Outlook SafeLinks, antivirus...) pré-visitent les
+    // liens ; un re-clic après vérification doit rester un succès. On conserve donc le
+    // jeton (inoffensif une fois l'email vérifié : il ne fait que re-confirmer) au lieu
+    // de le consommer, et on répond « succès » si le compte est déjà vérifié.
+    if (school && school.emailVerified) {
+      return res.render('auth/verify-notice', { title: 'Vérification de l’email', status: 'success' });
+    }
+
     const valid =
       school &&
       school.verifyTokenExpiry &&
@@ -93,12 +119,7 @@ async function verifyEmail(req, res, next) {
         .render('auth/verify-notice', { title: 'Vérification de l’email', status: 'invalid' });
     }
 
-    // Idempotent : marque vérifié et consomme le jeton (usage unique).
-    await schoolService.update(school.id, {
-      emailVerified: true,
-      verifyTokenHash: null,
-      verifyTokenExpiry: null,
-    });
+    await schoolService.update(school.id, { emailVerified: true });
 
     res.render('auth/verify-notice', { title: 'Vérification de l’email', status: 'success' });
   } catch (err) {

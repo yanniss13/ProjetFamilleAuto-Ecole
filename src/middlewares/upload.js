@@ -6,6 +6,7 @@
 // Taille max 5 Mo/fichier, nom RÉGÉNÉRÉ (jamais celui du client), extension dérivée du
 // mimetype, stockage dans le dossier PRIVÉ storage/ (jamais sous public/).
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const multer = require('multer');
 
@@ -63,9 +64,45 @@ const uploadApplicationFiles = multer({
   { name: 'teachingCard', maxCount: 1 },
 ]);
 
+// Signatures binaires (magic bytes) attendues par extension. Le mimetype annoncé par
+// le client est déclaratif et falsifiable : on vérifie le CONTENU réel du fichier.
+const SIGNATURES = {
+  '.pdf': [Buffer.from('%PDF')],
+  '.jpg': [Buffer.from([0xff, 0xd8, 0xff])],
+  '.png': [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
+};
+
+// Les premiers octets du fichier écrit correspondent-ils à son extension ?
+async function matchesSignature(file) {
+  const sigs = SIGNATURES[path.extname(file.filename)];
+  if (!sigs) return false;
+  const fh = await fs.promises.open(file.path, 'r');
+  try {
+    const buf = Buffer.alloc(8);
+    const { bytesRead } = await fh.read(buf, 0, 8, 0);
+    return sigs.some((sig) => bytesRead >= sig.length && buf.subarray(0, sig.length).equals(sig));
+  } finally {
+    await fh.close();
+  }
+}
+
+// Supprime (disque + req.files) tout fichier dont le contenu ne correspond pas au type
+// annoncé ; le contrôleur signalera alors le champ comme manquant/invalide.
+async function discardMismatched(req) {
+  for (const [field, files] of Object.entries(req.files || {})) {
+    for (const file of files) {
+      if (!(await matchesSignature(file))) {
+        fs.unlink(file.path, () => {});
+        delete req.files[field];
+        req.uploadError = req.uploadError || 'Le contenu d’un fichier ne correspond pas à son format annoncé.';
+      }
+    }
+  }
+}
+
 // Wrapper : transforme les erreurs multer (fichier trop gros, etc.) en message de
-// validation (req.uploadError) au lieu de faire échouer la requête (500). Les erreurs
-// inattendues sont propagées normalement.
+// validation (req.uploadError) au lieu de faire échouer la requête (500), puis vérifie
+// les magic bytes des fichiers acceptés. Les erreurs inattendues sont propagées.
 function handleApplicationUpload(req, res, next) {
   uploadApplicationFiles(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -76,7 +113,7 @@ function handleApplicationUpload(req, res, next) {
       return next();
     }
     if (err) return next(err);
-    next();
+    discardMismatched(req).then(() => next(), next);
   });
 }
 

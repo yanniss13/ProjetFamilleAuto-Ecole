@@ -76,9 +76,12 @@ async function apply(req, res, next) {
       trackingToken,
     });
 
-    await mailer.sendApplicationNotification(listing.school.email, listing.title, value.applicantName);
-    // Best-effort : confirme au candidat + lien de suivi (n'interrompt pas le flux).
-    await mailer.sendApplicationConfirmation(value.applicantEmail, value.applicantName, listing.title, trackingToken);
+    // Best-effort, en parallèle (mailer.send ne lève jamais) : notification à l'école
+    // + confirmation au candidat avec son lien de suivi.
+    await Promise.all([
+      mailer.sendApplicationNotification(listing.school.email, listing.title, value.applicantName),
+      mailer.sendApplicationConfirmation(value.applicantEmail, value.applicantName, listing.title, trackingToken),
+    ]);
 
     req.flash('success', 'Votre candidature a bien été envoyée.');
     res.redirect(`/annonces/${id}`);
