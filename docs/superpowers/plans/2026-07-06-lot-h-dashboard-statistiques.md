@@ -374,7 +374,7 @@ git commit -m "H: service de statistiques (buckets hebdomadaires et pourcentages
   - `funnel` : 4 étapes `{ label, count, rateFromPrevious }` — labels exacts `'Vues'`, `'Candidatures'`, `'Acceptées'`, `'Contrats signés'`, `rateFromPrevious: null` pour la première ;
   - `topListings` : 5 max, `{ id, title, views, applications, conversionRate }`, tri candidatures desc puis vues desc.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -458,12 +458,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
       'forSchool : compte neuf - series vides mais completes');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ statsService.forSchool is not a function`.
 
-- [ ] **Étape 3 : implémenter `forSchool`**
+- [x] **Étape 3 : implémenter `forSchool`**
 
 Dans `src/services/statsService.js`, juste AVANT la ligne `module.exports`, ajouter :
 
@@ -517,7 +517,7 @@ Et remplacer la ligne d'export par :
 module.exports = { weeklyBuckets, rate, forSchool };
 ```
 
-- [ ] **Étape 4 : vérifier que le test passe (GREEN)**
+- [x] **Étape 4 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 23 assertions.`
