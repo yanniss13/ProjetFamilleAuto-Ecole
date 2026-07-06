@@ -7,6 +7,7 @@ const helmet = require('helmet');
 
 const flash = require('./middlewares/flash');
 const csrf = require('./middlewares/csrf');
+const sessionLocals = require('./middlewares/sessionLocals');
 const routes = require('./routes');
 const prisma = require('./config/prisma');
 const PrismaSessionStore = require('./config/sessionStore');
@@ -66,6 +67,7 @@ app.use(
 
 app.use(flash); // messages flash disponibles dans les vues
 app.use(csrf); // jeton CSRF (exposé aux vues + vérifié sur POST/PUT/PATCH/DELETE)
+app.use(sessionLocals); // nav consciente de la session sur TOUTES les pages (affichage seul)
 
 // Routeurs applicatifs (public + auth + espace auto-école).
 app.use(routes);
