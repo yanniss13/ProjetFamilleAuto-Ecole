@@ -190,6 +190,14 @@ async function main() {
       && vide.funnel.every((s) => s.count === 0) && vide.topListings.length === 0,
       'forSchool : compte neuf - series vides mais completes');
 
+    // --- 4. statsService.forPlatform ---
+    // Comptes globaux : la base peut contenir d'autres donnees, on teste en >=.
+    const plat = await statsService.forPlatform();
+    ok(plat.tiles.schools >= 3 && plat.tiles.listings >= 4 && plat.tiles.applications >= 5 && plat.tiles.signedContracts >= 1,
+      'forPlatform : tuiles >= donnees semees');
+    ok(plat.schoolsWeekly.length === 12 && plat.applicationsWeekly.length === 12, 'forPlatform : deux series de 12 semaines');
+    ok(plat.schoolsWeekly[11].count >= 3 && plat.applicationsWeekly[11].count >= 5, 'forPlatform : creations de la semaine comptees');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

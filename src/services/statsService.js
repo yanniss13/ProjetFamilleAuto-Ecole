@@ -82,4 +82,23 @@ async function forSchool(schoolId) {
   };
 }
 
-module.exports = { weeklyBuckets, rate, forSchool };
+// Statistiques plateforme (dashboard admin) : totaux globaux + inscriptions d'écoles
+// et candidatures par semaine.
+async function forPlatform() {
+  const since = new Date(Date.now() - SERIES_DAYS * 24 * 60 * 60 * 1000);
+  const [schools, listings, applications, signedContracts, recentSchools, recentApplications] = await Promise.all([
+    prisma.school.count(),
+    prisma.listing.count(),
+    prisma.application.count(),
+    prisma.contract.count({ where: { applicantSignedAt: { not: null } } }),
+    prisma.school.findMany({ where: { createdAt: { gte: since } }, select: { createdAt: true } }),
+    prisma.application.findMany({ where: { createdAt: { gte: since } }, select: { createdAt: true } }),
+  ]);
+  return {
+    tiles: { schools, listings, applications, signedContracts },
+    schoolsWeekly: weeklyBuckets(recentSchools.map((s) => s.createdAt), WEEKS),
+    applicationsWeekly: weeklyBuckets(recentApplications.map((a) => a.createdAt), WEEKS),
+  };
+}
+
+module.exports = { weeklyBuckets, rate, forSchool, forPlatform };
