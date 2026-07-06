@@ -22,14 +22,16 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   magic bytes des uploads, géocodage hors requête, écriture PDF async.
 - **Lot E (carte des annonces + rayon) : LIVRÉ le 2026-07-06** (exécuté par Codex,
   revu et validé — 33 assertions dans `test/lot-e.cjs`, plan entièrement coché).
-- **Prochain travail : Lot F (vérification SIRET).**
-  - Spec validée : `docs/superpowers/specs/2026-07-06-lot-f-verification-siret-design.md`
-  - Plan PAS ENCORE COMMENCÉ, à exécuter tâche par tâche :
-    `docs/superpowers/plans/2026-07-06-lot-f-verification-siret.md`
-    (5 tâches TDD avec le code exact de chaque étape ; cocher les cases `- [ ]` au fur
-    et à mesure ; une tâche = tests rouges → implémentation → tests verts → commit).
-  - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
-    concurrent a déjà avalé le travail d'un autre agent une fois).
+- **Lot F (vérification SIRET) : LIVRÉ le 2026-07-06** (exécuté par Codex, revu et
+  validé — 21 assertions dans `test/lot-f.cjs`, plan entièrement coché).
+- **Prochain travail : Lot G (signature électronique du contrat)** — spec et plan à
+  écrire (brainstorming en cours avec l'utilisateur), puis exécution tâche par tâche
+  comme les lots E/F.
+- ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
+  concurrent a déjà avalé le travail d'un autre agent une fois).
+- Habitude à surveiller côté exécution : remplacer la typographie française (— … )
+  par de l'ASCII dans les textes utilisateur — deux corrections déjà nécessaires
+  (lots E et F). La typographie des vues/messages doit rester française.
 - Feuille de route validée avec l'utilisateur (démo jury, dans cet ordre) :
   E carte+rayon → F vérification SIRET (API Recherche d'entreprises) → G signature
   électronique du contrat (canvas + incrustation PDF) → H dashboard statistiques →
