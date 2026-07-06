@@ -1,0 +1,12 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Alerte activée</h1>
+    <p>Votre alerte pour le département <strong>{{ alert.department }}</strong>{% if alert.keyword %}
+      (mot-clé « {{ alert.keyword }} »){% endif %} est active : vous recevrez un email
+      à chaque nouvelle annonce correspondante.</p>
+    <p class="muted">Chaque email contient un lien pour vous désabonner à tout moment.</p>
+    <p><a href="/annonces" class="btn btn-primary">Voir les annonces</a></p>
+  </section>
+{% endblock %}

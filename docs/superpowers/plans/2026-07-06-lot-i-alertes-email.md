@@ -541,7 +541,7 @@ git commit -m "I: formulaire public d alerte + email de confirmation (message ne
 **Interfaces :**
 - Produit : `alertService.confirmByToken(rawToken): Promise<Alert | null>` — hashe le jeton, pose `confirmedAt` si absent, renvoie l'alerte (re-clic = même succès), `null` si inconnu. Route `GET /alertes/confirmer/:token`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);`` :
 
@@ -561,12 +561,12 @@ Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(sDup.rawConfirmToken === null, 'subscribe : doublon deja confirme -> aucun nouveau jeton');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ ECHEC : confirmation : alerte activee` (route inconnue → 404).
 
-- [ ] **Étape 3 : ajouter `confirmByToken` au service**
+- [x] **Étape 3 : ajouter `confirmByToken` au service**
 
 Dans `src/services/alertService.js`, juste AVANT `module.exports`, ajouter :
 
@@ -583,7 +583,7 @@ async function confirmByToken(rawToken) {
 
 Et remplacer l'export par : `module.exports = { subscribe, confirmByToken };`
 
-- [ ] **Étape 4 : contrôleur + route + vue**
+- [x] **Étape 4 : contrôleur + route + vue**
 
 Dans `src/controllers/alertController.js` :
 1. ajouter en tête, avec les autres requires : `const { notFound } = require('../utils/http');`
@@ -627,12 +627,12 @@ Créer `views/alerts/confirmed.twig` :
 {% endblock %}
 ```
 
-- [ ] **Étape 5 : vérifier que le test passe (GREEN)**
+- [x] **Étape 5 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 20 assertions.`
 
-- [ ] **Étape 6 : committer**
+- [x] **Étape 6 : committer**
 
 ```powershell
 git add src/services/alertService.js src/controllers/alertController.js src/routes/alertRoutes.js views/alerts/confirmed.twig test/lot-i.cjs

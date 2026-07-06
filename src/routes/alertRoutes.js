@@ -16,5 +16,6 @@ const subscribeLimiter = rateLimit({
 
 router.get('/', alertController.newForm);
 router.post('/', subscribeLimiter, alertController.create);
+router.get('/confirmer/:token', alertController.confirm);
 
 module.exports = router;

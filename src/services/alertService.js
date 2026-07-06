@@ -39,4 +39,13 @@ async function subscribe(email, department, keyword) {
   }
 }
 
-module.exports = { subscribe };
+// Active l'alerte du jeton (reçu en clair, hashé pour le lookup). Idempotent : le
+// jeton est conservé après confirmation, un re-clic renvoie la même alerte active.
+async function confirmByToken(rawToken) {
+  const alert = await prisma.alert.findUnique({ where: { confirmTokenHash: hashToken(rawToken) } });
+  if (!alert) return null;
+  if (alert.confirmedAt) return alert;
+  return prisma.alert.update({ where: { id: alert.id }, data: { confirmedAt: new Date() } });
+}
+
+module.exports = { subscribe, confirmByToken };

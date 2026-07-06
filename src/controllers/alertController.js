@@ -2,6 +2,7 @@
 // et désabonnement. Aucune session : tout passe par les jetons des liens email.
 const alertService = require('../services/alertService');
 const mailer = require('../services/mailer');
+const { notFound } = require('../utils/http');
 const { validateAlert } = require('../validators/alertValidator');
 
 // GET /alertes (?departement=, ?q= — pré-remplissage depuis la recherche d'annonces)
@@ -37,4 +38,15 @@ async function create(req, res, next) {
   }
 }
 
-module.exports = { newForm, create };
+// GET /alertes/confirmer/:token — idempotent (re-clic = succès).
+async function confirm(req, res, next) {
+  try {
+    const alert = await alertService.confirmByToken(req.params.token);
+    if (!alert) return notFound(res);
+    res.render('alerts/confirmed', { title: 'Alerte activée', alert });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { newForm, create, confirm };
