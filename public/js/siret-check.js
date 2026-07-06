@@ -30,9 +30,9 @@
           if (businessName && !businessName.value && data.name) businessName.value = data.name;
           if (address && !address.value && data.address) address.value = data.address;
         } else if (data.status === 'closed') {
-          show('Établissement fermé administrativement - vous pouvez tout de même vous inscrire.', false);
+          show('Établissement fermé administrativement — vous pouvez tout de même vous inscrire.', false);
         } else if (data.status === 'not_found') {
-          show('SIRET introuvable au répertoire Sirene - vérifiez la saisie.', false);
+          show('SIRET introuvable au répertoire Sirene — vérifiez la saisie.', false);
         } else {
           status.hidden = true; // panne / rate-limit : silencieux, jamais bloquant
         }
