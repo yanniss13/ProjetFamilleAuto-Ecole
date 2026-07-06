@@ -34,7 +34,8 @@ app.use(
 );
 
 // Moteur de vues Twig. autoescape activé : toute {{ variable }} est échappée
-// (anti-XSS stocké). Aucune vue n'utilise |raw.
+// (anti-XSS stocké). Unique usage de |raw : le bloc de données JSON #map-data de
+// listings/index.twig (JSON.stringify avec "<" échappé côté serveur, jamais du HTML).
 app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'twig');
 app.set('twig options', { autoescape: true });

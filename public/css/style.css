@@ -135,7 +135,8 @@ body {
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
-.filter-bar input {
+.filter-bar input,
+.filter-bar select {
   flex: 1 1 200px;
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--color-border);
@@ -225,3 +226,27 @@ body {
 
 .label-note { font-weight: 400; font-size: 0.9rem; }
 .fine-print { font-size: 0.8rem; }
+
+/* ---------- Lot E : vue carte des annonces & rayon ---------- */
+#listings-map {
+  height: 480px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+.view-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.badge-distance {
+  background: #eef2ff;
+  color: #3730a3;
+  border-radius: 999px;
+  padding: 0 0.5rem;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+.map-popup-listings {
+  margin: 0.25rem 0 0;
+  padding-left: 1rem;
+}

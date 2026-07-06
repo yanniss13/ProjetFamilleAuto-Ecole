@@ -471,7 +471,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `geocoder.geocodeCached` (Task 2), `listingService.findPublic` / `findPublicForMap` (Task 3), `parsePage`/`paginate`/`pageUrl` (`src/utils/pagination.js`, existants).
 - Produces: variables de vue `vue`, `filters { departement, q, ville, rayon }`, `rayons`, `villeIntrouvable`, `listeUrl`, `carteUrl`, `unlocatedCount`, `mapJson` ; bloc HTML `#map-data` + conteneur `#listings-map`.
 
-- [ ] **Step 1 : tests HTTP qui échouent** — dans `test/lot-e.cjs` :
+- [x] **Step 1 : tests HTTP qui échouent** — dans `test/lot-e.cjs` :
 
 (a) compléter les requires en tête (sous listingService) :
 
@@ -563,12 +563,12 @@ et dans le `finally`, AVANT `prisma.$disconnect()` :
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-e.cjs`
 Attendu : `❌ ÉCHEC : HTTP : rayon 50 km filtre la liste...`
 
-- [ ] **Step 3 : implémentation contrôleur** — dans `src/controllers/listingController.js` :
+- [x] **Step 3 : implémentation contrôleur** — dans `src/controllers/listingController.js` :
 
 (a) en tête, sous le require de pagination :
 
@@ -647,7 +647,7 @@ async function browse(req, res, next) {
 }
 ```
 
-- [ ] **Step 4 : implémentation vue** — remplacer intégralement `views/listings/index.twig` par :
+- [x] **Step 4 : implémentation vue** — remplacer intégralement `views/listings/index.twig` par :
 
 ```twig
 {% extends 'layouts/base.twig' %}
@@ -724,7 +724,7 @@ async function browse(req, res, next) {
 {% endblock %}
 ```
 
-- [ ] **Step 5 : commentaire autoescape** — dans `src/app.js`, remplacer :
+- [x] **Step 5 : commentaire autoescape** — dans `src/app.js`, remplacer :
 
 ```js
 // Moteur de vues Twig. autoescape activé : toute {{ variable }} est échappée
@@ -739,7 +739,7 @@ par :
 // listings/index.twig (JSON.stringify avec « < » échappé côté serveur, jamais du HTML).
 ```
 
-- [ ] **Step 6 : JS de la carte** — créer `public/js/listings-map.js` :
+- [x] **Step 6 : JS de la carte** — créer `public/js/listings-map.js` :
 
 ```js
 // Carte des annonces (/annonces?vue=carte) : lit le bloc JSON #map-data et affiche un
@@ -815,7 +815,7 @@ par :
 })();
 ```
 
-- [ ] **Step 7 : styles** — ajouter en FIN de `public/css/style.css` :
+- [x] **Step 7 : styles** — ajouter en FIN de `public/css/style.css` :
 
 ```css
 /* ---------- Lot E : vue carte des annonces & rayon ---------- */
@@ -843,12 +843,12 @@ par :
 }
 ```
 
-- [ ] **Step 8 : vérifier le succès**
+- [x] **Step 8 : vérifier le succès**
 
 Run : `node test/lot-e.cjs`
 Attendu : 33 ✓, `✅ Lot E tests réussis — 33 assertions.`
 
-- [ ] **Step 9 : commit**
+- [x] **Step 9 : commit**
 
 ```bash
 git add src/controllers/listingController.js views/listings/index.twig src/app.js public/js/listings-map.js public/css/style.css test/lot-e.cjs

@@ -4,28 +4,69 @@
   <div class="page-header"><h1>Annonces</h1></div>
 
   <form action="/annonces" method="get" class="filter-bar">
-    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville…)">
+    {% if vue == 'carte' %}<input type="hidden" name="vue" value="carte">{% endif %}
+    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville...)">
     <input type="text" name="departement" value="{{ filters.departement }}" placeholder="Département (ex. 13)">
+    <input type="text" name="ville" value="{{ filters.ville }}" placeholder="Autour de... (ville)">
+    <select name="rayon" aria-label="Rayon de recherche">
+      {% for r in rayons %}
+        <option value="{{ r }}" {% if filters.rayon == r %}selected{% endif %}>{{ r }} km</option>
+      {% endfor %}
+    </select>
     <button type="submit" class="btn">Filtrer</button>
   </form>
 
-  {% if listings|length == 0 %}
-    <p class="muted">Aucune annonce ne correspond à votre recherche.</p>
+  <div class="view-toggle">
+    <a href="{{ listeUrl }}" class="btn btn-small {% if vue == 'liste' %}btn-primary{% endif %}">Liste</a>
+    <a href="{{ carteUrl }}" class="btn btn-small {% if vue == 'carte' %}btn-primary{% endif %}">Carte</a>
+  </div>
+
+  {% if villeIntrouvable %}
+    <div class="flash flash-error" role="alert">Ville introuvable - le filtre de rayon a été ignoré.</div>
+  {% endif %}
+
+  {% if vue == 'carte' %}
+    <div id="listings-map"></div>
+    {% if unlocatedCount > 0 %}
+      <p class="muted">{{ unlocatedCount }} annonce(s) sans localisation - consultez la vue liste.</p>
+    {% endif %}
+    {# Bloc de DONNÉES (non exécutable, hors CSP script-src). JSON échappé côté
+       serveur ("<" -> séquence unicode) : unique usage documenté de |raw. #}
+    <script type="application/json" id="map-data">{{ mapJson|raw }}</script>
   {% else %}
-    <ul class="listing-list">
-      {% for l in listings %}
-        <li class="listing-card">
-          <a href="/annonces/{{ l.id }}"><h2>{{ l.title }}</h2></a>
-          <p class="muted">
-            {{ l.city }} ({{ l.department }})
-            {% if l.contractType %} · {{ l.contractType }}{% endif %}
-            {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
-          </p>
-          <p>{{ l.description }}</p>
-          <p><a href="/annonces/{{ l.id }}" class="btn btn-small">Voir &amp; postuler</a></p>
-        </li>
-      {% endfor %}
-    </ul>
-    {% include 'partials/pagination.twig' %}
+    {% if listings|length == 0 %}
+      <p class="muted">Aucune annonce ne correspond à votre recherche.</p>
+    {% else %}
+      <ul class="listing-list">
+        {% for l in listings %}
+          <li class="listing-card">
+            <a href="/annonces/{{ l.id }}"><h2>{{ l.title }}</h2></a>
+            <p class="muted">
+              {{ l.city }} ({{ l.department }})
+              {% if l.contractType %} · {{ l.contractType }}{% endif %}
+              {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
+              {% if l.distanceKm %} <span class="badge-distance">à {{ l.distanceKm }} km</span>{% endif %}
+            </p>
+            <p>{{ l.description }}</p>
+            <p><a href="/annonces/{{ l.id }}" class="btn btn-small">Voir &amp; postuler</a></p>
+          </li>
+        {% endfor %}
+      </ul>
+      {% include 'partials/pagination.twig' %}
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{# Assets carto chargés uniquement en vue carte. #}
+{% block head %}
+  {% if vue == 'carte' %}
+    <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {% if vue == 'carte' %}
+    <script src="/vendor/leaflet/leaflet.js"></script>
+    <script src="/js/listings-map.js"></script>
   {% endif %}
 {% endblock %}

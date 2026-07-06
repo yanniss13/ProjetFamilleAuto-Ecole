@@ -4,21 +4,65 @@ const { validateListing } = require('../validators/listingValidator');
 const { parseId, notFound } = require('../utils/http');
 const { deleteStored } = require('../config/storage');
 const { parsePage, paginate, pageUrl } = require('../utils/pagination');
+const geocoder = require('../services/geocoder');
+
+// Rayons de recherche proposés (km). Défaut : 25.
+const RAYONS = [10, 25, 50, 100];
 
 // ----------------------------- Public -----------------------------
 
-// GET /annonces  (?departement=, ?q=, ?page=)
+// GET /annonces  (?departement=, ?q=, ?ville=, ?rayon=, ?vue=, ?page=)
 async function browse(req, res, next) {
   try {
     const { departement, q } = req.query;
+    const ville = (typeof req.query.ville === 'string' ? req.query.ville : '').trim();
+    const rayonParsed = parseInt(req.query.rayon, 10);
+    const rayon = RAYONS.includes(rayonParsed) ? rayonParsed : 25;
+    const vue = req.query.vue === 'carte' ? 'carte' : 'liste';
     const page = parsePage(req.query.page);
-    const { items, total } = await listingService.findPublic({ department: departement, q, page });
-    const { page: current, pageCount } = paginate(page, total);
-    const query = { departement: departement || '', q: q || '' };
-    res.render('listings/index', {
+
+    // Rayon actif seulement si la ville saisie est localisable (cache Nominatim).
+    let center = null;
+    let villeIntrouvable = false;
+    if (ville) {
+      center = await geocoder.geocodeCached(ville);
+      if (!center) villeIntrouvable = true;
+    }
+
+    const query = { departement: departement || '', q: q || '', ville, rayon: ville ? String(rayon) : '' };
+    const common = {
       title: 'Annonces',
+      filters: { departement: query.departement, q: query.q, ville, rayon },
+      rayons: RAYONS,
+      vue,
+      villeIntrouvable,
+      listeUrl: pageUrl('/annonces', query, 1),
+      carteUrl: pageUrl('/annonces', { ...query, vue: 'carte' }, 1),
+    };
+
+    if (vue === 'carte') {
+      const { schools, unlocatedCount } = await listingService.findPublicForMap({
+        department: departement, q, center, radiusKm: center ? rayon : null,
+      });
+      const mapData = { schools, center: center ? { lat: center.lat, lng: center.lng, radiusKm: rayon } : null };
+      return res.render('listings/index', {
+        ...common,
+        listings: [],
+        unlocatedCount,
+        // Bloc <script type="application/json"> : "<" échappé pour qu'aucune donnée
+        // (titre d'annonce...) ne puisse fermer le bloc. Rendu avec |raw : voir le
+        // commentaire autoescape de app.js (unique exception, JSON jamais HTML).
+        mapJson: JSON.stringify(mapData).replace(/</g, '\\u003c'),
+      });
+    }
+
+    const { items, total } = await listingService.findPublic({
+      department: departement, q, page, center, radiusKm: center ? rayon : null,
+    });
+    const { page: current, pageCount } = paginate(page, total);
+    res.render('listings/index', {
+      ...common,
       listings: items,
-      filters: query,
       pagination: {
         page: current,
         pageCount,
