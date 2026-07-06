@@ -24,9 +24,13 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   revu et validé — 33 assertions dans `test/lot-e.cjs`, plan entièrement coché).
 - **Lot F (vérification SIRET) : LIVRÉ le 2026-07-06** (exécuté par Codex, revu et
   validé — 21 assertions dans `test/lot-f.cjs`, plan entièrement coché).
-- **Prochain travail : Lot G (signature électronique du contrat)** — spec et plan à
-  écrire (brainstorming en cours avec l'utilisateur), puis exécution tâche par tâche
-  comme les lots E/F.
+- **Prochain travail : Lot G (signature électronique du contrat).**
+  - Spec validée : `docs/superpowers/specs/2026-07-06-lot-g-signature-electronique-design.md`
+  - Plan PAS ENCORE COMMENCÉ, à exécuter tâche par tâche :
+    `docs/superpowers/plans/2026-07-06-lot-g-signature-electronique.md`
+    (7 tâches TDD avec le code exact de chaque étape ; cocher les cases `- [ ]` ; une
+    tâche = tests rouges → implémentation → tests verts → commit). Attention : la
+    Task 4 adapte aussi `test/smoke.cjs` (signature désormais requise à l'acceptation).
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
