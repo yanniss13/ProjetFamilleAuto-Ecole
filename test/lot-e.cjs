@@ -9,8 +9,12 @@ process.env.SMTP_HOST = '';
 process.env.GEOCODING_DISABLED = '1';
 
 const { haversineKm, bboxAround } = require('../src/utils/geo');
+const prisma = require('../src/config/prisma');
+const listingService = require('../src/services/listingService');
 
 const STAMP = Date.now();
+const createdSchoolIds = [];
+const KW = `lote${STAMP}`;
 
 let passed = 0;
 function ok(cond, label) {
@@ -19,7 +23,29 @@ function ok(cond, label) {
   console.log(`  ✓ ${label}`);
 }
 
+// Une ecole + une annonce portant le mot-cle du lot (isolation des donnees de test).
+async function seedSchool(name, siretPrefix, latitude, longitude) {
+  const school = await prisma.school.create({
+    data: {
+      email: `${name.toLowerCase().replace(/\s/g, '')}.${STAMP}@example.test`, passwordHash: 'x',
+      businessName: name, siret: `${siretPrefix}${String(STAMP).slice(-13).padStart(13, '0')}`,
+      emailVerified: true, latitude, longitude,
+    },
+  });
+  createdSchoolIds.push(school.id);
+  return school;
+}
+async function seedListing(school, title) {
+  return prisma.listing.create({
+    data: {
+      title, description: 'desc', city: 'Ville', department: '13', schoolId: school.id,
+      titleLower: title.toLowerCase(), descriptionLower: 'desc', cityLower: 'ville',
+    },
+  });
+}
+
 async function main() {
+  try {
   // --- 1. utils/geo ---
   const dMA = haversineKm(43.2965, 5.3698, 43.5297, 5.4474); // Marseille -> Aix
   ok(dMA > 22 && dMA < 30, 'geo : Marseille-Aix environ 26 km');
@@ -62,7 +88,48 @@ async function main() {
     }
   }
 
+    // --- 3. listingService : rayon + donnees carte ---
+    const MRS = { lat: 43.2965, lng: 5.3698 }; // Marseille
+    const schoolNear = await seedSchool('LotE Near', '2', 43.2965, 5.3698); // Marseille
+    const schoolFar = await seedSchool('LotE Far', '3', 50.6329, 3.0573); // Lille (~834 km)
+    const schoolNoGeo = await seedSchool('LotE NoGeo', '4', null, null);
+    const lNear1 = await seedListing(schoolNear, `${KW} proche un`);
+    const lNear2 = await seedListing(schoolNear, `${KW} proche deux`);
+    const lFar = await seedListing(schoolFar, `${KW} lointaine`);
+    await seedListing(schoolNoGeo, `${KW} sans geo`);
+
+    let res = await listingService.findPublic({ q: KW, center: MRS, radiusKm: 50 });
+    ok(res.total === 2 && res.items.every((l) => l.schoolId === schoolNear.id),
+      'service : rayon 50 km garde Marseille, exclut Lille et la non-localisee');
+    ok(res.items[0].distanceKm === 1, 'service : distanceKm entier avec plancher 1 km');
+
+    res = await listingService.findPublic({ q: KW, center: MRS, radiusKm: 1000 });
+    ok(res.total === 3, 'service : rayon 1000 km inclut Lille (pas la non-localisee)');
+    const far = res.items.find((l) => l.id === lFar.id);
+    ok(res.items[res.items.length - 1].id === lFar.id && far.distanceKm > 700 && far.distanceKm < 1000,
+      'service : tri par distance croissante, Lille en dernier (~834 km)');
+
+    res = await listingService.findPublic({ q: KW });
+    ok(res.total === 4 && res.items.every((l) => l.distanceKm === undefined),
+      'service : sans rayon, comportement inchange (4 annonces, pas de distanceKm)');
+
+    let m = await listingService.findPublicForMap({ q: KW });
+    ok(m.schools.length === 2, 'service : carte = 2 ecoles geolocalisees');
+    const near = m.schools.find((s) => s.schoolName === 'LotE Near');
+    ok(near && near.listings.length === 2 && near.listings.some((l) => l.id === lNear1.id) && near.listings.some((l) => l.id === lNear2.id),
+      'service : annonces groupees par ecole');
+    ok(m.unlocatedCount === 1, 'service : 1 annonce sans localisation comptee');
+
+    m = await listingService.findPublicForMap({ q: KW, center: MRS, radiusKm: 50 });
+    ok(m.schools.length === 1 && m.schools[0].schoolName === 'LotE Near', 'service : carte filtree par rayon');
+
   console.log(`\n✅ Lot E tests reussis - ${passed} assertions.`);
+  } finally {
+    if (createdSchoolIds.length) {
+      await prisma.school.deleteMany({ where: { id: { in: createdSchoolIds } } });
+    }
+    await prisma.$disconnect();
+  }
 }
 
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });

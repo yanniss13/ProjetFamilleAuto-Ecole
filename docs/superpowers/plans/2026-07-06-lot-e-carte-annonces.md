@@ -249,7 +249,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `findPublic({ department, q, page, center, radiusKm })` : `center = { lat, lng } | null`. Avec centre+rayon : items filtrés au rayon, triés par distance croissante, chacun portant `distanceKm` (entier, plancher 1) ; pagination en mémoire ; sans centre : comportement actuel inchangé.
   - `findPublicForMap({ department, q, center, radiusKm }) -> { schools, unlocatedCount }` où `schools = [{ schoolName, latitude, longitude, listings: [{ id, title, city }] }]` (annonces ouvertes d'écoles non suspendues et géolocalisées, groupées par école) et `unlocatedCount` = nb d'annonces filtrées sans coordonnées.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-e.cjs` :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-e.cjs` :
 
 (a) compléter les requires en tête de fichier (sous le require de geo) :
 
@@ -338,12 +338,12 @@ async function main() {
 }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-e.cjs`
 Attendu : `❌ ÉCHEC : service : rayon 50 km...` (distanceKm/filtre absents) ou `findPublicForMap is not a function`
 
-- [ ] **Step 3 : implémentation** — dans `src/services/listingService.js` :
+- [x] **Step 3 : implémentation** — dans `src/services/listingService.js` :
 
 (a) en tête, sous le require de pagination :
 
@@ -441,12 +441,12 @@ async function findPublicForMap({ department, q, center = null, radiusKm = null 
 
 (d) ajouter `findPublicForMap` à la ligne `module.exports` existante.
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-e.cjs`
 Attendu : 19 ✓.
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/services/listingService.js test/lot-e.cjs
