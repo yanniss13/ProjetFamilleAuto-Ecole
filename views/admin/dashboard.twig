@@ -30,6 +30,25 @@
     <script type="application/json" id="stats-data">{{ statsJson|raw }}</script>
   {% endif %}
 
+  <section class="purge-card">
+    <h2>Purge RGPD</h2>
+    {% if lastPurge %}
+      <p>Dernière purge : {{ lastPurge.ranAt|date('d/m/Y H:i') }} —
+        {{ lastPurge.unconfirmedAlerts }} alerte(s) non confirmée(s),
+        {{ lastPurge.rejectedApplications }} candidature(s) refusée(s),
+        {{ lastPurge.expiredTokens }} jeton(s) expiré(s).</p>
+    {% else %}
+      <p class="muted">Aucune purge pour l’instant.</p>
+    {% endif %}
+    <form action="/admin/purge" method="post">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn">Lancer une purge maintenant</button>
+    </form>
+    <p class="muted">Automatique au démarrage puis toutes les 24 h — alertes non confirmées
+      après 7 jours, candidatures refusées après 180 jours, jetons expirés.
+      Les candidatures acceptées et les contrats sont conservés.</p>
+  </section>
+
   <div class="dashboard-actions">
     <a href="/admin/ecoles" class="btn btn-primary">Auto-écoles</a>
     <a href="/admin/annonces" class="btn">Annonces</a>

@@ -447,7 +447,7 @@ git commit -m "J: service de purge (alertes, candidatures refusees + fichiers, j
 - Consomme : `purgeService.runPurge`, `purgeService.findLatestRun` (Tâche 2).
 - Produit : `POST /admin/purge` (protégé par `requireAdmin` + `loadAdmin`, comme les autres actions admin), variable `lastPurge` dans la vue dashboard.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);`` :
 
@@ -479,12 +479,12 @@ Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(rAnon.status === 302 && rAnon.location === '/admin/connexion', 'admin : purge refusee sans session admin');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `❌ ECHEC : admin : bloc purge + bouton presents`.
 
-- [ ] **Étape 3 : contrôleur admin**
+- [x] **Étape 3 : contrôleur admin**
 
 Dans `src/controllers/adminController.js` :
 
@@ -528,7 +528,7 @@ async function purge(req, res, next) {
 
 4. Ajouter `purge` à l'objet `module.exports`.
 
-- [ ] **Étape 4 : route + vue + CSS**
+- [x] **Étape 4 : route + vue + CSS**
 
 Dans `src/routes/adminRoutes.js`, dans la section protégée (après `router.get('/', adminController.dashboard);`), ajouter :
 
@@ -575,12 +575,12 @@ Dans `public/css/style.css`, juste APRÈS le bloc « Graphiques des tableaux de 
 .purge-card form { margin: 0.5rem 0; }
 ```
 
-- [ ] **Étape 5 : vérifier que le test passe (GREEN)**
+- [x] **Étape 5 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `✅ Lot J tests reussis - 20 assertions.`
 
-- [ ] **Étape 6 : suite complète puis commit**
+- [x] **Étape 6 : suite complète puis commit**
 
 Lancer : `npm test` — en particulier `test/lot-c.cjs` et `test/lot-h.cjs` (dashboard admin) doivent rester verts.
 

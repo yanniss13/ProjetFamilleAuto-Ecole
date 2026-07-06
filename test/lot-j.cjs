@@ -154,6 +154,32 @@ async function main() {
       'purge : PurgeRun ecrite et findLatestRun coherente');
     createdPurgeRunIds.push(latest.id);
 
+    // --- 3. dashboard admin : tuile + purge manuelle ---
+    const adminService = require('../src/services/adminService');
+    const admin = await adminService.create({ email: `j.admin.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('adminpass123') });
+    createdAdminIds.push(admin.id);
+    const adminJar = makeJar();
+    let ra = await req(adminJar, 'GET', '/admin/connexion');
+    ra = await req(adminJar, 'POST', '/admin/connexion', form({ _csrf: csrfFrom(ra.text), email: admin.email, password: 'adminpass123' }));
+    ra = await req(adminJar, 'GET', '/admin');
+    ok(ra.status === 200 && ra.text.includes('Purge RGPD') && ra.text.includes('Lancer une purge maintenant'),
+      'admin : bloc purge + bouton presents');
+    ok(ra.text.includes('Dernière purge'), 'admin : derniere purge affichee');
+
+    const alOld2 = await mkAlert(`j.al.old2.${STAMP}@example.test`, null, daysAgo(10));
+    ra = await req(adminJar, 'GET', '/admin');
+    ra = await req(adminJar, 'POST', '/admin/purge', form({ _csrf: csrfFrom(ra.text) }));
+    ok(ra.status === 302 && ra.location === '/admin', 'admin : POST purge -> redirection dashboard');
+    ok((await prisma.alert.findUnique({ where: { id: alOld2.id } })) === null, 'admin : la purge manuelle a bien purge');
+    ra = await req(adminJar, 'GET', '/admin');
+    ok(ra.text.includes('Purge effectuée'), 'admin : flash avec les compteurs affiche');
+    createdPurgeRunIds.push((await purgeService.findLatestRun()).id);
+
+    const anonJar = makeJar();
+    let rAnon = await req(anonJar, 'GET', '/admin/connexion');
+    rAnon = await req(anonJar, 'POST', '/admin/purge', form({ _csrf: csrfFrom(rAnon.text) }));
+    ok(rAnon.status === 302 && rAnon.location === '/admin/connexion', 'admin : purge refusee sans session admin');
+
     console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
