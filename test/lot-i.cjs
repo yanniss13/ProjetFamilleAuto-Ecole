@@ -146,6 +146,62 @@ async function main() {
     r = await get(`/alertes/desabonner/${unsubToken}`);
     ok(r.status === 404, 'desabonnement : jeton deja consomme -> 404');
 
+    // --- 5. notification a la publication ---
+    const aA = (await alertService.subscribe(`i.a.${STAMP}@example.test`, '13', '')).alert;
+    const aB = (await alertService.subscribe(`i.b.${STAMP}@example.test`, '13', 'moto')).alert;
+    const aC = (await alertService.subscribe(`i.c.${STAMP}@example.test`, '13', '')).alert; // restera non confirmee
+    const aD = (await alertService.subscribe(`i.d.${STAMP}@example.test`, '75', '')).alert;
+    await prisma.alert.updateMany({ where: { id: { in: [aA.id, aB.id, aD.id] } }, data: { confirmedAt: new Date() } });
+
+    const alertMails = [];
+    mailer.sendListingAlert = async (email, listing, unsubscribeToken) => {
+      alertMails.push({ email, listingId: listing.id, unsubscribeToken });
+      return true;
+    };
+
+    const schoolI = await prisma.school.create({
+      data: {
+        email: `i.ecole.${STAMP}@example.test`,
+        passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: `Ecole Lot I ${STAMP}`,
+        siret: `8${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(schoolI.id);
+    const schoolJar = makeJar();
+    let rs = await req(schoolJar, 'GET', '/connexion');
+    rs = await req(schoolJar, 'POST', '/connexion', form({ _csrf: csrfFrom(rs.text), email: schoolI.email, password: 'motdepasse123' }));
+
+    let rc = await req(schoolJar, 'GET', '/mes-annonces/nouvelle');
+    rc = await req(schoolJar, 'POST', '/mes-annonces', form({
+      _csrf: csrfFrom(rc.text), title: `Moniteur Moto ${STAMP}`, description: 'poste complet', city: 'Marseille', department: '13',
+    }));
+    ok(rc.status === 302 && rc.location === '/mes-annonces', 'publication : annonce creee');
+    ok(await eventually(() => alertMails.length >= 2), 'alerte : emails partis apres la publication');
+    await new Promise((r2) => setTimeout(r2, 150)); // laisse retomber d'eventuels envois en trop
+    ok(alertMails.length === 2, 'alerte : exactement 2 destinataires');
+    const dests = alertMails.map((m) => m.email);
+    ok(dests.includes(aA.email) && dests.includes(aB.email), 'alerte : sans mot-cle + mot-cle « moto » notifies');
+    ok(!dests.includes(aC.email) && !dests.includes(aD.email), 'alerte : non confirmee et autre departement exclues');
+    ok(alertMails.every((m) => typeof m.unsubscribeToken === 'string' && m.unsubscribeToken.length >= 32),
+      'alerte : chaque email porte son jeton de desabonnement');
+
+    alertMails.length = 0;
+    rc = await req(schoolJar, 'GET', '/mes-annonces/nouvelle');
+    rc = await req(schoolJar, 'POST', '/mes-annonces', form({
+      _csrf: csrfFrom(rc.text), title: `Moniteur voiture ${STAMP}`, description: 'poste', city: 'Marseille', department: '13',
+    }));
+    ok(await eventually(() => alertMails.length === 1) && alertMails[0].email === aA.email,
+      'alerte : mot-cle non matche -> seule l alerte sans mot-cle est notifiee');
+
+    mailer.sendListingAlert = async () => { throw new Error('panne smtp simulee'); };
+    rc = await req(schoolJar, 'GET', '/mes-annonces/nouvelle');
+    rc = await req(schoolJar, 'POST', '/mes-annonces', form({
+      _csrf: csrfFrom(rc.text), title: `Moniteur secours ${STAMP}`, description: 'poste', city: 'Marseille', department: '13',
+    }));
+    ok(rc.status === 302 && rc.location === '/mes-annonces', 'alerte : une panne d envoi ne bloque jamais la publication');
+
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

@@ -178,6 +178,22 @@ function sendAlertConfirmation(email, department, keyword, rawToken) {
   );
 }
 
+// Alerte : une nouvelle annonce correspond aux critères de l'abonné. Le lien de
+// désabonnement figure dans CHAQUE email (obligation d'opt-out).
+function sendListingAlert(email, listing, unsubscribeToken) {
+  const link = `${APP_URL}/annonces/${listing.id}`;
+  const unsubscribeLink = `${APP_URL}/alertes/desabonner/${unsubscribeToken}`;
+  return send(
+    email,
+    `Nouvelle annonce — ${listing.title}`,
+    `<p>Une nouvelle annonce correspond à votre alerte :</p>
+     <p><strong>${esc(listing.title)}</strong> — ${esc(listing.city)} (${esc(listing.department)})</p>
+     <p><a href="${link}">Voir l’annonce et postuler</a></p>
+     <p><a href="${unsubscribeLink}">Se désabonner de cette alerte</a></p>`,
+    { link }
+  );
+}
+
 module.exports = {
   send,
   sendVerification,
@@ -189,6 +205,7 @@ module.exports = {
   sendApplicationAccepted,
   sendApplicationRejected,
   sendAlertConfirmation,
+  sendListingAlert,
   maskEmail,
   esc,
   APP_URL,

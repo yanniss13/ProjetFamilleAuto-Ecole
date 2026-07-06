@@ -1,5 +1,6 @@
 // Annonces : consultation publique + gestion par l'auto-école propriétaire.
 const listingService = require('../services/listingService');
+const alertService = require('../services/alertService');
 const { validateListing } = require('../validators/listingValidator');
 const { parseId, notFound } = require('../utils/http');
 const { deleteStored } = require('../config/storage');
@@ -130,7 +131,8 @@ async function create(req, res, next) {
         isEdit: false,
       });
     }
-    await listingService.createForSchool(req.school.id, value);
+    const listing = await listingService.createForSchool(req.school.id, value);
+    alertService.notifyNewListing(listing); // fire-and-forget : la publication n'attend pas les emails
     req.flash('success', 'Annonce publiée.');
     res.redirect('/mes-annonces');
   } catch (err) {
