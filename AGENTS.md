@@ -27,7 +27,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 - **Lot G (signature électronique du contrat) : LIVRÉ** — pad canvas école + candidat,
   PDF final avec page de signatures (horodatages + empreintes SHA-256), invitation par
   email, invalidation à la ré-édition. Tests : `test/lot-g.cjs`.
-- **Prochain travail : Lot H (dashboard statistiques)** — spec et plan à écrire.
+- **Prochain travail : Lot H (dashboard statistiques)** — spec validée
+  (`docs/superpowers/specs/2026-07-06-lot-h-dashboard-statistiques-design.md`), plan à
+  exécuter tâche par tâche :
+  `docs/superpowers/plans/2026-07-06-lot-h-dashboard-statistiques.md`.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
