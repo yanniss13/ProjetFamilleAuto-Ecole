@@ -40,4 +40,46 @@ function rate(part, total) {
   return total ? Math.round((part / total) * 100) : 0;
 }
 
-module.exports = { weeklyBuckets, rate };
+// Statistiques du tableau de bord d'une école : tuiles, série hebdo des candidatures,
+// entonnoir de recrutement et top annonces. Toutes les requêtes sont scopées schoolId.
+async function forSchool(schoolId) {
+  const since = new Date(Date.now() - SERIES_DAYS * 24 * 60 * 60 * 1000);
+  const [openListings, viewsAgg, applications, accepted, signedContracts, recentApplications, listings] = await Promise.all([
+    prisma.listing.count({ where: { schoolId, status: 'open' } }),
+    prisma.listing.aggregate({ where: { schoolId }, _sum: { viewsCount: true } }),
+    prisma.application.count({ where: { listing: { schoolId } } }),
+    prisma.application.count({ where: { listing: { schoolId }, status: 'accepted' } }),
+    prisma.contract.count({ where: { applicantSignedAt: { not: null }, application: { listing: { schoolId } } } }),
+    prisma.application.findMany({ where: { listing: { schoolId }, createdAt: { gte: since } }, select: { createdAt: true } }),
+    prisma.listing.findMany({
+      where: { schoolId },
+      select: { id: true, title: true, viewsCount: true, _count: { select: { applications: true } } },
+    }),
+  ]);
+
+  const totalViews = viewsAgg._sum.viewsCount || 0;
+  const topListings = listings
+    .map((l) => ({
+      id: l.id,
+      title: l.title,
+      views: l.viewsCount,
+      applications: l._count.applications,
+      conversionRate: rate(l._count.applications, l.viewsCount),
+    }))
+    .sort((a, b) => b.applications - a.applications || b.views - a.views)
+    .slice(0, 5);
+
+  return {
+    tiles: { openListings, totalViews, applications, acceptRate: rate(accepted, applications), signedContracts },
+    weekly: weeklyBuckets(recentApplications.map((a) => a.createdAt), WEEKS),
+    funnel: [
+      { label: 'Vues', count: totalViews, rateFromPrevious: null },
+      { label: 'Candidatures', count: applications, rateFromPrevious: rate(applications, totalViews) },
+      { label: 'Acceptées', count: accepted, rateFromPrevious: rate(accepted, applications) },
+      { label: 'Contrats signés', count: signedContracts, rateFromPrevious: rate(signedContracts, accepted) },
+    ],
+    topListings,
+  };
+}
+
+module.exports = { weeklyBuckets, rate, forSchool };

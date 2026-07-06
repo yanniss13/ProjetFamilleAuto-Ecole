@@ -112,6 +112,84 @@ async function main() {
     ok(statsService.rate(0, 0) === 0, 'rate : total nul -> 0 (jamais NaN)');
     ok(statsService.rate(3, 3) === 100, 'rate : 3/3 -> 100');
 
+    // --- 3. statsService.forSchool ---
+    await prisma.listing.update({ where: { id: l1.id }, data: { viewsCount: 10 } });
+    const l2 = await prisma.listing.create({
+      data: {
+        title: `Lot H seconde ${STAMP}`, description: 'd', city: 'Aix-en-Provence', department: '13',
+        viewsCount: 4, schoolId: schoolA.id,
+        titleLower: `lot h seconde ${STAMP}`, descriptionLower: 'd', cityLower: 'aix-en-provence',
+      },
+    });
+    await prisma.listing.create({
+      data: {
+        title: `Lot H cloturee ${STAMP}`, description: 'd', city: 'Aubagne', department: '13',
+        status: 'closed', schoolId: schoolA.id,
+        titleLower: `lot h cloturee ${STAMP}`, descriptionLower: 'd', cityLower: 'aubagne',
+      },
+    });
+    const mkApp = (listingId, status) => prisma.application.create({
+      data: { applicantName: 'Moniteur Test', applicantEmail: `h.cand.${STAMP}@example.test`, message: 'm', status, listingId },
+    });
+    const a1 = await mkApp(l1.id, 'accepted');
+    await mkApp(l1.id, 'pending');
+    await mkApp(l1.id, 'pending');
+    await mkApp(l2.id, 'pending');
+    // Contrat signé (posé directement en base : l'entonnoir compte applicantSignedAt non nul).
+    await prisma.contract.create({
+      data: {
+        type: 'cdi', startDate: new Date(), grossSalary: '2200€ brut/mois', workplace: 'Marseille',
+        pdfPath: 'contracts/lot-h-test.pdf', applicantSignedAt: new Date(), applicationId: a1.id,
+      },
+    });
+
+    // Autre ecole : ses donnees ne doivent JAMAIS apparaitre dans les stats de A.
+    const schoolB = await prisma.school.create({
+      data: {
+        email: `h.autre.${STAMP}@example.test`, passwordHash: 'x',
+        businessName: `Autre ecole ${STAMP}`, siret: `6${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(schoolB.id);
+    const lB = await prisma.listing.create({
+      data: {
+        title: `Lot H autre ${STAMP}`, description: 'd', city: 'Lyon', department: '69', schoolId: schoolB.id,
+        titleLower: `lot h autre ${STAMP}`, descriptionLower: 'd', cityLower: 'lyon',
+      },
+    });
+    await mkApp(lB.id, 'pending');
+
+    const sStats = await statsService.forSchool(schoolA.id);
+    ok(sStats.tiles.openListings === 2, 'forSchool : annonces ouvertes (la cloturee est exclue)');
+    ok(sStats.tiles.totalViews === 14, 'forSchool : total des vues (10 + 4)');
+    ok(sStats.tiles.applications === 4, 'forSchool : candidatures - isolation (celle de l autre ecole exclue)');
+    ok(sStats.tiles.acceptRate === 25, 'forSchool : taux d acceptation 1/4 -> 25');
+    ok(sStats.tiles.signedContracts === 1, 'forSchool : contrats signes');
+    ok(sStats.weekly.length === 12 && sStats.weekly[11].count === 4, 'forSchool : serie hebdo - 12 entrees, 4 candidatures cette semaine');
+    ok(JSON.stringify(sStats.funnel.map((s) => s.count)) === '[14,4,1,1]' && sStats.funnel[0].label === 'Vues',
+      'forSchool : entonnoir 14 -> 4 -> 1 -> 1');
+    ok(JSON.stringify(sStats.funnel.map((s) => s.rateFromPrevious)) === '[null,29,25,100]',
+      'forSchool : taux de conversion entre etapes');
+    ok(sStats.topListings.length === 3 && sStats.topListings[0].id === l1.id && sStats.topListings[1].id === l2.id
+      && sStats.topListings[0].conversionRate === 30,
+      'forSchool : top annonces triees (candidatures puis vues), conversion 3/10 -> 30');
+
+    const schoolNeuf = await prisma.school.create({
+      data: {
+        email: `h.neuf.${STAMP}@example.test`, passwordHash: 'x',
+        businessName: `Neuf ${STAMP}`, siret: `7${String(STAMP).slice(-13).padStart(13, '0')}`,
+      },
+    });
+    createdSchoolIds.push(schoolNeuf.id);
+    const vide = await statsService.forSchool(schoolNeuf.id);
+    ok(vide.tiles.openListings === 0 && vide.tiles.totalViews === 0 && vide.tiles.applications === 0
+      && vide.tiles.acceptRate === 0 && vide.tiles.signedContracts === 0,
+      'forSchool : compte neuf - toutes les tuiles a 0 (pas de NaN)');
+    ok(vide.weekly.length === 12 && vide.weekly.every((b) => b.count === 0)
+      && vide.funnel.every((s) => s.count === 0) && vide.topListings.length === 0,
+      'forSchool : compte neuf - series vides mais completes');
+
     console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
