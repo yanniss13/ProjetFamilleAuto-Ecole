@@ -1,7 +1,9 @@
 // Agrège les routeurs et applique la protection de session sur l'espace auto-école.
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 
 const pageController = require('../controllers/pageController');
+const siretController = require('../controllers/siretController');
 const authRoutes = require('./authRoutes');
 const listingRoutes = require('./listingRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
@@ -16,6 +18,14 @@ const router = express.Router();
 
 // Accueil public.
 router.get('/', pageController.home);
+
+// Verification SIRET en direct (formulaire d'inscription). Rate-limite : l'endpoint
+// relaie une API publique, on borne l'usage par IP.
+const siretLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false,
+  handler: (req, res) => res.status(429).json({ status: 'rate_limited', name: null, address: null }),
+});
+router.get('/api/siret/:siret', siretLimiter, siretController.check);
 
 // Public : auth (inscription/connexion/...) et annonces.
 router.use(authRoutes);
