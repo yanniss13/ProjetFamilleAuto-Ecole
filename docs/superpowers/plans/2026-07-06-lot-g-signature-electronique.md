@@ -262,7 +262,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `sha256Hex(buffer|string) -> string` (hex 64) ; `formatHash(hex) -> string` (groupes de 8) ; `decodeSignature(dataUrl) -> Buffer|null` ; `saveSignature(buf) -> Promise<string>` (chemin relatif `signatures/<hex>.png`). Consommés par les Tasks 3, 4 et 6.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-g.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 2. hash + validation des signatures ---
@@ -293,12 +293,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-g.cjs`
 Attendu : `Cannot find module '../src/utils/hash'`
 
-- [ ] **Step 3 : implémentation** — créer `src/utils/hash.js` :
+- [x] **Step 3 : implémentation** — créer `src/utils/hash.js` :
 
 ```js
 // Empreintes de documents (preuve d'intégrité pour la signature électronique).
@@ -354,12 +354,12 @@ async function saveSignature(buf) {
 module.exports = { decodeSignature, saveSignature, MAX_BYTES };
 ```
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-g.cjs`
 Attendu : 10 ✓.
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/utils/hash.js src/services/signatureImage.js test/lot-g.cjs
