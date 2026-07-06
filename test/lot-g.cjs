@@ -108,6 +108,33 @@ async function main() {
     ok(fs.existsSync(path.join(STORAGE_DIR, 'signatures')), 'storage : sous-dossier signatures créé');
     await prisma.contract.delete({ where: { id: c0.id } });
 
+    // --- 2. hash + validation des signatures ---
+    {
+      const { sha256Hex, formatHash } = require('../src/utils/hash');
+      const signatureImage = require('../src/services/signatureImage');
+
+      ok(sha256Hex('abc') === 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
+        'hash : sha256Hex vecteur connu');
+      ok(formatHash('aabbccdd11223344').startsWith('aabbccdd 11223344'), 'hash : formatHash groupe par 8');
+
+      const buf = signatureImage.decodeSignature(SIGNATURE_PNG);
+      ok(Buffer.isBuffer(buf) && buf.length > 50, 'signature : data URL PNG valide décodée');
+      ok(signatureImage.decodeSignature(`data:image/jpeg;base64,${PNG_B64}`) === null,
+        'signature : préfixe non-PNG refusé');
+      ok(signatureImage.decodeSignature('data:image/png;base64,@@@@') === null,
+        'signature : base64 corrompu refusé');
+      const fakeJpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(100)]);
+      ok(signatureImage.decodeSignature(`data:image/png;base64,${fakeJpeg.toString('base64')}`) === null,
+        'signature : contenu JPEG déguisé en PNG refusé (magic bytes)');
+      const huge = Buffer.concat([buf, Buffer.alloc(201 * 1024)]);
+      ok(signatureImage.decodeSignature(`data:image/png;base64,${huge.toString('base64')}`) === null,
+        'signature : plus de 200 Ko refusé');
+
+      const rel = await signatureImage.saveSignature(buf);
+      ok(rel.startsWith('signatures/') && fs.existsSync(absStored(rel)), 'signature : PNG écrit dans storage/signatures/');
+      fs.unlinkSync(absStored(rel));
+    }
+
     console.log(`\n✅ Lot G tests réussis — ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
