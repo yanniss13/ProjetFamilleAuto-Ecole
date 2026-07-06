@@ -604,7 +604,7 @@ git commit -m "J: purge visible et declenchable depuis le dashboard admin"
 **Interfaces :**
 - Produit : `purgeService.schedulePurge()` — premier run différé (30 s) puis toutes les 24 h, timers `unref()`, runs isolés par try/catch. CLI `npm run purge`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);`` :
 
@@ -620,12 +620,12 @@ Dans `test/lot-j.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(true, 'service : schedulePurge demarre sans erreur');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `❌ ECHEC : cli : npm run purge branche sur scripts/purge.js`.
 
-- [ ] **Étape 3 : ajouter `schedulePurge` au service**
+- [x] **Étape 3 : ajouter `schedulePurge` au service**
 
 Dans `src/services/purgeService.js`, juste AVANT `module.exports`, ajouter :
 
@@ -655,7 +655,7 @@ function schedulePurge() {
 Et remplacer l'export par :
 `module.exports = { runPurge, findLatestRun, schedulePurge };`
 
-- [ ] **Étape 4 : brancher au démarrage + CLI**
+- [x] **Étape 4 : brancher au démarrage + CLI**
 
 Dans `src/server.js` :
 1. après la ligne `const prisma = require('./config/prisma');`, ajouter :
@@ -705,7 +705,7 @@ Dans `package.json`, après la ligne `"admin:create": "node scripts/create-admin
     "purge": "node scripts/purge.js",
 ```
 
-- [ ] **Étape 5 : vérifier que le test passe (GREEN)**
+- [x] **Étape 5 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-j.cjs`
 Attendu : `✅ Lot J tests reussis - 24 assertions.`
@@ -713,7 +713,7 @@ Attendu : `✅ Lot J tests reussis - 24 assertions.`
 Puis vérifier le CLI à la main : `npm run purge`
 Attendu : `Purge effectuée : 0 alerte(s) non confirmée(s), ...` (ou plus si la base de dev contient des données périmées).
 
-- [ ] **Étape 6 : mettre à jour `AGENTS.md` (passation)**
+- [x] **Étape 6 : mettre à jour `AGENTS.md` (passation)**
 
 1. Remplacer les lignes `- **Prochain travail : Lot J (purge RGPD automatique)** — spec et plan à écrire.` et `  À prévoir : purger aussi les alertes jamais confirmées (décision de la spec du Lot I).` (ou leur variante pointant vers le plan) par :
 
@@ -746,7 +746,7 @@ Attendu : `Purge effectuée : 0 alerte(s) non confirmée(s), ...` (ou plus si la
   déclencher aucun timer) ; jamais de purge des candidatures acceptées/contrats.
 ```
 
-- [ ] **Étape 7 : suite complète puis commit final**
+- [x] **Étape 7 : suite complète puis commit final**
 
 Lancer : `npm test` — les 11 fichiers doivent être verts.
 

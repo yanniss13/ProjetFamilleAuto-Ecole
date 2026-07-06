@@ -9,9 +9,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (10 fichiers `.cjs`, ~310 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (11 fichiers `.cjs`, ~334 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
+- `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le
+  démarrage puis toutes les 24 h).
 
 ## État au 2026-07-06 (passation)
 
@@ -35,11 +37,14 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   (département + mot-clé), jeton de confirmation haché / désabonnement opaque,
   notification fire-and-forget à la publication (`alertService.notifyNewListing`),
   désabonnement en deux temps avec suppression réelle. Tests : `test/lot-i.cjs`.
-- **Prochain travail : Lot J (purge RGPD automatique)** — spec validée
-  (`docs/superpowers/specs/2026-07-07-lot-j-purge-rgpd-design.md`), plan à
-  exécuter tâche par tâche :
-  `docs/superpowers/plans/2026-07-07-lot-j-purge-rgpd.md`. Dernier lot de la
-  feuille de route démo E→J.
+- **Lot J (purge RGPD automatique) : LIVRÉ** — purge des alertes jamais confirmées
+  (7 j), des candidatures refusées avec leurs fichiers (180 j, `rejectedAt` posé au
+  refus), des jetons expirés ; journal `PurgeRun` + tuile et bouton sur `/admin` ;
+  planifiée dans `server.js` (30 s puis 24 h, unref) + CLI `npm run purge`.
+  Tests : `test/lot-j.cjs`. **La feuille de route démo E→J est complète.**
+- **Prochain travail : Lot K (seed de démo `npm run seed:demo`)** — spec et plan à
+  écrire. Ensuite : Mailpit (config locale, éventuel micro-fix `auth` du mailer) et
+  Lot L (autocomplétion d'adresse via l'API Adresse, pattern du relais SIRET).
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
@@ -61,7 +66,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   utilisateur, messages de commit (préfixe du lot : `E: ...`), labels de tests.
 - **TDD obligatoire** : test écrit d'abord dans `test/<nom>.cjs`, vu échouer, puis
   implémentation minimale. Pas de framework : serveur dédié sur un port unique
-  (4057-4065 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
+  (4057-4066 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
   nettoyage en `finally`. Nouveau fichier de test → l'ajouter à `"test"` dans
   `package.json`.
 - Architecture : `routes → contrôleurs → services (Prisma) → vues Twig`. Toute requête
@@ -100,6 +105,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 - **Alertes email** (Lot I) : `notifyNewListing` est fire-and-forget et ne lève
   jamais ; le mailer s'appelle toujours via l'objet (`mailer.sendListingAlert(...)`,
   jamais destructuré) pour rester interceptable dans les tests.
+- **Purge RGPD** (Lot J) : délais surchargables par `PURGE_ALERTES_JOURS` /
+  `PURGE_CANDIDATURES_REFUSEES_JOURS` ; `schedulePurge()` s'appelle UNIQUEMENT
+  dans `src/server.js` (jamais `app.js` — les tests importent `app` et ne doivent
+  déclencher aucun timer) ; jamais de purge des candidatures acceptées/contrats.
 - Windows : shell PowerShell 5.1 ; préférer les chemins via `path.join`, et `git add`
   explicite (des fichiers personnels non suivis traînent à la racine — `contexte.md`,
   `*.xlsx` — ne PAS les commiter).
