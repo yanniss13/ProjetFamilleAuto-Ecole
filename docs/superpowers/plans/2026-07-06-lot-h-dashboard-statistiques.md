@@ -249,7 +249,7 @@ Dans `package.json`, remplacer la valeur du script `"test"` par :
 "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs"
 ```
 
-- [ ] **Étape 9 : lancer la suite complète puis committer**
+- [x] **Étape 9 : lancer la suite complète puis committer**
 
 Lancer : `npm test` — tout doit être vert.
 
@@ -351,7 +351,7 @@ module.exports = { weeklyBuckets, rate };
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 12 assertions.`
 
-- [ ] **Étape 5 : committer**
+- [x] **Étape 5 : committer**
 
 ```powershell
 git add src/services/statsService.js test/lot-h.cjs
@@ -522,7 +522,7 @@ module.exports = { weeklyBuckets, rate, forSchool };
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 23 assertions.`
 
-- [ ] **Étape 5 : committer**
+- [x] **Étape 5 : committer**
 
 ```powershell
 git add src/services/statsService.js test/lot-h.cjs
@@ -595,7 +595,7 @@ module.exports = { weeklyBuckets, rate, forSchool, forPlatform };
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 26 assertions.`
 
-- [ ] **Étape 5 : committer**
+- [x] **Étape 5 : committer**
 
 ```powershell
 git add src/services/statsService.js test/lot-h.cjs
@@ -756,7 +756,7 @@ Les anciens compteurs du tableau de bord ne sont plus appelés nulle part :
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 34 assertions.`
 
-- [ ] **Étape 7 : lancer la suite complète puis committer**
+- [x] **Étape 7 : lancer la suite complète puis committer**
 
 Lancer : `npm test` — tout doit rester vert (le smoke test ne vérifie que la redirection vers `/tableau-de-bord`, pas son contenu).
 
@@ -901,7 +901,7 @@ Plus aucun appelant après ce changement :
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 38 assertions.`
 
-- [ ] **Étape 7 : lancer la suite complète puis committer**
+- [x] **Étape 7 : lancer la suite complète puis committer**
 
 Lancer : `npm test` — en particulier `test/lot-c.cjs` doit rester vert (« dashboard affiche des compteurs »).
 
@@ -924,7 +924,7 @@ git commit -m "H: dashboard admin (tuiles plateforme + inscriptions et candidatu
 **Interfaces :**
 - Consomme : le bloc `#stats-data` et les conteneurs `#chart-weekly`, `#chart-funnel` (Tâche 5), `#chart-schools-weekly`, `#chart-applications-weekly` (Tâche 6). Formes des données : `weekly`/`schoolsWeekly`/`applicationsWeekly` = `[{ label, count }]`, `funnel` = `[{ label, count, rateFromPrevious }]`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -935,12 +935,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(!r7.text.includes('innerHTML'), 'charts : aucune insertion HTML (CSP + anti-XSS)');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ ECHEC : charts : script servi, SVG construit en DOM` (le fichier n'existe pas, 404).
 
-- [ ] **Étape 3 : créer `public/js/dashboard-charts.js`**
+- [x] **Étape 3 : créer `public/js/dashboard-charts.js`**
 
 Contenu exact (règles dataviz : une teinte, texte en encre neutre, barres nulles non étiquetées, sommets arrondis 2 px côté valeur, base plate, `<title>` natif au survol) :
 
@@ -1071,7 +1071,7 @@ Contenu exact (règles dataviz : une teinte, texte en encre neutre, barres nulle
 })();
 ```
 
-- [ ] **Étape 4 : ajouter le CSS**
+- [x] **Étape 4 : ajouter le CSS**
 
 Dans `public/css/style.css`, juste APRÈS le bloc « Grille de statistiques (dashboard) » (après la ligne `.stat-label { ... }`), ajouter :
 
@@ -1091,7 +1091,7 @@ Dans `public/css/style.css`, juste APRÈS le bloc « Grille de statistiques (das
 .top-listings h2 { font-size: 1.1rem; }
 ```
 
-- [ ] **Étape 5 : mettre à jour le commentaire autoescape de `app.js`**
+- [x] **Étape 5 : mettre à jour le commentaire autoescape de `app.js`**
 
 Dans `src/app.js`, remplacer :
 
@@ -1110,16 +1110,16 @@ par :
 // JSON.stringify avec « < » échappé côté serveur, jamais du HTML.
 ```
 
-- [ ] **Étape 6 : vérifier que le test passe (GREEN)**
+- [x] **Étape 6 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 40 assertions.`
 
-- [ ] **Étape 7 : vérification visuelle**
+- [x] **Étape 7 : vérification visuelle**
 
 Lancer `npm run dev`, se connecter avec un compte école ayant des données, et vérifier `/tableau-de-bord` puis `/admin` : tuiles alignées, barres bleues avec valeurs au-dessus, entonnoir lisible avec les % entre les étapes, aucun chevauchement de libellés. Corriger le CSS si besoin (rien d'autre).
 
-- [ ] **Étape 8 : mettre à jour `AGENTS.md` (passation)**
+- [x] **Étape 8 : mettre à jour `AGENTS.md` (passation)**
 
 1. Remplacer la ligne d'état commençant par `- **Prochain travail : Lot H` par :
 
@@ -1137,7 +1137,7 @@ Lancer `npm run dev`, se connecter avec un compte école ayant des données, et 
 
 4. Dans le piège « CSP stricte », remplacer `(JSON échappé côté serveur — seul usage autorisé de |raw, cf. commentaire dans src/app.js)` par `(JSON échappé côté serveur — seuls usages autorisés de |raw : #map-data et #stats-data, cf. commentaire dans src/app.js)`.
 
-- [ ] **Étape 9 : suite complète puis commit final**
+- [x] **Étape 9 : suite complète puis commit final**
 
 Lancer : `npm test` — les 9 fichiers doivent être verts.
 

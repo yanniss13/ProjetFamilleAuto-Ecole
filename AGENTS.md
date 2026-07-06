@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (8 fichiers `.cjs`, ~236 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (9 fichiers `.cjs`, ~275 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 
@@ -27,10 +27,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 - **Lot G (signature électronique du contrat) : LIVRÉ** — pad canvas école + candidat,
   PDF final avec page de signatures (horodatages + empreintes SHA-256), invitation par
   email, invalidation à la ré-édition. Tests : `test/lot-g.cjs`.
-- **Prochain travail : Lot H (dashboard statistiques)** — spec validée
-  (`docs/superpowers/specs/2026-07-06-lot-h-dashboard-statistiques-design.md`), plan à
-  exécuter tâche par tâche :
-  `docs/superpowers/plans/2026-07-06-lot-h-dashboard-statistiques.md`.
+- **Lot H (dashboard statistiques) : LIVRÉ** — compteur de vues par annonce (fire-and-forget),
+  `statsService` (séries hebdo 12 semaines bornées à 84 jours, bucketing JS), tableau de bord
+  école (5 tuiles, barres, entonnoir, top annonces) et admin (4 tuiles, 2 barres), SVG en DOM
+  via le bloc `#stats-data`. Tests : `test/lot-h.cjs`.
+- **Prochain travail : Lot I (alertes email moniteurs)** — spec et plan à écrire.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
@@ -52,7 +53,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   utilisateur, messages de commit (préfixe du lot : `E: ...`), labels de tests.
 - **TDD obligatoire** : test écrit d'abord dans `test/<nom>.cjs`, vu échouer, puis
   implémentation minimale. Pas de framework : serveur dédié sur un port unique
-  (4057-4061 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
+  (4057-4064 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
   nettoyage en `finally`. Nouveau fichier de test → l'ajouter à `"test"` dans
   `package.json`.
 - Architecture : `routes → contrôleurs → services (Prisma) → vues Twig`. Toute requête
@@ -69,8 +70,8 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   4) `npx prisma migrate deploy` ; 5) `npx prisma generate`.
 - **CSP stricte** (helmet, `script-src 'self'`) : aucun JS/CSS inline dans les vues ;
   JS dans `public/js/`, données éventuelles via `data-*` ou bloc
-  `<script type="application/json">` (JSON échappé côté serveur — seul usage autorisé
-  de `|raw`, cf. commentaire dans `src/app.js`).
+  `<script type="application/json">` (JSON échappé côté serveur — seuls usages autorisés
+  de `|raw` : #map-data et #stats-data, cf. commentaire dans `src/app.js`).
 - **CSRF** : jeton de session vérifié globalement (`src/middlewares/csrf.js`) ; les
   routes multipart doivent être dans la liste blanche `DEFERRED_MULTIPART` et vérifier
   le jeton APRÈS multer (`verifyAfterUpload`), jamais en query string.
