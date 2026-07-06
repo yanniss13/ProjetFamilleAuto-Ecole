@@ -7,13 +7,25 @@
     <p class="muted">Aucune auto-école.</p>
   {% else %}
     <table class="data-table">
-      <thead><tr><th>Nom</th><th>Email</th><th>SIRET</th><th>Annonces</th><th>Statut</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Nom</th><th>Email</th><th>SIRET</th><th>Sirene</th><th>Annonces</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody>
         {% for s in schools %}
           <tr>
             <td>{{ s.businessName }}</td>
             <td>{{ s.email }}</td>
             <td>{{ s.siret }}</td>
+            <td>
+              {% if s.siretStatus == 'verified' %}
+                <span class="badge badge-available">Vérifiée</span>
+                {% if s.siretVerifiedName %}<br><span class="muted">{{ s.siretVerifiedName }}</span>{% endif %}
+              {% elseif s.siretStatus == 'closed' %}
+                <span class="badge badge-rejected">Fermée</span>
+              {% elseif s.siretStatus == 'not_found' %}
+                <span class="badge badge-rejected">Introuvable</span>
+              {% else %}
+                <span class="muted">Non vérifiée</span>
+              {% endif %}
+            </td>
             <td>{{ s._count.listings }}</td>
             <td>
               {% if s.suspended %}<span class="badge badge-rejected">Suspendue</span>

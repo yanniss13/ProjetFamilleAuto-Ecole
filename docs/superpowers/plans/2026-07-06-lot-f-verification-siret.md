@@ -651,7 +651,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `School.siretStatus`/`siretVerifiedName` (Task 1) — déjà inclus dans les requêtes publiques (`include: { school: true }`) et admin (`findAllWithCounts`).
 - Produces: classe CSS `.badge-verified`.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-f.cjs`, insérer avant le `console.log` final :
 
 ```js
     // --- 5. badges « École vérifiée » ---
@@ -702,12 +702,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 (Nettoyage : `schoolV`/`schoolU` sont dans `createdSchoolIds`, les annonces partent en cascade ; l'admin dans `createdAdminIds`.)
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-f.cjs`
 Attendu : `❌ ÉCHEC : badge : présent une seule fois...`
 
-- [ ] **Step 3 : badges publics** :
+- [x] **Step 3 : badges publics** :
 
 (a) dans `views/listings/index.twig`, carte d'annonce, remplacer :
 
@@ -747,7 +747,7 @@ par :
     </p>
 ```
 
-- [ ] **Step 4 : colonne admin** — dans `views/admin/schools.twig` :
+- [x] **Step 4 : colonne admin** — dans `views/admin/schools.twig` :
 
 (a) remplacer la ligne d'en-têtes par :
 
@@ -772,7 +772,7 @@ par :
             </td>
 ```
 
-- [ ] **Step 5 : style du badge** — ajouter à la suite du bloc Lot F de `public/css/style.css` :
+- [x] **Step 5 : style du badge** — ajouter à la suite du bloc Lot F de `public/css/style.css` :
 
 ```css
 .badge-verified {
@@ -785,12 +785,12 @@ par :
 }
 ```
 
-- [ ] **Step 6 : vérifier le succès**
+- [x] **Step 6 : vérifier le succès**
 
 Run : `node test/lot-f.cjs`
 Attendu : 21 ✓, `✅ Lot F tests réussis — 21 assertions.`
 
-- [ ] **Step 7 : intégration suite + AGENTS.md** :
+- [x] **Step 7 : intégration suite + AGENTS.md** :
 
 (a) dans `package.json`, ajouter ` && node test/lot-f.cjs` à la fin du script `"test"`.
 
@@ -803,7 +803,7 @@ Attendu : 21 ✓, `✅ Lot F tests réussis — 21 assertions.`
 
 (c) Run : `npm test` — attendu : les 7 fichiers verts (65 + 9 + 25 + 15 + 21 + 33 + 21).
 
-- [ ] **Step 8 : commit**
+- [x] **Step 8 : commit**
 
 ```bash
 git add views/listings/index.twig views/listings/show.twig views/admin/schools.twig public/css/style.css package.json AGENTS.md test/lot-f.cjs

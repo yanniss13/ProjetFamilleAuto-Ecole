@@ -10,7 +10,10 @@
     </p>
     {% if listing.compensation %}<p><strong>Rémunération :</strong> {{ listing.compensation }}</p>{% endif %}
     <p>{{ listing.description }}</p>
-    <p class="muted">Publiée par {{ listing.school.businessName }}</p>
+    <p class="muted">
+      Publiée par {{ listing.school.businessName }}
+      {% if listing.school.siretStatus == 'verified' %} <span class="badge-verified">✓ École vérifiée</span>{% endif %}
+    </p>
   </article>
 
   <section class="map-section">

@@ -182,6 +182,51 @@ async function main() {
         'inscription : zone d etat + script de verification presents');
     }
 
+    // --- 5. badges "Ecole verifiee" ---
+    const KW = `lotf${STAMP}`;
+    const schoolV = await prisma.school.create({
+      data: {
+        email: `f.badge.ok.${STAMP}@example.test`, passwordHash: 'x', businessName: 'F Badge Ok',
+        siret: `3${String(STAMP).slice(-13).padStart(13, '0')}`, emailVerified: true,
+        siretStatus: 'verified', siretVerifiedName: 'NOM OFFICIEL SIRENE', siretCheckedAt: new Date(),
+      },
+    });
+    const schoolU = await prisma.school.create({
+      data: {
+        email: `f.badge.ko.${STAMP}@example.test`, passwordHash: 'x', businessName: 'F Badge Ko',
+        siret: `4${String(STAMP).slice(-13).padStart(13, '0')}`, emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(schoolV.id, schoolU.id);
+    const lV = await prisma.listing.create({
+      data: { title: `${KW} verifiee`, description: 'd', city: 'Pau', department: '64', schoolId: schoolV.id,
+        titleLower: `${KW} verifiee`, descriptionLower: 'd', cityLower: 'pau' },
+    });
+    const lU = await prisma.listing.create({
+      data: { title: `${KW} non verifiee`, description: 'd', city: 'Pau', department: '64', schoolId: schoolU.id,
+        titleLower: `${KW} non verifiee`, descriptionLower: 'd', cityLower: 'pau' },
+    });
+
+    r = await get(`/annonces?q=${KW}`);
+    ok((r.text.match(/École vérifiée/g) || []).length === 1,
+      'badge : present une seule fois sur la liste (ecole verifiee uniquement)');
+    r = await get(`/annonces/${lV.id}`);
+    ok(r.text.includes('École vérifiée'), 'badge : present sur la page detail (ecole verifiee)');
+    r = await get(`/annonces/${lU.id}`);
+    ok(!r.text.includes('École vérifiée'), 'badge : absent sur la page detail (ecole non verifiee)');
+
+    // Colonne Sirene cote admin.
+    const adminService = require('../src/services/adminService');
+    const passwordUtil = require('../src/utils/password');
+    const admin = await adminService.create({ email: `f.admin.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('adminpass123') });
+    createdAdminIds.push(admin.id);
+    const adminJar = makeJar();
+    let ra = await req(adminJar, 'GET', '/admin/connexion');
+    ra = await req(adminJar, 'POST', '/admin/connexion', form({ _csrf: csrfFrom(ra.text), email: admin.email, password: 'adminpass123' }));
+    ra = await req(adminJar, 'GET', '/admin/ecoles');
+    ok(ra.status === 200 && ra.text.includes('NOM OFFICIEL SIRENE') && ra.text.includes('Vérifiée'),
+      'admin : colonne Sirene avec statut et nom officiel');
+
     console.log(`\n✅ Lot F tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
