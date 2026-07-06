@@ -44,7 +44,7 @@
 **Interfaces:**
 - Produces: `haversineKm(lat1, lng1, lat2, lng2) -> number` (km, flottant) ; `bboxAround(lat, lng, radiusKm) -> { minLat, maxLat, minLng, maxLng }`. Consommés par la Task 3.
 
-- [ ] **Step 1 : écrire le test qui échoue** — créer `test/lot-e.cjs` :
+- [x] **Step 1 : écrire le test qui échoue** — créer `test/lot-e.cjs` :
 
 ```js
 /**
@@ -85,12 +85,12 @@ async function main() {
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-e.cjs`
 Attendu : `Cannot find module '../src/utils/geo'`
 
-- [ ] **Step 3 : implémentation minimale** — créer `src/utils/geo.js` :
+- [x] **Step 3 : implémentation minimale** — créer `src/utils/geo.js` :
 
 ```js
 // Petites fonctions géographiques partagées (recherche par rayon du Lot E).
@@ -122,12 +122,12 @@ function bboxAround(lat, lng, radiusKm) {
 module.exports = { haversineKm, bboxAround };
 ```
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-e.cjs`
 Attendu : 5 ✓, `✅ Lot E tests réussis — 5 assertions.`
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/utils/geo.js test/lot-e.cjs
