@@ -270,7 +270,7 @@ git commit -m "H: compteur de vues des annonces (increment fire-and-forget)"
 - Produit : `statsService.weeklyBuckets(dates: Date[], weeks: number): Array<{ label: string, count: number }>` — exactement `weeks` entrées, de la plus ancienne à la semaine courante, lundi comme début de semaine, `label` au format `JJ/MM` (le lundi de la semaine), dates hors fenêtre ignorées.
 - Produit : `statsService.rate(part: number, total: number): number` — pourcentage entier arrondi, `0` si `total` est nul.
 
-- [ ] **Étape 1 : ajouter les tests unitaires (RED)**
+- [x] **Étape 1 : ajouter les tests unitaires (RED)**
 
 Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot H tests reussis - ${passed} assertions.`);`` :
 
@@ -291,12 +291,12 @@ Dans `test/lot-h.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(statsService.rate(3, 3) === 100, 'rate : 3/3 -> 100');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `❌ Cannot find module '../src/services/statsService'`.
 
-- [ ] **Étape 3 : créer le service avec les deux fonctions pures**
+- [x] **Étape 3 : créer le service avec les deux fonctions pures**
 
 Créer `src/services/statsService.js` :
 
@@ -346,7 +346,7 @@ function rate(part, total) {
 module.exports = { weeklyBuckets, rate };
 ```
 
-- [ ] **Étape 4 : vérifier que le test passe (GREEN)**
+- [x] **Étape 4 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-h.cjs`
 Attendu : `✅ Lot H tests reussis - 12 assertions.`
