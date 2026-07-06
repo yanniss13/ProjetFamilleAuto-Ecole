@@ -17,5 +17,7 @@ const subscribeLimiter = rateLimit({
 router.get('/', alertController.newForm);
 router.post('/', subscribeLimiter, alertController.create);
 router.get('/confirmer/:token', alertController.confirm);
+router.get('/desabonner/:token', alertController.unsubscribeForm);
+router.post('/desabonner/:token', alertController.unsubscribe);
 
 module.exports = router;

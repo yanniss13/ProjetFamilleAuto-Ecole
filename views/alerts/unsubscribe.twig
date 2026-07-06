@@ -1,0 +1,13 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <section class="form-card">
+    <h1>Se désabonner</h1>
+    <p>Supprimer l’alerte de <strong>{{ alert.email }}</strong> pour le département
+      <strong>{{ alert.department }}</strong>{% if alert.keyword %} (mot-clé « {{ alert.keyword }} »){% endif %} ?</p>
+    <form action="/alertes/desabonner/{{ token }}" method="post">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-primary">Se désabonner</button>
+    </form>
+  </section>
+{% endblock %}

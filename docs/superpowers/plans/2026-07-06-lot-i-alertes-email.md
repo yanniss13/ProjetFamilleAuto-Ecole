@@ -653,7 +653,7 @@ git commit -m "I: confirmation d alerte par jeton hache (idempotente)"
 **Interfaces :**
 - Produit : `alertService.findByUnsubscribeToken(token)`, `alertService.deleteByUnsubscribeToken(token): Promise<boolean>`. Routes `GET` + `POST /alertes/desabonner/:token`.
 
-- [ ] **Étape 1 : ajouter les tests (RED)**
+- [x] **Étape 1 : ajouter les tests (RED)**
 
 Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);`` :
 
@@ -674,12 +674,12 @@ Dans `test/lot-i.cjs`, insérer ce bloc juste AVANT la ligne ``console.log(`\n�
     ok(r.status === 404, 'desabonnement : jeton deja consomme -> 404');
 ```
 
-- [ ] **Étape 2 : vérifier l'échec (RED)**
+- [x] **Étape 2 : vérifier l'échec (RED)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `❌ ECHEC : desabonnement : page avec bouton (pas de suppression au GET)` (404).
 
-- [ ] **Étape 3 : ajouter les fonctions au service**
+- [x] **Étape 3 : ajouter les fonctions au service**
 
 Dans `src/services/alertService.js`, juste AVANT `module.exports`, ajouter :
 
@@ -698,7 +698,7 @@ async function deleteByUnsubscribeToken(token) {
 Et remplacer l'export par :
 `module.exports = { subscribe, confirmByToken, findByUnsubscribeToken, deleteByUnsubscribeToken };`
 
-- [ ] **Étape 4 : contrôleur + routes + vues**
+- [x] **Étape 4 : contrôleur + routes + vues**
 
 Dans `src/controllers/alertController.js`, juste AVANT `module.exports`, ajouter :
 
@@ -770,12 +770,12 @@ Créer `views/alerts/unsubscribed.twig` :
 {% endblock %}
 ```
 
-- [ ] **Étape 5 : vérifier que le test passe (GREEN)**
+- [x] **Étape 5 : vérifier que le test passe (GREEN)**
 
 Lancer : `node test/lot-i.cjs`
 Attendu : `✅ Lot I tests reussis - 25 assertions.`
 
-- [ ] **Étape 6 : committer**
+- [x] **Étape 6 : committer**
 
 ```powershell
 git add src/services/alertService.js src/controllers/alertController.js src/routes/alertRoutes.js views/alerts/unsubscribe.twig views/alerts/unsubscribed.twig test/lot-i.cjs

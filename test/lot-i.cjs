@@ -131,6 +131,21 @@ async function main() {
     const sDup = await alertService.subscribe(`i.form.${STAMP}@example.test`, '13', 'cdi');
     ok(sDup.rawConfirmToken === null, 'subscribe : doublon deja confirme -> aucun nouveau jeton');
 
+    // --- 4. desabonnement (page + bouton, suppression reelle) ---
+    const unsubToken = confirmed.unsubscribeToken;
+    r = await get(`/alertes/desabonner/${unsubToken}`);
+    ok(r.status === 200 && r.text.includes('<form') && r.text.includes('Se désabonner'),
+      'desabonnement : page avec bouton (pas de suppression au GET)');
+    ok(Boolean(await prisma.alert.findUnique({ where: { unsubscribeToken: unsubToken } })),
+      'desabonnement : le GET ne supprime rien');
+    let ru = await req(jarI, 'GET', `/alertes/desabonner/${unsubToken}`);
+    ru = await req(jarI, 'POST', `/alertes/desabonner/${unsubToken}`, form({ _csrf: csrfFrom(ru.text) }));
+    ok(ru.status === 200 && ru.text.includes('supprimée'), 'desabonnement : confirmation affichee');
+    ok((await prisma.alert.findUnique({ where: { unsubscribeToken: unsubToken } })) === null,
+      'desabonnement : ligne supprimee (RGPD)');
+    r = await get(`/alertes/desabonner/${unsubToken}`);
+    ok(r.status === 404, 'desabonnement : jeton deja consomme -> 404');
+
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
