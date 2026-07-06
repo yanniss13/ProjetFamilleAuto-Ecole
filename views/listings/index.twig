@@ -46,6 +46,7 @@
               {% if l.contractType %} · {{ l.contractType }}{% endif %}
               {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
               {% if l.distanceKm %} <span class="badge-distance">à {{ l.distanceKm }} km</span>{% endif %}
+              {% if l.school.siretStatus == 'verified' %} <span class="badge-verified">✓ École vérifiée</span>{% endif %}
             </p>
             <p>{{ l.description }}</p>
             <p><a href="/annonces/{{ l.id }}" class="btn btn-small">Voir &amp; postuler</a></p>

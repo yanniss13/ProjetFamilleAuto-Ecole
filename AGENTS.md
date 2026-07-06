@@ -73,6 +73,8 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   protégées uniquement.
 - **Nominatim** (géocodage) : jamais d'appel à l'affichage ; à l'enregistrement ou via
   `geocodeCached` (à créer en Lot E, cache 24 h). `GEOCODING_DISABLED=1` dans les tests.
+- **API Sirene** (vérification SIRET) : relais interne `/api/siret/:siret` uniquement
+  (CSP) ; `SIRET_LOOKUP_DISABLED=1` dans les tests ; cache 1 h dans `src/services/siret.js`.
 - **Emails** : sans `SMTP_HOST`, mode dev = lien loggé en console ; `mailer.send`
   ne lève jamais (renvoie `false`). Échapper tout texte utilisateur avec `esc()`.
 - Windows : shell PowerShell 5.1 ; préférer les chemins via `path.join`, et `git add`
