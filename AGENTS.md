@@ -20,12 +20,16 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   correctifs et durcissements ») — CSRF multipart différé, vérif email idempotente,
   P2002 inscription, admin 404=P2025 seulement, sessions Prisma, limites de longueur,
   magic bytes des uploads, géocodage hors requête, écriture PDF async.
-- **Travail en cours : Lot E (carte des annonces + recherche par rayon).**
-  - Spec validée : `docs/superpowers/specs/2026-07-06-lot-e-carte-annonces-design.md`
-  - Plan d'implémentation PAS ENCORE COMMENCÉ, à exécuter tâche par tâche :
-    `docs/superpowers/plans/2026-07-06-lot-e-carte-annonces.md`
+- **Lot E (carte des annonces + rayon) : LIVRÉ le 2026-07-06** (exécuté par Codex,
+  revu et validé — 33 assertions dans `test/lot-e.cjs`, plan entièrement coché).
+- **Prochain travail : Lot F (vérification SIRET).**
+  - Spec validée : `docs/superpowers/specs/2026-07-06-lot-f-verification-siret-design.md`
+  - Plan PAS ENCORE COMMENCÉ, à exécuter tâche par tâche :
+    `docs/superpowers/plans/2026-07-06-lot-f-verification-siret.md`
     (5 tâches TDD avec le code exact de chaque étape ; cocher les cases `- [ ]` au fur
     et à mesure ; une tâche = tests rouges → implémentation → tests verts → commit).
+  - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
+    concurrent a déjà avalé le travail d'un autre agent une fois).
 - Feuille de route validée avec l'utilisateur (démo jury, dans cet ordre) :
   E carte+rayon → F vérification SIRET (API Recherche d'entreprises) → G signature
   électronique du contrat (canvas + incrustation PDF) → H dashboard statistiques →
