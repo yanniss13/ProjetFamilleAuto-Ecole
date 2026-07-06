@@ -41,4 +41,26 @@ async function coordsFor(address) {
   return { latitude: c ? c.lat : null, longitude: c ? c.lng : null };
 }
 
-module.exports = { geocode, coordsFor };
+// Cache memoire du geocodage des RECHERCHES utilisateur ("autour de : ville").
+// Politique d'usage Nominatim : une meme ville n'est geocodee qu'une fois par TTL.
+// Les echecs sont aussi mis en cache, plus brievement (une faute de frappe repetee
+// ne doit pas marteler l'API). Taille bornee, eviction de l'entree la plus ancienne.
+const CACHE_MAX = 200;
+const CACHE_TTL_OK_MS = 24 * 60 * 60 * 1000; // 24 h
+const CACHE_TTL_FAIL_MS = 5 * 60 * 1000; // 5 min
+const cache = new Map();
+
+async function geocodeCached(ville) {
+  const key = (ville || '').trim().toLowerCase();
+  if (!key) return null;
+
+  const hit = cache.get(key);
+  if (hit && hit.expiresAt > Date.now()) return hit.coords;
+
+  const coords = await geocode(key);
+  if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value);
+  cache.set(key, { coords, expiresAt: Date.now() + (coords ? CACHE_TTL_OK_MS : CACHE_TTL_FAIL_MS) });
+  return coords;
+}
+
+module.exports = { geocode, coordsFor, geocodeCached };

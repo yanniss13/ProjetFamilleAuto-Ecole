@@ -30,6 +30,38 @@ async function main() {
   ok(box.maxLat < 43.3 + 0.6, 'geo : point a ~67 km hors de la boite de 50 km');
   ok(box.minLng < 5.37 && box.maxLng > 5.37, 'geo : la boite encadre la longitude du centre');
 
+  // --- 2. cache de geocodage ---
+  {
+    const geocoder = require('../src/services/geocoder');
+    const origFetch = global.fetch;
+    const origDisabled = process.env.GEOCODING_DISABLED;
+    const origNow = Date.now;
+    let calls = 0;
+    try {
+      process.env.GEOCODING_DISABLED = '0';
+      global.fetch = async () => { calls += 1; return { ok: true, json: async () => [{ lat: '43.3', lon: '5.37' }] }; };
+
+      const c1 = await geocoder.geocodeCached(`Marseille-${STAMP}`);
+      const c2 = await geocoder.geocodeCached(`  MARSEILLE-${STAMP} `);
+      ok(c1 && c1.lat === 43.3 && calls === 1, 'cache : 1er appel geocode via le reseau');
+      ok(c2 && c2.lat === 43.3 && calls === 1, 'cache : 2e appel (casse/espaces) servi par le cache');
+
+      Date.now = () => origNow() + 25 * 60 * 60 * 1000; // +25 h : entree expiree
+      await geocoder.geocodeCached(`Marseille-${STAMP}`);
+      ok(calls === 2, 'cache : entree expiree re-geocodee');
+      Date.now = origNow;
+
+      global.fetch = async () => { calls += 1; return { ok: false }; };
+      ok((await geocoder.geocodeCached(`Nulleville-${STAMP}`)) === null, 'cache : ville introuvable -> null');
+      await geocoder.geocodeCached(`Nulleville-${STAMP}`);
+      ok(calls === 3, 'cache : un echec est aussi mis en cache (pas de 2e appel reseau)');
+    } finally {
+      global.fetch = origFetch;
+      process.env.GEOCODING_DISABLED = origDisabled;
+      Date.now = origNow;
+    }
+  }
+
   console.log(`\n✅ Lot E tests reussis - ${passed} assertions.`);
 }
 

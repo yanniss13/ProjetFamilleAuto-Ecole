@@ -148,7 +148,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `geocode(address)` existant (renvoie `{ lat, lng }` ou `null`).
 - Produces: `geocodeCached(ville) -> Promise<{ lat, lng } | null>` — clé normalisée `trim().toLowerCase()`, TTL 24 h (succès) / 5 min (échec), 200 entrées max, éviction la plus ancienne. Consommé par la Task 4.
 
-- [ ] **Step 1 : test qui échoue** — dans `test/lot-e.cjs`, insérer AVANT la ligne `console.log(\`\n✅ Lot E tests réussis...\`)` :
+- [x] **Step 1 : test qui échoue** — dans `test/lot-e.cjs`, insérer AVANT la ligne `console.log(\`\n✅ Lot E tests réussis...\`)` :
 
 ```js
   // --- 2. cache de géocodage ---
@@ -184,12 +184,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   }
 ```
 
-- [ ] **Step 2 : vérifier l'échec**
+- [x] **Step 2 : vérifier l'échec**
 
 Run : `node test/lot-e.cjs`
 Attendu : `❌ ÉCHEC` ou `geocoder.geocodeCached is not a function`
 
-- [ ] **Step 3 : implémentation** — dans `src/services/geocoder.js`, insérer avant `module.exports` :
+- [x] **Step 3 : implémentation** — dans `src/services/geocoder.js`, insérer avant `module.exports` :
 
 ```js
 // Cache mémoire du géocodage des RECHERCHES utilisateur (« autour de : ville »).
@@ -221,12 +221,12 @@ puis remplacer la ligne d'export par :
 module.exports = { geocode, coordsFor, geocodeCached };
 ```
 
-- [ ] **Step 4 : vérifier le succès**
+- [x] **Step 4 : vérifier le succès**
 
 Run : `node test/lot-e.cjs`
 Attendu : 10 ✓.
 
-- [ ] **Step 5 : commit**
+- [x] **Step 5 : commit**
 
 ```bash
 git add src/services/geocoder.js test/lot-e.cjs
