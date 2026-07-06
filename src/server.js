@@ -14,12 +14,18 @@ if (manquants.length > 0) {
 
 const app = require('./app');
 const prisma = require('./config/prisma');
+const purgeService = require('./services/purgeService');
 
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
   console.log(`MoniteurConnect démarré sur http://localhost:${PORT}`);
 });
+
+// Purge RGPD : premier run différé puis toutes les 24 h (timers unref — voir
+// services/purgeService.js). Ici et PAS dans app.js : les tests importent app
+// et ne doivent déclencher aucun timer de purge.
+purgeService.schedulePurge();
 
 // Arrêt propre : ferme le serveur HTTP puis libère la connexion Prisma.
 function shutdown(signal) {

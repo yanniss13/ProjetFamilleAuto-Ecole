@@ -180,6 +180,16 @@ async function main() {
     rAnon = await req(anonJar, 'POST', '/admin/purge', form({ _csrf: csrfFrom(rAnon.text) }));
     ok(rAnon.status === 302 && rAnon.location === '/admin/connexion', 'admin : purge refusee sans session admin');
 
+    // --- 4. planification et CLI ---
+    const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+    ok(pkg.scripts.purge === 'node scripts/purge.js' && fs.existsSync(path.join(__dirname, '..', 'scripts', 'purge.js')),
+      'cli : npm run purge branche sur scripts/purge.js');
+    const serverSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'server.js'), 'utf8');
+    ok(serverSrc.includes('schedulePurge'), 'serveur : planification appelee au demarrage');
+    ok(typeof purgeService.schedulePurge === 'function', 'service : schedulePurge exposee');
+    purgeService.schedulePurge(); // timers unref() : n'empechent pas le process de finir
+    ok(true, 'service : schedulePurge demarre sans erreur');
+
     console.log(`\n✅ Lot J tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));

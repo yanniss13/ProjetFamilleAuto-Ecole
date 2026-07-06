@@ -78,4 +78,25 @@ function findLatestRun() {
   return prisma.purgeRun.findFirst({ orderBy: { id: 'desc' } });
 }
 
-module.exports = { runPurge, findLatestRun };
+// Planification en processus : premier run différé (laisse le serveur finir de
+// démarrer), puis toutes les 24 h. Timers unref() : ils n'empêchent jamais le
+// process de se terminer. Chaque run est isolé par try/catch — une purge qui
+// échoue ne tue pas le serveur, le run suivant retentera.
+const FIRST_RUN_DELAY_MS = 30 * 1000;
+const INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+async function safeRun() {
+  try {
+    const c = await runPurge();
+    console.log(`[purge] OK — ${c.unconfirmedAlerts} alerte(s), ${c.rejectedApplications} candidature(s), ${c.expiredTokens} jeton(s).`);
+  } catch (err) {
+    console.error(`[purge] échec : ${err.message}`);
+  }
+}
+
+function schedulePurge() {
+  setTimeout(safeRun, FIRST_RUN_DELAY_MS).unref();
+  setInterval(safeRun, INTERVAL_MS).unref();
+}
+
+module.exports = { runPurge, findLatestRun, schedulePurge };
