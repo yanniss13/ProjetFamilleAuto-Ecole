@@ -250,3 +250,8 @@ body {
   margin: 0.25rem 0 0;
   padding-left: 1rem;
 }
+
+/* ---------- Lot F : vérification SIRET ---------- */
+.field-hint { font-size: 0.9rem; margin: 0.25rem 0 0; }
+.field-hint-ok { color: #15803d; }
+.field-hint-warn { color: #b45309; }

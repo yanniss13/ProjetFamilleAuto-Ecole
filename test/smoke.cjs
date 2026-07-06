@@ -20,6 +20,7 @@ process.env.NODE_ENV = process.env.NODE_ENV === 'production' ? 'development' : p
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'smoke-test-secret-not-for-prod';
 process.env.SMTP_HOST = ''; // mode dev : pas d'envoi réel d'email
 process.env.GEOCODING_DISABLED = '1'; // pas d'appel réseau Nominatim en test
+process.env.SIRET_LOOKUP_DISABLED = '1'; // pas d'appel réseau Sirene en test
 
 const app = require('../src/app');
 const prisma = require('../src/config/prisma');

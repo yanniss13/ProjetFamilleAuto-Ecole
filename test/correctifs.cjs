@@ -13,6 +13,7 @@ process.env.NODE_ENV = process.env.NODE_ENV === 'production' ? 'development' : p
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'correctifs-test-secret-not-for-prod';
 process.env.SMTP_HOST = '';
 process.env.GEOCODING_DISABLED = '1';
+process.env.SIRET_LOOKUP_DISABLED = '1';
 
 const path = require('path');
 const fs = require('fs');
