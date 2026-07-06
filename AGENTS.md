@@ -31,10 +31,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `statsService` (séries hebdo 12 semaines bornées à 84 jours, bucketing JS), tableau de bord
   école (5 tuiles, barres, entonnoir, top annonces) et admin (4 tuiles, 2 barres), SVG en DOM
   via le bloc `#stats-data`. Tests : `test/lot-h.cjs`.
-- **Prochain travail : Lot I (alertes email moniteurs)** — spec validée
-  (`docs/superpowers/specs/2026-07-06-lot-i-alertes-email-design.md`), plan à
-  exécuter tâche par tâche :
-  `docs/superpowers/plans/2026-07-06-lot-i-alertes-email.md`.
+- **Prochain travail : Lot I (alertes email moniteurs) — EN COURS, reprendre à la
+  Tâche 3.** Tâches 1 et 2 livrées et commitées (`7a7fda8`, `cbbec24`) : modèle
+  `Alert` + `subscribe`, formulaire public + email de confirmation. Plan coché au
+  fur et à mesure : `docs/superpowers/plans/2026-07-06-lot-i-alertes-email.md`
+  (spec : `docs/superpowers/specs/2026-07-06-lot-i-alertes-email-design.md`).
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
