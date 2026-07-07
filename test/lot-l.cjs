@@ -10,6 +10,9 @@ process.env.GEOCODING_DISABLED = '1';
 process.env.SIRET_LOOKUP_DISABLED = '1';
 process.env.ADRESSE_LOOKUP_DISABLED = '1';
 
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
 const prisma = require('../src/config/prisma');
 const app = require('../src/app');
 
@@ -29,6 +32,50 @@ function jsonOrNull(text) {
 async function get(urlPath) {
   const res = await fetch(BASE + urlPath, { redirect: 'manual' });
   return { status: res.status, text: await res.text() };
+}
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function makeElement(tag) {
+  const attrs = {};
+  const el = {
+    tagName: tag.toUpperCase(), children: [], value: '', textContent: '',
+    appendChild(child) { this.children.push(child); child.parentNode = this; return child; },
+    replaceChildren(...items) { this.children = []; items.forEach((item) => this.appendChild(item)); },
+    setAttribute(name, value) { attrs[name] = String(value); },
+    getAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null; },
+    addEventListener(name, cb) { this.listeners = this.listeners || {}; this.listeners[name] = cb; },
+    dispatchInput() { if (this.listeners && this.listeners.input) this.listeners.input({ target: this }); },
+  };
+  Object.defineProperty(el, 'innerHTML', { set() { throw new Error('innerHTML interdit dans le test autocomplete.'); } });
+  return el;
+}
+function makeAutocompleteDom() {
+  const input = makeElement('input');
+  input.setAttribute('data-adresse-autocomplete', '');
+  input.setAttribute('data-debounce-ms', '20');
+  const body = makeElement('body');
+  body.appendChild(input);
+  const created = [];
+  const document = {
+    body,
+    querySelectorAll(selector) { return selector === 'input[data-adresse-autocomplete]' ? [input] : []; },
+    createElement(tag) { const el = makeElement(tag); created.push(el); return el; },
+  };
+  return { document, input, created };
+}
+function runAdresseAutocompleteJs(fetchImpl) {
+  const dom = makeAutocompleteDom();
+  const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'adresse-autocomplete.js'), 'utf8');
+  vm.runInNewContext(script, {
+    document: dom.document,
+    fetch: fetchImpl,
+    setTimeout,
+    clearTimeout,
+    AbortController,
+    encodeURIComponent,
+  });
+  return dom;
 }
 
 async function main() {
@@ -122,6 +169,53 @@ async function main() {
       } finally {
         adresseService.searchAddress = origSearch;
       }
+    }
+
+    // --- 3. script navigateur adresse-autocomplete.js ---
+    {
+      const calls = [];
+      const dom = runAdresseAutocompleteJs(async (url) => {
+        calls.push(String(url));
+        return {
+          ok: true,
+          json: async () => ({ resultats: [{ label: '8 Boulevard du Port 80000 Amiens', city: 'Amiens', postcode: '80000' }] }),
+        };
+      });
+      const listId = dom.input.getAttribute('list');
+      const datalist = dom.created.find((el) => el.tagName === 'DATALIST' && el.getAttribute('id') === listId);
+      ok(Boolean(listId && datalist), 'JS adresse : datalist creee et liee a l input');
+
+      dom.input.value = '8 bd du port';
+      dom.input.dispatchInput();
+      await wait(40);
+      ok(calls.length === 1 && calls[0].startsWith('/api/adresse?q=8%20bd%20du%20port'),
+        'JS adresse : saisie valide -> fetch vers le relais interne');
+      ok(datalist.children.length === 1 && datalist.children[0].value === '8 Boulevard du Port 80000 Amiens'
+        && datalist.children[0].textContent === '8 Boulevard du Port 80000 Amiens',
+        'JS adresse : suggestions rendues en option via value et textContent');
+
+      const shortCalls = [];
+      const shortDom = runAdresseAutocompleteJs(async (url) => {
+        shortCalls.push(String(url));
+        return { ok: true, json: async () => ({ resultats: [] }) };
+      });
+      shortDom.input.value = 'ab';
+      shortDom.input.dispatchInput();
+      await wait(40);
+      ok(shortCalls.length === 0, 'JS adresse : saisie trop courte -> aucun fetch');
+
+      const debounceCalls = [];
+      const debounceDom = runAdresseAutocompleteJs(async (url) => {
+        debounceCalls.push(String(url));
+        return { ok: true, json: async () => ({ resultats: [] }) };
+      });
+      debounceDom.input.value = '8 boulevard';
+      debounceDom.input.dispatchInput();
+      debounceDom.input.value = '8 boulevard du port';
+      debounceDom.input.dispatchInput();
+      await wait(40);
+      ok(debounceCalls.length === 1 && debounceCalls[0].includes('8%20boulevard%20du%20port'),
+        'JS adresse : appels debounces, seule la derniere saisie part');
     }
 
     console.log(`\n✅ Lot L tests reussis - ${passed} assertions.`);
