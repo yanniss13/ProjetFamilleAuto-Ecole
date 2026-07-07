@@ -1,8 +1,10 @@
 <header class="navbar">
-  <a class="navbar-brand" href="/">MoniteurConnect</a>
+  <a class="navbar-brand" href="{% if adminSessionActive %}/admin{% else %}/{% endif %}">MoniteurConnect</a>
   <nav class="navbar-links">
-    <a href="/annonces">Annonces</a>
-    <a href="/alertes">Alertes</a>
+    {% if not currentSchool and not currentAdmin %}
+      <a href="/annonces">Annonces</a>
+      <a href="/alertes">Alertes</a>
+    {% endif %}
     {% if currentSchool %}
       <a href="/tableau-de-bord">Tableau de bord</a>
       <a href="/mes-annonces">Mes annonces</a>
@@ -11,7 +13,7 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         <button type="submit" class="link-button">Déconnexion</button>
       </form>
-    {% elseif currentAdmin %}
+    {% elseif adminSessionActive %}
       <a href="/admin">Administration</a>
       <form action="/admin/deconnexion" method="post" class="inline-form">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">

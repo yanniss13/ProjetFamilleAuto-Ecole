@@ -5,6 +5,7 @@ const { validateRegister, validateLogin } = require('../validators/schoolValidat
 const password = require('../utils/password');
 const schoolService = require('../services/schoolService');
 const tokens = require('../services/tokens');
+const sessionService = require('../services/sessionService');
 const mailer = require('../services/mailer');
 const geocoder = require('../services/geocoder');
 const siretService = require('../services/siret');
@@ -220,20 +221,36 @@ async function forgot(req, res, next) {
   }
 }
 
-function showReset(req, res) {
-  res.render('auth/reset', { title: 'Nouveau mot de passe', errors: {} });
+// Retrouve l'école au jeton encore valide, sinon null. Partagé entre le GET
+// (l'utilisateur apprend tout de suite que son lien a expiré, pas après saisie)
+// et le POST (source de vérité au moment du changement).
+async function findSchoolByValidResetToken(rawToken) {
+  const hash = tokens.hashToken(rawToken);
+  const school = await schoolService.findByResetTokenHash(hash);
+  const valid = school && school.resetTokenExpiry && school.resetTokenExpiry > new Date();
+  return valid ? school : null;
+}
+
+function rejectInvalidResetLink(req, res) {
+  req.flash('error', 'Lien de réinitialisation invalide ou expiré. Veuillez en demander un nouveau.');
+  res.redirect('/mot-de-passe-oublie');
+}
+
+async function showReset(req, res, next) {
+  try {
+    if (!(await findSchoolByValidResetToken(req.params.token))) {
+      return rejectInvalidResetLink(req, res);
+    }
+    res.render('auth/reset', { title: 'Nouveau mot de passe', errors: {} });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function reset(req, res, next) {
   try {
-    const hash = tokens.hashToken(req.params.token);
-    const school = await schoolService.findByResetTokenHash(hash);
-    const valid = school && school.resetTokenExpiry && school.resetTokenExpiry > new Date();
-
-    if (!valid) {
-      req.flash('error', 'Lien de réinitialisation invalide ou expiré. Veuillez en demander un nouveau.');
-      return res.redirect('/mot-de-passe-oublie');
-    }
+    const school = await findSchoolByValidResetToken(req.params.token);
+    if (!school) return rejectInvalidResetLink(req, res);
 
     const pwd = req.body.password || '';
     const confirm = req.body.passwordConfirm || '';
@@ -254,6 +271,9 @@ async function reset(req, res, next) {
       resetTokenHash: null,
       resetTokenExpiry: null,
     });
+    // Déconnecte les sessions encore ouvertes ailleurs : si l'utilisateur
+    // réinitialise parce qu'il soupçonne un vol, l'accès volé tombe aussi.
+    await sessionService.destroyForSchool(school.id);
 
     req.flash('success', 'Mot de passe réinitialisé. Vous pouvez vous connecter.');
     res.redirect('/connexion');

@@ -29,8 +29,11 @@ function tokensMatch(received, expected) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+// Page dédiée : un jeton invalide vient presque toujours d'un formulaire resté
+// ouvert pendant que la session changeait — l'utilisateur doit comprendre qu'il
+// suffit de recharger, pas croire à une panne du site.
 function deny(res) {
-  return res.status(403).render('errors/500', { title: 'Erreur' });
+  return res.status(403).render('errors/csrf', { title: 'Formulaire expiré' });
 }
 
 function csrf(req, res, next) {

@@ -190,6 +190,22 @@ async function main() {
       geocoder.coordsFor = origCoordsFor;
     }
 
+    // --- Gabarit HTML commun des emails ---
+    {
+      const mailer = require('../src/services/mailer');
+      ok(typeof mailer.emailLayout === 'function', 'email : gabarit HTML exporté');
+      const html = mailer.emailLayout({
+        title: 'Titre <b>test</b>',
+        contentHtml: '<p>Corps du message.</p>',
+        cta: { label: 'Ouvrir', url: 'https://exemple.test/action' },
+      });
+      ok(html.includes('MoniteurConnect') && html.includes('Corps du message.'), 'email : marque + contenu présents');
+      ok(html.includes('Titre &lt;b&gt;test&lt;/b&gt;'), 'email : titre échappé (anti-injection)');
+      ok(html.includes('href="https://exemple.test/action"') && html.includes('>Ouvrir<') && html.includes('copiez ce lien'),
+        'email : bouton d’action + lien de secours en clair');
+      ok(!html.includes('<script') && !html.includes('<link'), 'email : aucun script ni ressource externe');
+    }
+
     console.log(`\n✅ Tests des améliorations réussis — ${passed} assertions.`);
   } finally {
     if (prisma.session) await prisma.session.deleteMany({ where: { sid: { startsWith: 'test-sid-' } } }).catch(() => {});

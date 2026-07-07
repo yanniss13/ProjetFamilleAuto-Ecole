@@ -5,11 +5,50 @@ const statsService = require('../services/statsService');
 const purgeService = require('../services/purgeService');
 const { deleteStored } = require('../config/storage');
 const { parseId, notFound } = require('../utils/http');
+const { parsePage, paginate, pageUrl } = require('../utils/pagination');
+
+// Pagination d'une liste admin : borne la page demandée et construit les URLs.
+async function paginateAdminList(req, basePath, countFn, findFn) {
+  const total = await countFn();
+  const { page, pageCount, skip, take } = paginate(parsePage(req.query.page), total);
+  const items = await findFn({ skip, take });
+  return {
+    items,
+    pagination: {
+      page,
+      pageCount,
+      prevUrl: page > 1 ? pageUrl(basePath, {}, page - 1) : null,
+      nextUrl: page < pageCount ? pageUrl(basePath, {}, page + 1) : null,
+    },
+  };
+}
 
 // P2025 = « enregistrement introuvable » (Prisma). Seul ce cas vaut 404 : toute autre
 // erreur (base indisponible...) doit suivre le circuit d'erreur normal, pas être maquillée.
 function isRecordNotFound(err) {
   return Boolean(err) && err.code === 'P2025';
+}
+
+function contractLabel(type) {
+  return ({ cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance', apprentissage: 'Apprentissage' })[type] || type || '';
+}
+
+function pluralLabel(count, singular, plural) {
+  return `${count} ${count > 1 ? plural : singular}`;
+}
+
+function formatAdminListing(listing) {
+  const applicationsCount = listing._count ? listing._count.applications : 0;
+  const publicAvailable = listing.status === 'open' && !listing.school.suspended;
+  return {
+    ...listing,
+    applicationsLabel: pluralLabel(applicationsCount, 'candidature', 'candidatures'),
+    contractTypeLabel: contractLabel(listing.contractType),
+    createdLabel: listing.createdAt.toLocaleDateString('fr-FR'),
+    publicAvailable,
+    statusLabel: listing.status === 'open' ? 'Ouverte' : 'Clôturée',
+    viewsLabel: pluralLabel(listing.viewsCount, 'vue', 'vues'),
+  };
 }
 
 // GET /admin
@@ -31,8 +70,10 @@ async function dashboard(req, res, next) {
 // GET /admin/ecoles
 async function schools(req, res, next) {
   try {
-    const all = await schoolService.findAllWithCounts();
-    res.render('admin/schools', { title: 'Auto-écoles', schools: all });
+    const { items, pagination } = await paginateAdminList(
+      req, '/admin/ecoles', schoolService.countAll, schoolService.findAllWithCounts
+    );
+    res.render('admin/schools', { title: 'Auto-écoles', schools: items, pagination });
   } catch (err) {
     next(err);
   }
@@ -41,8 +82,10 @@ async function schools(req, res, next) {
 // GET /admin/annonces
 async function listings(req, res, next) {
   try {
-    const all = await listingService.findAllWithSchool();
-    res.render('admin/listings', { title: 'Annonces', listings: all });
+    const { items, pagination } = await paginateAdminList(
+      req, '/admin/annonces', listingService.countAll, listingService.findAllWithSchool
+    );
+    res.render('admin/listings', { title: 'Annonces', listings: items.map(formatAdminListing), pagination });
   } catch (err) {
     next(err);
   }

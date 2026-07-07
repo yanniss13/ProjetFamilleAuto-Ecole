@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (12 fichiers `.cjs`, ~346 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (14 fichiers `.cjs`, ~380 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 - `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le
@@ -64,10 +64,25 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   électronique du contrat (canvas + incrustation PDF) → H dashboard statistiques →
   I alertes email moniteurs → J purge RGPD automatique. Chaque lot suit le cycle
   spec → plan → implémentation (`docs/superpowers/{specs,plans}/`).
-- Restes de revue non traités (mineurs, faire si le temps le permet) : pagination des
-  listes admin, page dédiée pour l'échec CSRF, valider le jeton de reset au GET,
-  invalider les sessions au changement de mot de passe, séparer logout admin/école,
-  tests dédiés Lot B.
+- **Session du 2026-07-07 (Claude) — TOUS les restes de revue sont traités :**
+  - Revue du travail Codex « nav double session / modération en cartes / emails
+    habillés » : 3 bugs corrigés (`adminSessionActive` non nettoyé par
+    `detachAuthenticatedSession` sur `/suivi` ; école suspendue qui voyait le
+    formulaire de candidature mais recevait 403 à l'envoi — le prédicat
+    `backOfficeSession` est maintenant posé par `sessionLocals` sur la session
+    BRUTE, même critère que `rejectBackOfficeApplication` ; limiteur anti-spam
+    déplacé APRÈS le rejet back-office) + 3 nettoyages (branches nav dupliquées,
+    `{% set backOfficeSession %}` dupliqué dans 2 vues, `else` mort de la carte).
+  - Améliorations v2 (`test/ameliorations-v2.cjs`, port 4068, 24 assertions) :
+    jeton de reset validé dès le GET ; les sessions ouvertes ailleurs sont
+    détruites après réinitialisation (`src/services/sessionService.js`) ; page
+    dédiée `errors/csrf.twig` en échec CSRF ; pagination de `/admin/annonces` et
+    `/admin/ecoles` (helper `paginateAdminList` dans `adminController`).
+    « Séparer logout admin/école » : SANS OBJET — les deux logins font
+    `session.regenerate()` (anti-fixation), une session mixte est impossible ;
+    documenté par assertions « cloisonnement ».
+  - Dette de tests Lot B soldée : `test/lot-b.cjs` (port 4069, 11 assertions) —
+    jeton de suivi opaque, page `/suivi` sans PII, 404, statuts, câblage emails.
 
 ## Conventions
 
@@ -75,7 +90,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   utilisateur, messages de commit (préfixe du lot : `E: ...`), labels de tests.
 - **TDD obligatoire** : test écrit d'abord dans `test/<nom>.cjs`, vu échouer, puis
   implémentation minimale. Pas de framework : serveur dédié sur un port unique
-  (4057-4067 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
+  (4055-4069 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
   nettoyage en `finally`. Nouveau fichier de test → l'ajouter à `"test"` dans
   `package.json`.
 - Architecture : `routes → contrôleurs → services (Prisma) → vues Twig`. Toute requête

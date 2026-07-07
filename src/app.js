@@ -47,6 +47,15 @@ app.set('twig options', { autoescape: true });
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Les pages HTML dépendent souvent de la session (nav, flash, CSRF). On évite donc
+// qu'un retour navigateur réaffiche une ancienne vue "déconnectée" ou admin.
+app.use((req, res, next) => {
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    res.set('Cache-Control', 'no-store');
+  }
+  next();
+});
+
 // Session (SESSION_SECRET garanti présent par le fail-fast de server.js).
 // Store persistant en base (table Session) : survit aux redémarrages et
 // fonctionne en multi-process, contrairement au MemoryStore par défaut.
