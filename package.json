@@ -13,7 +13,7 @@
     "admin:create": "node scripts/create-admin.js",
     "purge": "node scripts/purge.js",
     "seed:demo": "node scripts/seed-demo.js",
-    "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-b.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/ameliorations-v2.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs && node test/lot-k.cjs"
+    "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-b.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/ameliorations-v2.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs && node test/lot-k.cjs && node test/lot-l.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

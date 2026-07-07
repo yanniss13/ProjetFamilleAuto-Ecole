@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (14 fichiers `.cjs`, ~380 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (15 fichiers `.cjs`, ~400 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 - `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le
@@ -17,7 +17,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 - `npm run seed:demo` — jeu de données de démo relançable (comptes et URLs affichés
   en fin de script). À relancer avant chaque répétition de la démo.
 
-## État au 2026-07-06 (passation)
+## État au 2026-07-07 (passation)
 
 - Lots A (correctifs), B (notifications/suivi candidat), C (admin/modération) : livrés.
 - Revue de code complète : 9 correctifs/durcissements livrés (commit « Revue de code :
@@ -49,12 +49,14 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   contrat réellement signé (services du Lot G) et fichiers réels sous `storage/`.
   Données marquées `@demo.moniteur-connect.example`, relançable (delete puis
   recreate), identifiants affichés en fin de script. Tests : `test/lot-k.cjs`.
-- **Prochain travail : Lot L (autocomplétion d'adresse via l'API Adresse
-  adresse.data.gouv.fr)** — **PLAN PRÊT, reprendre à la Tâche 1** :
-  `docs/superpowers/plans/2026-07-07-lot-l-autocomplete-adresse.md` (mini-spec
-  incluse ; pattern du relais SIRET ; port de test 4070). Côté utilisateur :
-  config Mailpit (SMTP_HOST=localhost, SMTP_PORT=1025) — si l'envoi échoue,
-  micro-fix : ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
+- **Lot L (autocomplétion d'adresse via l'API Adresse adresse.data.gouv.fr) :
+  LIVRÉ le 2026-07-07** — relais interne `/api/adresse?q=...` (CSP, rate-limit
+  30/min/IP), service cache 10 min jamais bloquant, datalist navigateur sur les
+  champs `address` d'inscription et de profil. Tests : `test/lot-l.cjs` (port
+  4070, 20 assertions).
+- **Prochain travail : préparation démo jury (script de démonstration)**. Côté
+  utilisateur : config Mailpit (SMTP_HOST=localhost, SMTP_PORT=1025) — si l'envoi
+  échoue, micro-fix : ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
@@ -91,7 +93,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   utilisateur, messages de commit (préfixe du lot : `E: ...`), labels de tests.
 - **TDD obligatoire** : test écrit d'abord dans `test/<nom>.cjs`, vu échouer, puis
   implémentation minimale. Pas de framework : serveur dédié sur un port unique
-  (4055-4069 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
+  (4055-4070 déjà pris), assertions `ok(cond, label)`, données suffixées `STAMP`,
   nettoyage en `finally`. Nouveau fichier de test → l'ajouter à `"test"` dans
   `package.json`.
 - Architecture : `routes → contrôleurs → services (Prisma) → vues Twig`. Toute requête
@@ -120,6 +122,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   `geocodeCached` (à créer en Lot E, cache 24 h). `GEOCODING_DISABLED=1` dans les tests.
 - **API Sirene** (vérification SIRET) : relais interne `/api/siret/:siret` uniquement
   (CSP) ; `SIRET_LOOKUP_DISABLED=1` dans les tests ; cache 1 h dans `src/services/siret.js`.
+- **API Adresse** (autocomplétion d'adresse) : relais interne `/api/adresse?q=...`
+  uniquement (CSP) ; `ADRESSE_LOOKUP_DISABLED=1` dans les tests ; cache 10 min
+  dans `src/services/adresse.js` ; front dans `public/js/adresse-autocomplete.js`
+  branché via `data-adresse-autocomplete`.
 - **Signatures** (Lot G) : dessin ou import PNG/JPEG dans le pad canvas, puis PNG
   validé par `src/services/signatureImage.js` (data URL, magic bytes, 200 Ko max),
   stocké sous `storage/signatures/` ; toute

@@ -15,12 +15,14 @@ const path = require('path');
 const vm = require('vm');
 const prisma = require('../src/config/prisma');
 const app = require('../src/app');
+const passwordUtil = require('../src/utils/password');
 
 const PORT = 4070;
 const BASE = `http://127.0.0.1:${PORT}`;
 const STAMP = Date.now();
 
 let passed = 0;
+const createdSchoolIds = [];
 function ok(cond, label) {
   if (!cond) throw new Error(`ECHEC : ${label}`);
   passed += 1;
@@ -32,6 +34,29 @@ function jsonOrNull(text) {
 async function get(urlPath) {
   const res = await fetch(BASE + urlPath, { redirect: 'manual' });
   return { status: res.status, text: await res.text() };
+}
+function makeJar() { return { cookie: '' }; }
+function storeCookies(jar, res) {
+  const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
+  for (const c of sc) jar.cookie = c.split(';')[0];
+}
+async function req(jar, method, urlPath, { body, headers = {} } = {}) {
+  const res = await fetch(BASE + urlPath, {
+    method, redirect: 'manual',
+    headers: { ...(jar.cookie ? { cookie: jar.cookie } : {}), ...headers }, body,
+  });
+  storeCookies(jar, res);
+  return { status: res.status, location: res.headers.get('location'), text: await res.text() };
+}
+function csrfFrom(html) {
+  const m = html.match(/name="csrf-token" content="([^"]+)"/);
+  if (!m) throw new Error('Jeton CSRF introuvable.');
+  return m[1];
+}
+function form(obj) {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(obj)) p.append(k, v);
+  return { body: p.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 }
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -218,9 +243,37 @@ async function main() {
         'JS adresse : appels debounces, seule la derniere saisie part');
     }
 
+    // --- 4. integration vues inscription + profil ---
+    {
+      let r = await get('/inscription');
+      ok(r.status === 200 && r.text.includes('name="address"') && r.text.includes('data-adresse-autocomplete')
+        && r.text.includes('/js/adresse-autocomplete.js') && r.text.includes('defer'),
+        'vues : inscription equipe le champ adresse et charge le script');
+
+      const email = `lotl.profil.${STAMP}@example.test`;
+      const school = await prisma.school.create({
+        data: {
+          email, passwordHash: await passwordUtil.hash('motdepasse123'), businessName: 'Lot L Profil',
+          siret: `8${String(STAMP).slice(-13).padStart(13, '0')}`, emailVerified: true,
+        },
+      });
+      createdSchoolIds.push(school.id);
+
+      const jar = makeJar();
+      r = await req(jar, 'GET', '/connexion');
+      r = await req(jar, 'POST', '/connexion', form({ _csrf: csrfFrom(r.text), email, password: 'motdepasse123' }));
+      ok(r.status === 302 && r.location === '/tableau-de-bord', 'vues : connexion ecole pour acceder au profil');
+
+      r = await req(jar, 'GET', '/mon-compte');
+      ok(r.status === 200 && r.text.includes('name="address"') && r.text.includes('data-adresse-autocomplete')
+        && r.text.includes('/js/adresse-autocomplete.js') && r.text.includes('defer'),
+        'vues : profil equipe le champ adresse et charge le script');
+    }
+
     console.log(`\n✅ Lot L tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
+    if (createdSchoolIds.length) await prisma.school.deleteMany({ where: { id: { in: createdSchoolIds } } });
     await prisma.$disconnect();
   }
 }

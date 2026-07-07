@@ -39,7 +39,7 @@
 
       <div class="form-group">
         <label for="address">Adresse <span class="muted">(optionnel — pour la carte des annonces)</span></label>
-        <input id="address" name="address" type="text" autocomplete="street-address"
+        <input id="address" name="address" type="text" autocomplete="street-address" data-adresse-autocomplete
                value="{{ values.address|default('') }}"
                placeholder="ex. 12 rue de la République, 13001 Marseille">
         {% if errors.address %}<p class="field-error">{{ errors.address }}</p>{% endif %}
@@ -66,4 +66,5 @@
 
 {% block scripts %}
   <script src="/js/siret-check.js" defer></script>
+  <script src="/js/adresse-autocomplete.js" defer></script>
 {% endblock %}
