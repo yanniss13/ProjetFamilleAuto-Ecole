@@ -37,6 +37,59 @@ function esc(s) {
     .replace(/'/g, '&#39;');
 }
 
+// ------------------------- Habillage HTML commun -------------------------
+// Contraintes des clients mail : CSS inline uniquement, mise en page par tableaux,
+// AUCUNE ressource externe (image, police, feuille de style, script). Les couleurs
+// reprennent la charte du site (public/css/style.css).
+// `title` est échappé ici ; `contentHtml` et `footerHtml` sont fournis par
+// l'appelant, qui a déjà passé `esc()` sur tout texte utilisateur interpolé.
+const EMAIL_FONT = "Arial, 'Segoe UI', sans-serif";
+
+function emailLayout({ title, contentHtml, cta = null, footerHtml = '' }) {
+  const bouton = cta
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto 8px;">
+        <tr><td style="border-radius:6px;background-color:#2563eb;">
+          <a href="${cta.url}" style="display:inline-block;padding:12px 24px;font-family:${EMAIL_FONT};font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">${esc(cta.label)}</a>
+        </td></tr>
+      </table>
+      <p style="margin:0 0 8px;font-family:${EMAIL_FONT};font-size:12px;color:#6b7280;text-align:center;word-break:break-all;">
+        Si le bouton ne fonctionne pas, copiez ce lien : <a href="${cta.url}" style="color:#2563eb;">${cta.url}</a>
+      </p>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background-color:#f4f6f8;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8;padding:24px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
+        <tr>
+          <td style="background-color:#2563eb;border-radius:8px 8px 0 0;padding:16px 28px;">
+            <span style="font-family:${EMAIL_FONT};font-size:18px;font-weight:bold;color:#ffffff;">MoniteurConnect</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;padding:28px;">
+            <h1 style="margin:0 0 16px;font-family:${EMAIL_FONT};font-size:20px;line-height:1.3;color:#111827;">${esc(title)}</h1>
+            <div style="font-family:${EMAIL_FONT};font-size:14px;line-height:1.6;color:#374151;">${contentHtml}</div>
+            ${bouton}
+            ${footerHtml}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 8px;text-align:center;">
+            <p style="margin:0;font-family:${EMAIL_FONT};font-size:12px;line-height:1.6;color:#6b7280;">
+              MoniteurConnect — auto-écoles &amp; moniteurs indépendants<br>
+              Email automatique, merci de ne pas y répondre.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 // Envoi générique. Ne logge jamais le contenu/jeton, seulement l'email masqué.
 // Renvoie true si l'email est parti (ou, en mode dev sans SMTP, s'il a été « traité »
 // et journalisé), false uniquement en cas d'échec réel d'envoi SMTP.
@@ -58,16 +111,20 @@ async function send(to, subject, html, { link = null, attachments = null } = {})
   }
 }
 
-// --- Emails métier (le corps HTML pourra être enrichi à l'implémentation) ---
+// --- Emails métier (tous habillés par emailLayout) ---
 
 function sendVerification(email, rawToken) {
   const link = `${APP_URL}/verifier-email/${rawToken}`;
   return send(
     email,
     'Confirmez votre adresse email',
-    `<p>Bienvenue sur MoniteurConnect.</p>
-     <p>Confirmez votre adresse (lien valable 24 h) :</p>
-     <p><a href="${link}">Vérifier mon adresse</a></p>`,
+    emailLayout({
+      title: 'Bienvenue sur MoniteurConnect',
+      contentHtml: `<p>Votre compte auto-école vient d’être créé.</p>
+        <p>Confirmez votre adresse email pour activer votre espace et publier vos annonces.
+        Ce lien est valable 24 heures.</p>`,
+      cta: { label: 'Vérifier mon adresse', url: link },
+    }),
     { link }
   );
 }
@@ -77,21 +134,33 @@ function sendReset(email, rawToken) {
   return send(
     email,
     'Réinitialisez votre mot de passe',
-    `<p>Vous avez demandé à réinitialiser votre mot de passe.</p>
-     <p>Lien valable 1 h, usage unique :</p>
-     <p><a href="${link}">Choisir un nouveau mot de passe</a></p>`,
+    emailLayout({
+      title: 'Réinitialisation du mot de passe',
+      contentHtml: `<p>Vous avez demandé à réinitialiser votre mot de passe.
+        Ce lien est valable 1 heure et à usage unique.</p>
+        <p>Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet email :
+        votre mot de passe actuel reste inchangé.</p>`,
+      cta: { label: 'Choisir un nouveau mot de passe', url: link },
+    }),
     { link }
   );
 }
 
 // Notifie l'auto-école qu'une candidature a été déposée sur son annonce.
 function sendApplicationNotification(schoolEmail, listingTitle, applicantName) {
+  const link = `${APP_URL}/tableau-de-bord`;
   return send(
     schoolEmail,
     `Nouvelle candidature — ${listingTitle}`,
-    `<p>Vous avez reçu une candidature de <strong>${esc(applicantName)}</strong> pour votre annonce
-     « ${esc(listingTitle)} ».</p>
-     <p>Connectez-vous à votre tableau de bord pour la consulter.</p>`
+    emailLayout({
+      title: 'Vous avez reçu une candidature',
+      contentHtml: `<p><strong>${esc(applicantName)}</strong> vient de postuler à votre annonce
+        « ${esc(listingTitle)} ».</p>
+        <p>Retrouvez son CV et ses pièces dans votre espace pour lui répondre rapidement —
+        les meilleurs profils partent vite.</p>`,
+      cta: { label: 'Ouvrir mon tableau de bord', url: link },
+    }),
+    { link }
   );
 }
 
@@ -101,10 +170,14 @@ function sendSignatureInvitation(applicantEmail, applicantName, listingTitle, to
   return send(
     applicantEmail,
     `Votre contrat est prêt à signer — ${listingTitle}`,
-    `<p>Bonjour ${esc(applicantName)},</p>
-     <p>L'auto-école a établi et signé votre contrat pour « ${esc(listingTitle)} ».
-     Lisez-le puis signez-le en ligne depuis votre page de suivi :</p>
-     <p><a href="${link}">Lire et signer mon contrat</a></p>`,
+    emailLayout({
+      title: 'Votre contrat est prêt',
+      contentHtml: `<p>Bonjour ${esc(applicantName)},</p>
+        <p>L’auto-école a établi et signé votre contrat pour « ${esc(listingTitle)} ».</p>
+        <p>Lisez-le attentivement puis signez-le en ligne depuis votre page de suivi —
+        vous recevrez ensuite le document final signé par les deux parties.</p>`,
+      cta: { label: 'Lire et signer mon contrat', url: link },
+    }),
     { link }
   );
 }
@@ -114,9 +187,13 @@ function sendSignedContract(to, name, listingTitle, pdfPath) {
   return send(
     to,
     `Contrat signé — ${listingTitle}`,
-    `<p>Bonjour ${esc(name)},</p>
-     <p>Le contrat lié à « ${esc(listingTitle)} » a été signé par les deux parties.
-     Vous trouverez le document final en pièce jointe — conservez-le précieusement.</p>`,
+    emailLayout({
+      title: 'Contrat signé par les deux parties',
+      contentHtml: `<p>Bonjour ${esc(name)},</p>
+        <p>Le contrat lié à « ${esc(listingTitle)} » a été signé par les deux parties.</p>
+        <p>Vous trouverez le document final en pièce jointe — conservez-le précieusement.
+        Son intégrité est garantie par une empreinte numérique inscrite dans le document.</p>`,
+    }),
     { attachments: [{ filename: 'contrat-signe.pdf', path: pdfPath, contentType: 'application/pdf' }] }
   );
 }
@@ -127,9 +204,14 @@ function sendApplicationConfirmation(applicantEmail, applicantName, listingTitle
   return send(
     applicantEmail,
     `Candidature reçue — ${listingTitle}`,
-    `<p>Bonjour ${esc(applicantName)},</p>
-     <p>Votre candidature à l'annonce « ${esc(listingTitle)} » a bien été reçue.</p>
-     ${link ? `<p>Suivez son avancement à tout moment : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    emailLayout({
+      title: 'Candidature bien reçue',
+      contentHtml: `<p>Bonjour ${esc(applicantName)},</p>
+        <p>Votre candidature à l’annonce « ${esc(listingTitle)} » a bien été transmise à
+        l’auto-école.</p>
+        ${link ? '<p>Vous pouvez suivre son avancement à tout moment, sans créer de compte :</p>' : ''}`,
+      cta: link ? { label: 'Suivre ma candidature', url: link } : null,
+    }),
     { link }
   );
 }
@@ -140,10 +222,13 @@ function sendApplicationAccepted(applicantEmail, applicantName, listingTitle, to
   return send(
     applicantEmail,
     `Candidature acceptée — ${listingTitle}`,
-    `<p>Bonjour ${esc(applicantName)},</p>
-     <p>Bonne nouvelle : votre candidature à « ${esc(listingTitle)} » a été acceptée. L'auto-école
-     vous transmettra votre contrat par email.</p>
-     ${link ? `<p>Détails : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    emailLayout({
+      title: 'Bonne nouvelle : candidature acceptée',
+      contentHtml: `<p>Bonjour ${esc(applicantName)},</p>
+        <p>Votre candidature à « ${esc(listingTitle)} » a été <strong>acceptée</strong>.
+        L’auto-école prépare votre contrat : vous recevrez une invitation à le signer en ligne.</p>`,
+      cta: link ? { label: 'Voir le suivi de mon dossier', url: link } : null,
+    }),
     { link }
   );
 }
@@ -154,10 +239,15 @@ function sendApplicationRejected(applicantEmail, applicantName, listingTitle, to
   return send(
     applicantEmail,
     `Votre candidature — ${listingTitle}`,
-    `<p>Bonjour ${esc(applicantName)},</p>
-     <p>Votre candidature à « ${esc(listingTitle)} » n'a pas été retenue cette fois-ci. Merci de
-     l'intérêt porté à cette auto-école.</p>
-     ${link ? `<p>Suivi : <a href="${link}">voir le suivi</a></p>` : ''}`,
+    emailLayout({
+      title: 'Réponse à votre candidature',
+      contentHtml: `<p>Bonjour ${esc(applicantName)},</p>
+        <p>Votre candidature à « ${esc(listingTitle)} » n’a pas été retenue cette fois-ci.
+        Merci de l’intérêt porté à cette auto-école.</p>
+        <p>D’autres annonces sont publiées chaque semaine — vous pouvez aussi créer une
+        alerte email pour être prévenu(e) automatiquement.</p>`,
+      cta: link ? { label: 'Voir le suivi', url: link } : null,
+    }),
     { link }
   );
 }
@@ -169,11 +259,17 @@ function sendAlertConfirmation(email, department, keyword, rawToken) {
   return send(
     email,
     'Confirmez votre alerte MoniteurConnect',
-    `<p>Vous avez demandé une alerte email pour les annonces du département
-     <strong>${esc(department)}</strong>${keyword ? ` (mot-clé « ${esc(keyword)} »)` : ''}.</p>
-     <p>Confirmez pour l’activer :</p>
-     <p><a href="${link}">Activer mon alerte</a></p>
-     <p>Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet email.</p>`,
+    emailLayout({
+      title: 'Activez votre alerte email',
+      contentHtml: `<p>Vous avez demandé une alerte pour les annonces du département
+        <strong>${esc(department)}</strong>${keyword ? ` (mot-clé « ${esc(keyword)} »)` : ''}.</p>
+        <p>Confirmez votre adresse pour l’activer : vous recevrez ensuite un email à chaque
+        nouvelle annonce correspondante.</p>`,
+      cta: { label: 'Activer mon alerte', url: link },
+      footerHtml: `<p style="margin:16px 0 0;font-family:${EMAIL_FONT};font-size:12px;color:#6b7280;">
+        Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet email —
+        aucune alerte ne sera activée.</p>`,
+    }),
     { link }
   );
 }
@@ -186,16 +282,21 @@ function sendListingAlert(email, listing, unsubscribeToken) {
   return send(
     email,
     `Nouvelle annonce — ${listing.title}`,
-    `<p>Une nouvelle annonce correspond à votre alerte :</p>
-     <p><strong>${esc(listing.title)}</strong> — ${esc(listing.city)} (${esc(listing.department)})</p>
-     <p><a href="${link}">Voir l’annonce et postuler</a></p>
-     <p><a href="${unsubscribeLink}">Se désabonner de cette alerte</a></p>`,
+    emailLayout({
+      title: 'Une annonce correspond à votre alerte',
+      contentHtml: `<p><strong>${esc(listing.title)}</strong><br>
+        ${esc(listing.city)} (${esc(listing.department)})</p>`,
+      cta: { label: 'Voir l’annonce et postuler', url: link },
+      footerHtml: `<p style="margin:16px 0 0;font-family:${EMAIL_FONT};font-size:12px;color:#6b7280;text-align:center;">
+        <a href="${unsubscribeLink}" style="color:#6b7280;">Se désabonner de cette alerte</a></p>`,
+    }),
     { link }
   );
 }
 
 module.exports = {
   send,
+  emailLayout,
   sendVerification,
   sendReset,
   sendApplicationNotification,

@@ -39,7 +39,7 @@ async function req(jar, method, urlPath, { body, headers = {} } = {}) {
   });
   storeCookies(jar, res);
   const text = await res.text();
-  return { status: res.status, location: res.headers.get('location'), text };
+  return { status: res.status, location: res.headers.get('location'), headers: res.headers, text };
 }
 function csrfFrom(html) {
   const m = html.match(/name="csrf-token" content="([^"]+)"/);
@@ -123,7 +123,20 @@ async function main() {
 
     // C (Task 4) : modération — retrait d'une annonce (avec nettoyage des fichiers)
     const modListing = await prisma.listing.create({
-      data: { title: `ModAnnonce ${STAMP}`, description: 'à modérer', city: 'Lyon', department: '69', schoolId: sRow.id, titleLower: `modannonce ${STAMP}`, descriptionLower: 'à modérer', cityLower: 'lyon' },
+      data: {
+        title: `ModAnnonce ${STAMP}`,
+        description: 'à modérer',
+        city: 'Lyon',
+        department: '69',
+        contractType: 'cdd',
+        hoursPerWeek: 24,
+        compensation: '2100€ brut/mois',
+        viewsCount: 7,
+        schoolId: sRow.id,
+        titleLower: `modannonce ${STAMP}`,
+        descriptionLower: 'à modérer',
+        cityLower: 'lyon',
+      },
     });
     // une candidature avec un fichier sur disque pour vérifier le nettoyage
     const relCv = `cv/lotc-${STAMP}.pdf`;
@@ -132,6 +145,15 @@ async function main() {
 
     rc = await req(adminJar, 'GET', '/admin/annonces');
     ok(rc.status === 200 && rc.text.includes(`ModAnnonce ${STAMP}`), 'C : liste admin des annonces');
+    ok(rc.text.includes('listing-card') && !rc.text.includes('class="data-table"'), 'C : modération des annonces en cartes détaillées');
+    ok(rc.text.includes('à modérer') && rc.text.includes('Iso') && rc.text.includes('Lyon (69)'),
+      'C : modération affiche le contenu, l’école et le lieu');
+    ok(rc.text.includes('CDD') && rc.text.includes('24 h/sem') && rc.text.includes('2100€ brut/mois'),
+      'C : modération affiche les conditions de mission');
+    ok(rc.text.includes('1 candidature') && rc.text.includes('7 vue'),
+      'C : modération affiche candidatures et vues');
+    ok(rc.text.includes(`/annonces/${modListing.id}`) && rc.text.includes(`/admin/annonces/${modListing.id}/supprimer`),
+      'C : modération garde l’accès public et le retrait');
     rc = await req(adminJar, 'POST', `/admin/annonces/${modListing.id}/supprimer`, form({ _csrf: await adminCsrf(adminJar) }));
     ok(rc.status === 302, 'C : retrait d’annonce -> redirection');
     ok(!(await prisma.listing.findUnique({ where: { id: modListing.id } })), 'C : annonce retirée de la base');
@@ -173,13 +195,51 @@ async function main() {
     rs = await req(blocked, 'POST', '/connexion', form({ _csrf: csrfB, email: sEmail, password: 'motdepasse123' }));
     ok(rs.status === 302 && rs.location === '/tableau-de-bord', 'C : connexion de nouveau possible après réactivation');
 
-    // Nav consciente de la session sur les pages PUBLIQUES : un admin (ou une école)
-    // qui visite /annonces doit garder le lien vers son espace — sinon il se croit
-    // déconnecté et perd le chemin du back-office (correctif post-Lot K).
+    // La session admin garde un retour vers /admin sans transformer les pages
+    // publiques en vue admin : les liens moniteurs restent visibles, pas Connexion.
+    rs = await req(adminJar, 'GET', '/');
+    ok(rs.status === 200 && rs.text.includes('class="navbar-brand" href="/admin"'), 'C : logo renvoie vers /admin pour un admin connecté');
+    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : accueil public garde le lien Administration pour un admin connecté');
+    ok(rs.text.includes('href="/annonces"') && rs.text.includes('action="/admin/deconnexion"'), 'C : accueil public garde les liens publics et la déconnexion admin');
+    ok(!rs.text.includes('href="/connexion"'), 'C : accueil public ne propose pas Connexion à un admin déjà connecté');
+    ok(/no-store/i.test(rs.headers.get('cache-control') || ''), 'C : accueil dynamique non mis en cache par le navigateur');
     rs = await req(adminJar, 'GET', '/annonces');
-    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : nav publique — session admin gardée (lien Administration)');
+    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : annonces publiques gardent le lien Administration');
+    ok(rs.text.includes('href="/annonces"') && rs.text.includes('href="/alertes"'), 'C : annonces publiques gardent la navigation moniteur avec session admin');
+    ok(rs.text.includes('action="/admin/deconnexion"') && !rs.text.includes('href="/connexion"'), 'C : annonces publiques proposent la déconnexion admin sans Connexion');
+    ok(!rs.text.includes('Voir &amp; postuler'), 'C : session admin ne voit pas d’appel à postuler dans la liste publique');
+    rs = await req(adminJar, 'GET', '/connexion');
+    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : connexion école garde le lien Administration');
+    ok(rs.text.includes('action="/admin/deconnexion"') && !rs.text.includes('href="/connexion"'), 'C : connexion école affiche la déconnexion admin, pas le lien Connexion');
+    rs = await req(adminJar, 'GET', '/admin');
+    ok(rs.status === 200 && rs.text.includes('href="/admin"'), 'C : espace admin garde la navigation admin');
+    ok(/no-store/i.test(rs.headers.get('cache-control') || ''), 'C : espace admin non mis en cache par le navigateur');
+
+    rs = await req(adminJar, 'GET', `/annonces/${suspListing.id}`);
+    ok(rs.status === 200 && !rs.text.includes(`action="/annonces/${suspListing.id}/postuler"`),
+      'C : session admin ne voit pas le formulaire de candidature');
+    const beforeAdminApply = await prisma.application.count({ where: { listingId: suspListing.id } });
+    rs = await req(adminJar, 'POST', `/annonces/${suspListing.id}/postuler`,
+      form({ _csrf: csrfFrom(rs.text), applicantName: 'Admin', applicantEmail: `admin.apply.${STAMP}@example.test`, message: 'm' }));
+    ok(rs.status === 403, 'C : session admin ne peut pas poster une candidature');
+    ok((await prisma.application.count({ where: { listingId: suspListing.id } })) === beforeAdminApply,
+      'C : session admin ne crée aucune candidature');
+
+    // Une école connectée garde en revanche son raccourci back-office, car c'est son
+    // espace métier et les pages publiques ne doivent pas lui proposer les alertes ni
+    // la candidature destinée aux moniteurs.
     rs = await req(blocked, 'GET', '/annonces');
+    ok(!rs.text.includes('href="/annonces"'), 'C : nav publique - session ecole masque le lien Annonces');
     ok(rs.status === 200 && rs.text.includes('href="/tableau-de-bord"'), 'C : nav publique — session école gardée (lien Tableau de bord)');
+    rs = await req(blocked, 'GET', `/annonces/${suspListing.id}`);
+    ok(rs.status === 200 && !rs.text.includes(`action="/annonces/${suspListing.id}/postuler"`),
+      'C : session école ne voit pas le formulaire de candidature');
+    const beforeSchoolApply = await prisma.application.count({ where: { listingId: suspListing.id } });
+    rs = await req(blocked, 'POST', `/annonces/${suspListing.id}/postuler`,
+      form({ _csrf: csrfFrom(rs.text), applicantName: 'Ecole', applicantEmail: `ecole.apply.${STAMP}@example.test`, message: 'm' }));
+    ok(rs.status === 403, 'C : session école ne peut pas poster une candidature');
+    ok((await prisma.application.count({ where: { listingId: suspListing.id } })) === beforeSchoolApply,
+      'C : session école ne crée aucune candidature');
 
     console.log(`\n✅ Lot C tests réussis — ${passed} assertions.`);
   } finally {

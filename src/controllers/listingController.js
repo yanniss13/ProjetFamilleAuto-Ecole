@@ -52,7 +52,7 @@ async function browse(req, res, next) {
       const { schools, unlocatedCount } = await listingService.findPublicForMap({
         department: departement, q, center, radiusKm: center ? rayon : null,
       });
-      const mapData = { schools, center: center ? { lat: center.lat, lng: center.lng, radiusKm: rayon } : null };
+      const mapData = { schools, center: center ? { lat: center.lat, lng: center.lng, radiusKm: rayon, label: ville } : null };
       return res.render('listings/index', {
         ...common,
         listings: [],

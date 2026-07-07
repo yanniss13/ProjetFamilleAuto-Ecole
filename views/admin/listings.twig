@@ -6,25 +6,66 @@
   {% if listings|length == 0 %}
     <p class="muted">Aucune annonce.</p>
   {% else %}
-    <table class="data-table">
-      <thead><tr><th>Titre</th><th>Auto-école</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr></thead>
-      <tbody>
-        {% for l in listings %}
-          <tr>
-            <td>{{ l.title }}</td>
-            <td>{{ l.school.businessName }}</td>
-            <td>{{ l.city }} ({{ l.department }})</td>
-            <td>{{ l.status }}</td>
-            <td class="actions">
-              <form action="/admin/annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
-                    data-confirm="Retirer définitivement cette annonce et ses candidatures ?">
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                <button type="submit" class="btn btn-small btn-danger">Retirer</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <ul class="listing-list admin-listing-list">
+      {% for l in listings %}
+        <li class="listing-card admin-listing-card">
+          <div class="listing-card-header">
+            <div>
+              {% if l.publicAvailable %}
+                <a href="/annonces/{{ l.id }}"><h2>{{ l.title }}</h2></a>
+              {% else %}
+                <h2>{{ l.title }}</h2>
+              {% endif %}
+              <p class="muted">
+                {{ l.city }} ({{ l.department }})
+                {% if l.contractTypeLabel %} · {{ l.contractTypeLabel }}{% endif %}
+                {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
+              </p>
+            </div>
+            <div class="listing-card-badges">
+              <span class="badge {% if l.status == 'open' %}badge-available{% else %}badge-pending{% endif %}">{{ l.statusLabel }}</span>
+              {% if l.school.suspended %}<span class="badge badge-rejected">École suspendue</span>{% endif %}
+              {% if l.school.siretStatus == 'verified' %}<span class="badge-verified">✓ École vérifiée</span>{% endif %}
+            </div>
+          </div>
+
+          <p class="listing-card-description">{{ l.description }}</p>
+          {% if l.compensation %}<p><strong>Rémunération :</strong> {{ l.compensation }}</p>{% endif %}
+
+          <dl class="admin-listing-details">
+            <div>
+              <dt>Auto-école</dt>
+              <dd>{{ l.school.businessName }}</dd>
+            </div>
+            <div>
+              <dt>Candidatures</dt>
+              <dd>{{ l.applicationsLabel }}</dd>
+            </div>
+            <div>
+              <dt>Vues</dt>
+              <dd>{{ l.viewsLabel }}</dd>
+            </div>
+            <div>
+              <dt>Publication</dt>
+              <dd>{{ l.createdLabel }}</dd>
+            </div>
+          </dl>
+
+          <div class="dashboard-actions admin-listing-actions">
+            {% if l.publicAvailable %}
+              <a href="/annonces/{{ l.id }}" class="btn btn-small">Voir la page publique</a>
+            {% else %}
+              <span class="muted">Page publique masquée</span>
+            {% endif %}
+            <form action="/admin/annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
+                  data-confirm="Retirer définitivement cette annonce et ses candidatures ?">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              <button type="submit" class="btn btn-small btn-danger">Retirer</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+    {% include 'partials/pagination.twig' %}
   {% endif %}
 {% endblock %}

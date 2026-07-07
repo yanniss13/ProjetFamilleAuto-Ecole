@@ -8,6 +8,13 @@ const { verifyAfterUpload } = require('../middlewares/csrf');
 
 const router = express.Router();
 
+function rejectBackOfficeApplication(req, res, next) {
+  if (req.session && (req.session.schoolId || req.session.adminId)) {
+    return res.status(403).render('errors/403', { title: 'Accès refusé' });
+  }
+  next();
+}
+
 // Anti-spam sur le dépôt de candidature. Au dépassement : message + retour à l'annonce.
 const applyLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false,
@@ -23,6 +30,8 @@ router.get('/:id', listingController.show);
 // Candidature : multipart (CV + pièces). handleApplicationUpload (multer) parse le corps,
 // puis verifyAfterUpload contrôle le jeton CSRF (champ _csrf) — la vérification globale
 // est différée pour cette route (voir middlewares/csrf.js).
-router.post('/:id/postuler', applyLimiter, handleApplicationUpload, verifyAfterUpload, applicationController.apply);
+// Le rejet back-office précède le limiteur : un 403 ne doit pas consommer le
+// quota anti-spam partagé par IP des vrais candidats.
+router.post('/:id/postuler', rejectBackOfficeApplication, applyLimiter, handleApplicationUpload, verifyAfterUpload, applicationController.apply);
 
 module.exports = router;

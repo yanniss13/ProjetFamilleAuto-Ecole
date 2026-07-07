@@ -50,7 +50,11 @@
               {% if l.school.siretStatus == 'verified' %} <span class="badge-verified">✓ École vérifiée</span>{% endif %}
             </p>
             <p>{{ l.description }}</p>
-            <p><a href="/annonces/{{ l.id }}" class="btn btn-small">Voir &amp; postuler</a></p>
+            <p>
+              <a href="/annonces/{{ l.id }}" class="btn btn-small">
+                {% if backOfficeSession %}Voir l'annonce{% else %}Voir &amp; postuler{% endif %}
+              </a>
+            </p>
           </li>
         {% endfor %}
       </ul>

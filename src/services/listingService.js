@@ -166,8 +166,16 @@ async function findAnyFilePathsForListing(id) {
 function deleteAny(id) {
   return prisma.listing.delete({ where: { id } });
 }
-function findAllWithSchool() {
-  return prisma.listing.findMany({ orderBy: { createdAt: 'desc' }, include: { school: true } });
+function findAllWithSchool({ skip, take } = {}) {
+  return prisma.listing.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { school: true, _count: { select: { applications: true } } },
+    skip,
+    take,
+  });
+}
+function countAll() {
+  return prisma.listing.count();
 }
 
-module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool };
+module.exports = { findPublic, findPublicById, incrementViews, findPublicForMap, findAllBySchool, findOwnedById, createForSchool, updateOwned, deleteOwned, findFilePathsForListing, findAnyFilePathsForListing, deleteAny, findAllWithSchool, countAll };

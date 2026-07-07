@@ -154,6 +154,42 @@ body {
 }
 .listing-card h2 { margin: 0 0 0.25rem; font-size: 1.15rem; }
 .listing-card a { color: var(--color-primary); text-decoration: none; }
+.listing-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.listing-card-header > div:first-child { flex: 1 1 16rem; }
+.listing-card-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.listing-card-description { white-space: pre-wrap; }
+.admin-listing-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+.admin-listing-details dt {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+.admin-listing-details dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+}
+.admin-listing-actions {
+  align-items: center;
+  margin-bottom: 0;
+}
 
 /* --- Tableaux --- */
 .data-table {

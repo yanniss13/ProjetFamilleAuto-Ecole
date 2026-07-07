@@ -250,8 +250,19 @@ async function main() {
     r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, accept: '1', signatureData: 'data:image/png;base64,@@' }));
     ok(r.status === 400, 'candidat : signature invalide refusée');
 
-    r = await req(pub, 'POST', `${suivi}/signer`, form({ _csrf: csrfP, accept: '1', signatureData: SIGNATURE_PNG }));
+    const jarCandidatAvecSessionEcole = makeJar();
+    r = await req(jarCandidatAvecSessionEcole, 'GET', '/connexion');
+    r = await req(jarCandidatAvecSessionEcole, 'POST', '/connexion',
+      form({ _csrf: csrfFrom(r.text), email: school.email, password: 'motdepasse123' }));
+    ok(r.status === 302, 'candidat : précondition session école active avant signature');
+    r = await req(jarCandidatAvecSessionEcole, 'GET', `${suivi}/signer`);
+    const csrfMelange = csrfFrom(r.text);
+    r = await req(jarCandidatAvecSessionEcole, 'POST', `${suivi}/signer`,
+      form({ _csrf: csrfMelange, accept: '1', signatureData: SIGNATURE_PNG }));
     ok(r.status === 302 && r.location === suivi, 'candidat : signature acceptée -> retour suivi');
+    r = await req(jarCandidatAvecSessionEcole, 'GET', '/tableau-de-bord');
+    ok(r.status === 302 && r.location === '/connexion',
+      'candidat : signature via suivi neutralise la session école du navigateur');
     contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
     ok(contract.applicantSignedAt instanceof Date && contract.applicantSignaturePath
       && fs.existsSync(absStored(contract.applicantSignaturePath)),

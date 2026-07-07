@@ -210,6 +210,8 @@ async function main() {
     ok(r.text.includes('Créer une alerte') && r.text.includes('/alertes?departement=13&amp;q=moto'),
       'annonces : lien « Creer une alerte » pre-rempli avec les filtres');
     ok(r.text.includes('>Alertes<'), 'nav : entree publique Alertes');
+    rs = await req(schoolJar, 'GET', '/mes-annonces');
+    ok(!rs.text.includes('href="/alertes"'), 'nav : entree Alertes masquee cote ecole');
 
     console.log(`\n✅ Lot I tests reussis - ${passed} assertions.`);
   } finally {

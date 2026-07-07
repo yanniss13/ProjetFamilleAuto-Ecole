@@ -8,6 +8,9 @@ process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'lote-test-secret-not
 process.env.SMTP_HOST = '';
 process.env.GEOCODING_DISABLED = '1';
 
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
 const { haversineKm, bboxAround } = require('../src/utils/geo');
 const prisma = require('../src/config/prisma');
 const listingService = require('../src/services/listingService');
@@ -55,6 +58,54 @@ function mapDataFrom(html) {
   const m = html.match(/<script type="application\/json" id="map-data">(.*?)<\/script>/s);
   if (!m) return null;
   return JSON.parse(m[1]);
+}
+function runListingsMapJs(payload) {
+  const calls = { markers: [], centerMarkers: [], circles: [], fitBounds: [], setViews: [] };
+  const elements = {
+    'listings-map': { id: 'listings-map' },
+    'map-data': { id: 'map-data', textContent: JSON.stringify(payload) },
+  };
+  const makeEl = (tag) => ({
+    tag, children: [], className: '', textContent: '', href: '',
+    appendChild(child) { this.children.push(child); return child; },
+  });
+  const map = {
+    ready: false,
+    fitBounds(bounds) { this.ready = true; calls.fitBounds.push(bounds); return this; },
+    setView(latlng, zoom) { this.ready = true; calls.setViews.push({ latlng, zoom }); return this; },
+  };
+  function assertReady() {
+    if (!map.ready) throw new Error('Carte Leaflet sans centre/zoom avant ajout de couche.');
+  }
+  const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'listings-map.js'), 'utf8');
+  vm.runInNewContext(script, {
+    document: {
+      getElementById: (id) => elements[id] || null,
+      createElement: makeEl,
+    },
+    L: {
+      icon: (opts) => opts,
+      map: () => map,
+      tileLayer: () => ({ addTo: () => null }),
+      marker: (latlng, opts) => {
+        const marker = { latlng, opts, popup: null, addTo: () => { assertReady(); return marker; }, bindPopup: (popup) => { marker.popup = popup; return marker; } };
+        calls.markers.push(marker);
+        return marker;
+      },
+      circleMarker: (latlng, opts) => {
+        const marker = { latlng, opts, popup: null, addTo: () => { assertReady(); return marker; }, bindPopup: (popup) => { marker.popup = popup; return marker; } };
+        calls.centerMarkers.push(marker);
+        return marker;
+      },
+      circle: (latlng, opts) => {
+        const bounds = { kind: 'circle-bounds', extended: [], extend(point) { this.extended.push(point); return this; } };
+        const circle = { latlng, opts, addTo: () => { assertReady(); return circle; }, getBounds: () => bounds };
+        calls.circles.push(circle);
+        return circle;
+      },
+    },
+  });
+  return calls;
 }
 
 async function main() {
@@ -176,6 +227,10 @@ async function main() {
       ok(data50.schools.length === 1 && data50.schools[0].schoolName === 'LotE Near',
         'HTTP : carte filtree par rayon');
       ok(data50.center && data50.center.radiusKm === 50, 'HTTP : centre + rayon transmis a la carte');
+      ok(data50.center.label === 'Marseille', 'HTTP : libelle de ville transmis au centre de carte');
+      const jsCalls = runListingsMapJs(data50);
+      ok(jsCalls.centerMarkers.length === 1 && jsCalls.centerMarkers[0].latlng[0] === 43.2965,
+        'JS : la carte affiche un repere au centre de la recherche');
 
       // Departement invalide tolere (chaine libre) mais filtre applique en vue carte.
       r = await get(`/annonces?q=${KW}&vue=carte&departement=99`);

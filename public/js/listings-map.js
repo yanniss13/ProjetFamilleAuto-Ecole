@@ -25,7 +25,7 @@
     shadowSize: [41, 41],
   });
 
-  var map = L.map(el);
+  var map = L.map(el).setView([46.6, 2.4], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -55,17 +55,28 @@
   });
 
   if (data.center) {
-    var circle = L.circle([data.center.lat, data.center.lng], {
+    var centerLatLng = [data.center.lat, data.center.lng];
+    var circle = L.circle(centerLatLng, {
       radius: data.center.radiusKm * 1000,
       color: '#1d4ed8',
       fillColor: '#1d4ed8',
       fillOpacity: 0.08,
       weight: 1.5,
     }).addTo(map);
-    map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+    var centerMarker = L.circleMarker(centerLatLng, {
+      radius: 6,
+      color: '#1d4ed8',
+      fillColor: '#ffffff',
+      fillOpacity: 1,
+      weight: 3,
+    }).addTo(map);
+    var centerPopup = document.createElement('strong');
+    centerPopup.textContent = data.center.label ? 'Autour de ' + data.center.label : 'Centre de recherche';
+    centerMarker.bindPopup(centerPopup);
+    var searchBounds = circle.getBounds();
+    bounds.forEach(function (point) { searchBounds.extend(point); });
+    map.fitBounds(searchBounds, { padding: [20, 20] });
   } else if (bounds.length > 0) {
     map.fitBounds(bounds, { padding: [40, 40] });
-  } else {
-    map.setView([46.6, 2.4], 6); // vue France par défaut
   }
 })();

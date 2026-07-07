@@ -27,8 +27,16 @@ function findByResetTokenHash(hash) {
 }
 
 // --- Admin ---
-function findAllWithCounts() {
-  return prisma.school.findMany({ orderBy: { createdAt: 'desc' }, include: { _count: { select: { listings: true } } } });
+function findAllWithCounts({ skip, take } = {}) {
+  return prisma.school.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { _count: { select: { listings: true } } },
+    skip,
+    take,
+  });
+}
+function countAll() {
+  return prisma.school.count();
 }
 function setSuspended(id, value) {
   return prisma.school.update({ where: { id }, data: { suspended: value } });
@@ -43,5 +51,6 @@ module.exports = {
   findByVerifyTokenHash,
   findByResetTokenHash,
   findAllWithCounts,
+  countAll,
   setSuspended,
 };
