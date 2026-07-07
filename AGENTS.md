@@ -50,10 +50,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   Données marquées `@demo.moniteur-connect.example`, relançable (delete puis
   recreate), identifiants affichés en fin de script. Tests : `test/lot-k.cjs`.
 - **Prochain travail : Lot L (autocomplétion d'adresse via l'API Adresse
-  adresse.data.gouv.fr)** — spec et plan à écrire (pattern du relais SIRET :
-  endpoint interne, cache, jamais bloquant). Côté utilisateur : config Mailpit
-  (SMTP_HOST=localhost, SMTP_PORT=1025) — si l'envoi échoue, micro-fix : ne passer
-  `auth` à nodemailer que si `SMTP_USER` est défini.
+  adresse.data.gouv.fr)** — **PLAN PRÊT, reprendre à la Tâche 1** :
+  `docs/superpowers/plans/2026-07-07-lot-l-autocomplete-adresse.md` (mini-spec
+  incluse ; pattern du relais SIRET ; port de test 4070). Côté utilisateur :
+  config Mailpit (SMTP_HOST=localhost, SMTP_PORT=1025) — si l'envoi échoue,
+  micro-fix : ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
