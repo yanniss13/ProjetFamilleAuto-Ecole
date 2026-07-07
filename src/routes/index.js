@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 
 const pageController = require('../controllers/pageController');
 const siretController = require('../controllers/siretController');
+const adresseController = require('../controllers/adresseController');
 const authRoutes = require('./authRoutes');
 const listingRoutes = require('./listingRoutes');
 const alertRoutes = require('./alertRoutes');
@@ -27,6 +28,12 @@ const siretLimiter = rateLimit({
   handler: (req, res) => res.status(429).json({ status: 'rate_limited', name: null, address: null }),
 });
 router.get('/api/siret/:siret', siretLimiter, siretController.check);
+
+const adresseLimiter = rateLimit({
+  windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false,
+  handler: (req, res) => res.status(429).json({ erreur: 'rate_limited' }),
+});
+router.get('/api/adresse', adresseLimiter, adresseController.search);
 
 // Public : auth (inscription/connexion/...) et annonces.
 router.use(authRoutes);

@@ -10,6 +10,9 @@ process.env.GEOCODING_DISABLED = '1';
 process.env.SIRET_LOOKUP_DISABLED = '1';
 process.env.ADRESSE_LOOKUP_DISABLED = '1';
 
+const prisma = require('../src/config/prisma');
+const app = require('../src/app');
+
 const PORT = 4070;
 const BASE = `http://127.0.0.1:${PORT}`;
 const STAMP = Date.now();
@@ -20,10 +23,22 @@ function ok(cond, label) {
   passed += 1;
   console.log(`  ✓ ${label}`);
 }
+function jsonOrNull(text) {
+  try { return JSON.parse(text); } catch { return null; }
+}
+async function get(urlPath) {
+  const res = await fetch(BASE + urlPath, { redirect: 'manual' });
+  return { status: res.status, text: await res.text() };
+}
 
 async function main() {
-  // --- 1. service relais API Adresse ---
-  {
+  let server;
+  try {
+    server = app.listen(PORT);
+    await new Promise((r) => server.once('listening', r));
+
+    // --- 1. service relais API Adresse ---
+    {
     const adresseService = require('../src/services/adresse');
     const origFetch = global.fetch;
     const origDisabled = process.env.ADRESSE_LOOKUP_DISABLED;
@@ -69,7 +84,51 @@ async function main() {
     }
   }
 
-  console.log(`\n✅ Lot L tests reussis - ${passed} assertions.`);
+    // --- 2. endpoint interne /api/adresse ---
+    {
+      const adresseService = require('../src/services/adresse');
+      const origSearch = adresseService.searchAddress;
+      try {
+        let seenQuery = null;
+        adresseService.searchAddress = async (q) => {
+          seenQuery = q;
+          return [{ label: '8 Boulevard du Port 80000 Amiens', city: 'Amiens', postcode: '80000' }];
+        };
+
+        let r = await get('/api/adresse?q=8+bd+du+port');
+        let body = jsonOrNull(r.text);
+        ok(r.status === 200 && body && body.resultats.length === 1 && body.resultats[0].city === 'Amiens' && seenQuery === '8 bd du port',
+          'api adresse : relaie les resultats du service en JSON');
+
+        r = await get('/api/adresse');
+        body = jsonOrNull(r.text);
+        ok(r.status === 400 && typeof body.erreur === 'string',
+          'api adresse : q absente -> 400 JSON');
+
+        r = await get('/api/adresse?q=ab');
+        body = jsonOrNull(r.text);
+        ok(r.status === 400 && typeof body.erreur === 'string',
+          'api adresse : q trop courte -> 400 JSON');
+
+        let limited = false;
+        for (let i = 0; i < 40 && !limited; i += 1) {
+          r = await get(`/api/adresse?q=limite-${STAMP}-${i}`);
+          if (r.status === 429) {
+            body = jsonOrNull(r.text);
+            limited = body.erreur === 'rate_limited';
+          }
+        }
+        ok(limited, 'api adresse : rate-limit public 30/min/IP en JSON');
+      } finally {
+        adresseService.searchAddress = origSearch;
+      }
+    }
+
+    console.log(`\n✅ Lot L tests reussis - ${passed} assertions.`);
+  } finally {
+    if (server) await new Promise((r) => server.close(r));
+    await prisma.$disconnect();
+  }
 }
 
 main().catch((err) => { console.error(`\n❌ ${err.message}`); process.exit(1); });
