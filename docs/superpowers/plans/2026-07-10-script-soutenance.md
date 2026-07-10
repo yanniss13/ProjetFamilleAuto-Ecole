@@ -99,9 +99,9 @@ git commit -m "Jury: transport SMTP sans auth quand SMTP_USER est absent (Mailpi
 **Files:**
 - Create: `docs/jury/veille-technique.md`
 
-- [ ] **Step 1:** Vérifier en ligne les sources anglophones et récupérer un fait récent exploitable par source : Node.js releases/LTS (https://nodejs.org/en/about/previous-releases), blog Express / doc 5.x (https://expressjs.com/), releases Prisma (https://github.com/prisma/prisma/releases), MDN (https://developer.mozilla.org/). Noter dates de consultation et versions constatées.
-- [ ] **Step 2:** Rédiger : méthode de veille (quelles sources, en anglais, à quelle fréquence, comment trier) ; un tableau par source : URL, langue, fréquence, exemple d'information récente (version/annonce réelle constatée au Step 1), **implication concrète pour MoniteurConnect** (ex. : LTS visée en production, breaking changes Express 5 déjà absorbés — router, `req.query` ; suivi des majeures Prisma — la 7 est dispo, migration à planifier hors jury) ; paragraphe sur le niveau d'anglais mobilisé (lecture de documentation technique, critère B1/A2 du référentiel).
-- [ ] **Step 3:** Contrôle des liens. `npm test`. Cocher, checkpoint, commit : `Jury: veille technique (sources officielles anglophones, dernier critere solde)`.
+- [x] **Step 1:** Vérifier en ligne les sources anglophones. **Fait le 2026-07-10 : Node v26 Current / v24+v22 LTS (v20 EOL) ; Express 5.2.1 stable + guide de migration ; Prisma 7.8.0 du 22/04/2026 (projet en 6.19.3 — migration notée pour la production) ; MDN (articles API web récentes).**
+- [x] **Step 2:** Rédiger : méthode de veille (quelles sources, en anglais, à quelle fréquence, comment trier) ; un tableau par source : URL, langue, fréquence, exemple d'information récente (version/annonce réelle constatée au Step 1), **implication concrète pour MoniteurConnect** (ex. : LTS visée en production, breaking changes Express 5 déjà absorbés — router, `req.query` ; suivi des majeures Prisma — la 7 est dispo, migration à planifier hors jury) ; paragraphe sur le niveau d'anglais mobilisé (lecture de documentation technique, critère B1/A2 du référentiel).
+- [x] **Step 3:** Contrôle des liens. `npm test` (15 suites). Cocher, checkpoint, commit : `Jury: veille technique (sources officielles anglophones, dernier critere solde)`.
 
 ### Task 5: `docs/jury/soutenance/questions-reponses.md`
 
