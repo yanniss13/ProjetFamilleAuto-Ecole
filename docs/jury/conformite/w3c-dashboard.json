@@ -1,0 +1,17 @@
+{
+  "erreurs": 0,
+  "avertissements": 1,
+  "messages": [
+    {
+      "type": "info",
+      "lastLine": 33,
+      "lastColumn": 30,
+      "firstColumn": 3,
+      "subType": "warning",
+      "message": "Section lacks heading. Consider using “h2”-“h6” elements to add identifying headings to all sections, or else use a “div” element instead for any cases where no heading is needed.",
+      "extract": "ction>\n\n  <section class=\"stats-grid\">\n    <",
+      "hiliteStart": 10,
+      "hiliteLength": 28
+    }
+  ]
+}

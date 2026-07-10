@@ -122,16 +122,17 @@ Puis vérifier dans un navigateur :
   `jury-conformite-visible`, plan :
   `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
   cochées — reprendre à la première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 1** — client CDP
-  extrait dans `scripts/lib/cdp.js`, pages partagées dans
-  `scripts/lib/pages-jury.js`, `scripts/captures-jury.js` refactorisé et
-  re-vérifié (15/15 captures identiques en comportement).
-- Vérifications exécutées : `node scripts/captures-jury.js` → 15/15 ;
-  `npm test` (15 suites, 438 assertions) avant le commit.
-- Prochaine tâche : **Task 2** — `npm i -D axe-core`, écrire
-  `scripts/conformite-jury.js` (code complet dans le plan), premier constat
-  brut sur les 15 pages (prérequis : `npm run seed:demo` + serveur
-  `$env:PORT='4071'; node src/server.js`).
+- Dernière action terminée (2026-07-10, Claude) : **Task 2** —
+  `scripts/conformite-jury.js` écrit (axe-core en devDependency), 45/45
+  contrôles exécutés, constat brut archivé sous `docs/jury/conformite/`
+  (dont `resume-avant-corrections.json`) : W3C 3 erreurs (inscription,
+  contrat, compte) + 2 avertissements ; axe 1-2 violations/page ;
+  débordement : AUCUN.
+- Vérifications exécutées : 45 ✓ au run de conformité ; `npm test`
+  (15 suites, 438 assertions) avant le commit.
+- Prochaine tâche : **Task 3** — captures responsive 320/375/768 (3 runs de
+  `scripts/captures-jury.js --largeur=… --sortie=docs/jury/captures/r…`,
+  prérequis : `npm run seed:demo` + serveur `$env:PORT='4071'`).
 - Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
   `main` le 2026-07-10 avec le rangement Codex et le Lot L.
 - `main` local a ~91 commits d'avance sur `origin/main` — pousser quand
