@@ -17,35 +17,40 @@
 
 ## Synthèse
 
-Sur les 33 critères relevés dans la checklist (après les chantiers
-« consolidation du dossier » et « conformité visible » du 2026-07-10) :
+Sur les 33 critères relevés dans la checklist (après les trois chantiers du
+2026-07-10 : « consolidation du dossier », « conformité visible » et
+« script de soutenance ») :
 
-- **22 sont validés** par le code, les tests ou les documents présents ;
-- **10 sont à renforcer** pour devenir démontrables devant le jury ;
-- **1 est manquant** (veille technique avec sources en anglais).
+- **29 sont validés** par le code, les tests ou les documents présents ;
+- **4 sont à renforcer** — deux critères facultatifs (découpage fonctionnel
+  destiné au jury, charte graphique formalisée) et deux compléments de
+  production (sauvegarde/restauration de la base, environnement de
+  production démontré) ;
+- **0 manquant.**
 
-Le produit est plus avancé que son dossier. Le principal risque n'est pas l'absence de
-fonctionnalités : ce sont les preuves obligatoires ou attendues qui manquent. Le
-`README.md` et `docs/DESIGN.md` décrivent encore un « squelette », alors que les lots A
-à L sont livrés. Cette contradiction doit être corrigée avant la soutenance.
+Au 2026-07-10 au soir, le dossier a rattrapé le produit : les preuves
+obligatoires existent, sont datées et re-jouables. La contradiction
+documentaire initiale (`README.md` et `docs/DESIGN.md` au statut
+« squelette ») est corrigée : README réécrit sur l'état réel, DESIGN classé
+avec la conception de juin. Le matériel de soutenance (deck 35 min, démo
+11 min, 26 Q/R) est sous `docs/jury/soutenance/`.
 
-Fait au 2026-07-10 (chantiers « consolidation du dossier » puis « conformité
-visible ») : maquettes préservées et écarts expliqués, diagramme BDD v2
-(8 modèles), résumé, besoin v2 et matrice de compétences sous `docs/jury/` ;
-preuves W3C (0 erreur/0 avertissement), responsive (0 débordement,
-45 captures) et accessibilité (0 violation axe) archivées dans
-[`conformite.md`](conformite.md).
+Fait au 2026-07-10 (trois chantiers) : maquettes préservées et écarts
+expliqués, diagramme BDD v2, résumé, besoin v2, matrice de compétences ;
+preuves W3C/responsive/accessibilité ([`conformite.md`](conformite.md)) ;
+deck 35 min, démo 11 min, 26 Q/R ([`soutenance/`](soutenance/)), veilles
+sécurité et technique anglophone, README réécrit, DESIGN classé, micro-fix
+Mailpit.
 
-Priorités restantes :
+Priorités restantes (côté utilisateur, avant la soutenance) :
 
-1. écrire le script de soutenance (35 min, démo 11 min) et préparer les
-   45 minutes de questions ;
-2. préparer une veille sécurité et une veille technique fondée sur des sources
-   en anglais ;
-3. actualiser `README.md` et `docs/DESIGN.md` (toujours au statut « squelette ») ;
-4. documenter sauvegarde et restauration de la base ;
-5. dérouler la checklist clavier manuelle de `conformite.md` avant la
-   soutenance.
+1. répéter en chronométrant : deck (touche N pour les notes), démo
+   (`soutenance/demo-11-minutes.md`), focus code ;
+2. dérouler la checklist clavier manuelle de [`conformite.md`](conformite.md) ;
+3. relancer `npm run seed:demo` avant chaque répétition (après le démarrage
+   du serveur) ;
+4. facultatif hors jury : documenter sauvegarde/restauration de la base
+   (dernier gros reste avec l'hébergement de production).
 
 L'inventaire et les écarts des sources de juin sont détaillés dans
 [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md).
@@ -54,7 +59,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 
 | Statut | Critère de la checklist | Constat et preuves dans le dépôt | Action nécessaire |
 |---|---|---|---|
-| VALIDÉ | Résumé du projet en français | [`resume-projet.md`](resume-projet.md) (2026-07-10) : problème, acteurs, solution, valeur, périmètre livré lot par lot, stack. | Le relire avant la soutenance ; `README.md` et `docs/DESIGN.md` restent à actualiser (chantier séparé). |
+| VALIDÉ | Résumé du projet en français | [`resume-projet.md`](resume-projet.md) (2026-07-10) : problème, acteurs, solution, valeur, périmètre livré lot par lot, stack. `README.md` réécrit et `DESIGN.md` classé en historique le même jour. | Le relire avant la soutenance. |
 | VALIDÉ | Cahier des charges / expression du besoin | [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md) : besoin, objectifs, contraintes, critères d'acceptation adossés aux tests, hors-périmètre, chronologie v1 → v2. | Présenter la chronologie (v1 intacte, v2 datée) comme preuve de méthode. |
 | VALIDÉ | Liste des compétences | [`competences-dwwm.md`](competences-dwwm.md) : matrice des 8 compétences REAC RNCP37674 (libellés vérifiés) avec réalisations et preuves. | Assumer à l'oral les couvertures partielles (NoSQL, déploiement) telles que documentées. |
 | À RENFORCER | Découpage fonctionnel avec descriptions (facultatif) | Les lots et l'architecture `routes → contrôleurs → services → vues` donnent un découpage réel, mais pas une vue fonctionnelle destinée au jury. | Ajouter un schéma simple des trois parcours : candidat, auto-école et administrateur. |
@@ -62,21 +67,21 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | À RENFORCER | Charte graphique (facultative) | Les couleurs, espacements et composants sont centralisés dans `public/css/style.css`, sans document de charte. | Extraire une page de charte : palette, typographie, boutons, cartes, badges, messages et règles d'accessibilité. |
 | À RENFORCER | Description de la BDD, création, restauration et comparaison | `prisma/schema.prisma`, 13 migrations, `.env.example` et les commandes Prisma prouvent la création et l'évolution. Il n'existe pas de procédure de sauvegarde/restauration ni de comparaison argumentée SQLite/PostgreSQL. | Documenter création, migration, seed, sauvegarde et restauration ; justifier SQLite en développement et PostgreSQL en production. |
 | VALIDÉ | Diagramme de base de données | [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg) + PNG (8 modèles, colonnes réelles, cardinalités, cascades) et lecture guidée dans [`base-de-donnees.md`](base-de-donnees.md) ; le MCD/MLD v1 reste la preuve initiale. | Montrer v1 puis v2 côte à côte pour illustrer l'évolution 4 → 8. |
-| À RENFORCER | Choix des technologies | La stack est listée dans `README.md`, `docs/DESIGN.md` et `package.json`. Les compromis et alternatives sont peu explicités. | Justifier Express/Twig/Prisma, le rendu serveur, les sessions, SQLite/PostgreSQL et les bibliothèques principales. |
+| VALIDÉ | Choix des technologies | Justifications et alternatives rejetées explicitées : diapositive « Technologies et pourquoi » du [deck](soutenance/soutenance.html), Q/R « Choix technologiques » ([`soutenance/questions-reponses.md`](soutenance/questions-reponses.md)) et [`veille-technique.md`](veille-technique.md). | Répéter les justifications à l'oral (framework front, JWT, SQLite). |
 | À RENFORCER | Description des environnements | `.env.example` distingue développement et production ; `src/app.js` adapte proxy et cookie sécurisé. Aucun environnement de préproduction/production n'est démontré. | Décrire poste de développement, environnement de test et cible de production, variables, secrets, HTTPS, stockage et SMTP. |
 | VALIDÉ | Description de la méthodologie de travail | `AGENTS.md` impose TDD et le cycle spécification → plan → implémentation. `docs/superpowers/{specs,plans}` et l'historique Git matérialisent cette méthode. | En faire une diapositive avec un exemple de lot et son test écrit en premier. |
-| À RENFORCER | Extrait de code source documenté | Le code est largement commenté, mais aucun extrait n'est sélectionné et expliqué pour le jury. | Retenir le flux de signature électronique : validation d'image, génération PDF, horodatages, SHA-256, contre-signature et invalidation. |
+| VALIDÉ | Extrait de code source documenté | Le focus code de 6 minutes est écrit : 4 diapositives du [deck](soutenance/soutenance.html) sur le flux de signature (validation d'image, PDF + SHA-256, contreseing + invalidation), avec les fichiers à ouvrir en séance. | Répéter le focus en chronométrant ; garder `signatureImage.js` ouvert dans l'éditeur. |
 | VALIDÉ | Jeu de données d'entrée / fixtures | `scripts/seed-demo.js` génère un jeu riche et relançable ; les 15 fichiers de test créent des fixtures isolées par horodatage. | Montrer la commande `npm run seed:demo` et une fixture courte dans le focus technique. |
-| À RENFORCER | Données de sortie | L'application produit pages, statuts, emails et PDF signés avec empreintes. Les sorties ne sont pas regroupées dans le dossier. | Préparer captures d'écran, exemple de PDF signé, email Mailpit et avant/après en base. |
-| À RENFORCER | Veille sécurité | Le produit applique Helmet/CSP, CSRF, bcrypt, rate limiting, validation, contrôle des magic bytes, stockage privé et purge RGPD. Il manque un document de veille daté avec sources et décisions. | Créer une fiche de veille : menace, source, impact, décision appliquée et preuve dans le code. |
-| MANQUANT | Veille technique avec sources en anglais | Aucun journal de veille technique ni source anglophone n'a été trouvé. | Constituer une courte veille avec documentation officielle anglophone de Node.js, Express, Prisma et Helmet ; rédiger la synthèse en français. |
+| VALIDÉ | Données de sortie | Sorties regroupées et montrables : 60 captures d'écran versionnées (`captures/`), PDF signé du dossier vitrine du seed, emails visibles dans Mailpit pendant la démo, journal de purge — le [déroulé de démo](soutenance/demo-11-minutes.md) les enchaîne. | Relancer `npm run seed:demo` avant chaque répétition. |
+| VALIDÉ | Veille sécurité | [`veille-securite.md`](veille-securite.md) (2026-07-10) : 8 fiches « menace → source datée (OWASP Top 10 **2025**, cheat sheets) → impact → décision → preuve testée », méthode de veille explicitée. | Citer un exemple à l'oral (magic bytes ou Argon2id noté pour la production). |
+| VALIDÉ | Veille technique avec sources en anglais | [`veille-technique.md`](veille-technique.md) (2026-07-10) : 4 sources officielles anglophones vérifiées (Node.js LTS, Express 5.2.1, Prisma 7.8.0, MDN), chaque relevé relié à une décision du dépôt, synthèse en français, niveau d'anglais explicité. | Mentionner un relevé concret à l'oral (le projet tourne sur une LTS). |
 
 ## 2. Audit de l'application
 
 | Statut | Critère de la checklist | Constat et preuves dans le dépôt | Action nécessaire |
 |---|---|---|---|
 | VALIDÉ | Front et back, API facultative | Front SSR Twig + JavaScript dédié ; back Express structuré ; relais JSON `/api/siret/:siret` et `/api/adresse`. | Montrer un flux navigateur → route → contrôleur → service → Prisma/API externe. |
-| À RENFORCER | POO (facultatif) | L'application privilégie des modules fonctionnels CommonJS. `PrismaSessionStore extends Store` constitue un exemple réel de classe et d'héritage. | Expliquer ce choix sans prétendre que toute l'application est orientée objet ; ne pas refactoriser artificiellement pour ce critère facultatif. |
+| VALIDÉ | POO (facultatif) | Choix architectural assumé et argumenté : modules fonctionnels à responsabilité unique, héritage réel là où il s'impose (`PrismaSessionStore extends Store`). Réponse préparée dans [`soutenance/questions-reponses.md`](soutenance/questions-reponses.md). | Ne pas survendre : dire « majoritairement non, et voici pourquoi ». |
 | VALIDÉ | Contraintes d'intégrité de la base | Clés primaires, étrangères, unicités, index, relations 1-N/1-1 et cascades sont définis dans `prisma/schema.prisma` et les migrations. | Illustrer trois contraintes : SIRET unique, contrat unique par candidature et suppression en cascade. |
 | VALIDÉ | Code source documenté | Les modules sensibles expliquent le pourquoi : CSRF multipart, uploads, sessions, services externes et purge. | Choisir quelques commentaires utiles plutôt qu'afficher de longs fichiers. |
 | VALIDÉ | Noms de variables et fonctions explicites | Les noms comme `findOwnedById`, `verifyAfterUpload`, `notifyNewListing` et `destroyForSchool` décrivent leur responsabilité. | Citer deux exemples pendant le focus code. |
@@ -89,7 +94,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | VALIDÉ | Politique de droits d'accès | Visiteur/candidat, école et admin ont des espaces distincts. `requireAuth`, `requireAdmin`, `loadSchool`, `loadAdmin` et le scoping `schoolId` protègent les données. | Montrer le test où une école reçoit 404 sur les documents d'une autre école. |
 | VALIDÉ | Interfaces responsives | Contrôlé le 2026-07-10 sur rendu réel : **0 débordement horizontal sur 15 pages × 4 largeurs** (320/375/768/1440), 45 captures archivées sous `captures/r{320,375,768}/` — voir [`conformite.md`](conformite.md). | Montrer 2-3 captures mobiles au jury ; re-jouer les contrôles avant la soutenance pour des preuves fraîches. |
 | VALIDÉ | Cohérence entre maquette initiale et application finale | [`comparaison-maquettes.md`](comparaison-maquettes.md) : 11 écrans v1 comparés à leurs captures 1440 px ([`captures/`](captures/)), 4 écrans nés des lots E–L, 7 écarts justifiés. | Réutiliser `scripts/captures-jury.js --largeur=` pour les captures responsive du chantier « conformité visible ». |
-| À RENFORCER | Cohérence entre spécifications et application finale | Les spécifications et plans par lot correspondent au code et aux tests, mais `README.md` et `docs/DESIGN.md` ne reflètent pas les lots livrés. | Actualiser les documents de référence et produire une matrice exigence → route/test/démonstration. |
+| VALIDÉ | Cohérence entre spécifications et application finale | Les 30 spécifications/plans par lot correspondent au code et aux tests ; `README.md` réécrit sur l'état réel, `DESIGN.md` classé en v1 ; matrice exigence → test dans [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md) (critères d'acceptation). | Montrer un exemple spec → plan → test → code si le jury creuse la méthode. |
 | VALIDÉ | Validation W3C | Validateur Nu officiel le 2026-07-10 sur les 15 pages rendues : 3 erreurs corrigées puis **0 erreur et 0 avertissement partout** — méthode, dates et résultats dans [`conformite.md`](conformite.md), JSON bruts sous `conformite/`. | Citer la correction la plus parlante (label sur canvas) si la question vient. |
 | VALIDÉ | Validateur d'accessibilité (facultatif) | Audit **axe-core** du 2026-07-10 : 2 violations serious corrigées (contraste `--color-muted`, `aria-label` des SVG) puis **0 violation tous niveaux sur les 15 pages** ; acquis déjà en place (lien d'évitement, `:focus-visible`, `aria-live`). | Dérouler la checklist clavier manuelle de [`conformite.md`](conformite.md) avant la soutenance ; assumer la limite du pad de signature (alternative : import de fichier). |
 
@@ -150,7 +155,7 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 
 ### Priorité 0 — critères obligatoires et contradictions documentaires
 
-- [ ] Actualiser `README.md` et `docs/DESIGN.md` ;
+- [x] Actualiser `README.md` et `docs/DESIGN.md` ;
 - [x] versionner les documents historiques sans écraser les maquettes initiales ;
 - [x] créer le résumé, le cahier des charges actuel et la liste des compétences ;
 - [x] identifier et contrôler les maquettes initiales obligatoires ;
@@ -166,18 +171,22 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 - [x] effectuer un audit accessibilité automatisé (le contrôle clavier manuel
   reste à dérouler avant la soutenance, checklist dans `conformite.md`) ;
 - [x] produire le tableau de comparaison maquettes v1 / application finale ;
-- [ ] remettre à jour la matrice spécifications → application → tests.
+- [x] remettre à jour la matrice spécifications → application → tests
+  (critères d'acceptation → tests dans `expression-du-besoin-v2.md`).
 
 ### Priorité 2 — soutenance et démonstration
 
-- [ ] écrire le script oral chronométré ;
-- [ ] préparer le focus code de six minutes sur la signature ;
-- [ ] créer une fiche de veille sécurité ;
-- [ ] créer une veille technique avec sources officielles anglophones ;
-- [ ] corriger la configuration Mailpit : ne passer `auth` à Nodemailer que lorsque
-  `SMTP_USER` est défini ;
-- [ ] préparer les onglets, comptes, URLs et le scénario de secours ;
-- [ ] actualiser le seed juste avant chaque répétition avec `npm run seed:demo`.
+- [x] écrire le script oral chronométré (deck `soutenance/soutenance.html`) ;
+- [x] préparer le focus code de six minutes sur la signature (diapos 20-23) ;
+- [x] créer une fiche de veille sécurité (`veille-securite.md`) ;
+- [x] créer une veille technique avec sources officielles anglophones
+  (`veille-technique.md`) ;
+- [x] corriger la configuration Mailpit : ne passer `auth` à Nodemailer que lorsque
+  `SMTP_USER` est défini (TDD, `test/ameliorations.cjs`) ;
+- [x] préparer les onglets, comptes, URLs et le scénario de secours
+  (`soutenance/demo-11-minutes.md`) ;
+- [ ] actualiser le seed juste avant chaque répétition avec `npm run seed:demo`
+  (action récurrente côté utilisateur — après le démarrage du serveur).
 
 ## 6. Limites de cet audit
 
