@@ -7,14 +7,20 @@ const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 const FROM = process.env.MAIL_FROM || 'MoniteurConnect <no-reply@moniteur-connect.local>';
 const SMTP_CONFIGURE = Boolean(process.env.SMTP_HOST);
 
-const transporter = SMTP_CONFIGURE
-  ? nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465, // 465 = TLS direct, sinon STARTTLS
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    })
-  : null;
+// Options du transport SMTP. Le bloc `auth` n'est ajouté que si SMTP_USER est
+// défini : Mailpit et les relais locaux n'ont pas d'authentification, et
+// certains serveurs rejettent un bloc auth vide.
+function buildTransportOptions(env = process.env) {
+  const options = {
+    host: env.SMTP_HOST,
+    port: Number(env.SMTP_PORT) || 587,
+    secure: Number(env.SMTP_PORT) === 465, // 465 = TLS direct, sinon STARTTLS
+  };
+  if (env.SMTP_USER) options.auth = { user: env.SMTP_USER, pass: env.SMTP_PASS };
+  return options;
+}
+
+const transporter = SMTP_CONFIGURE ? nodemailer.createTransport(buildTransportOptions()) : null;
 
 // Masque un email pour les logs : jean.dupont@mail.fr -> j***@m***.fr
 function maskEmail(email) {
@@ -297,6 +303,7 @@ function sendListingAlert(email, listing, unsubscribeToken) {
 module.exports = {
   send,
   emailLayout,
+  buildTransportOptions,
   sendVerification,
   sendReset,
   sendApplicationNotification,

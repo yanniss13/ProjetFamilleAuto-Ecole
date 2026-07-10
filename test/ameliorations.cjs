@@ -206,6 +206,17 @@ async function main() {
       ok(!html.includes('<script') && !html.includes('<link'), 'email : aucun script ni ressource externe');
     }
 
+    // --- Transport SMTP : auth seulement si SMTP_USER est défini (Mailpit) ---
+    {
+      const mailer = require('../src/services/mailer');
+      ok(typeof mailer.buildTransportOptions === 'function', 'smtp : buildTransportOptions exportée');
+      const sans = mailer.buildTransportOptions({ SMTP_HOST: 'localhost', SMTP_PORT: '1025' });
+      ok(!('auth' in sans), 'smtp : pas de bloc auth sans SMTP_USER (Mailpit)');
+      ok(sans.port === 1025 && sans.secure === false, 'smtp : port et sécurité conservés');
+      const avec = mailer.buildTransportOptions({ SMTP_HOST: 'smtp.exemple.test', SMTP_PORT: '465', SMTP_USER: 'u', SMTP_PASS: 'p' });
+      ok(avec.auth && avec.auth.user === 'u' && avec.secure === true, 'smtp : auth présent avec SMTP_USER');
+    }
+
     console.log(`\n✅ Tests des améliorations réussis — ${passed} assertions.`);
   } finally {
     if (prisma.session) await prisma.session.deleteMany({ where: { sid: { startsWith: 'test-sid-' } } }).catch(() => {});
