@@ -106,7 +106,11 @@ plutôt que de sur-vendre.
 - Section « écrans nés après les maquettes » : vue carte, suivi candidat,
   signature du contrat, statistiques, administration, alertes — avec capture et
   justification (lots E–L). Captures nommées `carte.png`, `suivi.png`,
-  `signature.png`, `stats-ecole.png`, `admin.png`, `alertes.png`.
+  `admin.png`, `alertes.png`. Le pad de signature apparaît dans `contrat.png`
+  (formulaire d'acceptation, capturé pleine page) et les statistiques dans
+  `dashboard.png` (pleine page) : le seed ne contient aucun contrat « envoyé
+  mais non contresigné », et le script de captures ne doit rien écrire en base ;
+  la page de contreseing candidat sera montrée en démo live.
 - Section « prévu mais non réalisé sous cette forme », reprise de l'inventaire
   (réouverture d'annonce, filtre par statut...), avec justification.
 - Captures : PNG 1440 px sous `docs/jury/captures/`, nommées `<ecran>.png`
