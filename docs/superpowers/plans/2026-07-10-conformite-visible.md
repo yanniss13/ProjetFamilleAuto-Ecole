@@ -333,7 +333,7 @@ git commit -m "Jury: script de conformite (W3C/axe/debordement) + constat brut d
 **Interfaces:**
 - Consumes: `scripts/captures-jury.js --largeur=<n> --sortie=<dossier>` (Task 1).
 
-- [ ] **Step 1:** Seed + serveur 4071 (si arrêtés), puis les trois exécutions :
+- [x] **Step 1:** Seed + serveur 4071 (si arrêtés), puis les trois exécutions :
 
 ```powershell
 node scripts/captures-jury.js --largeur=320 --sortie=docs/jury/captures/r320
@@ -342,8 +342,8 @@ node scripts/captures-jury.js --largeur=768 --sortie=docs/jury/captures/r768
 ```
 
 Attendu : `15/15` à chaque fois (45 PNG, chacun > 5 Ko).
-- [ ] **Step 2:** Contrôle visuel par échantillon (outil Read) : `r320/annonces.png`, `r320/dashboard.png`, `r375/contrat.png`, `r768/admin.png` — noter tout débordement ou chevauchement visible (à recouper avec `debordement-*.json` de la Task 2 pour la Task 6).
-- [ ] **Step 3:** `npm test`. Cocher la Task 3, checkpoint README jury, puis :
+- [x] **Step 2:** Contrôle visuel par échantillon (outil Read) : `r320/annonces.png`, `r320/dashboard.png`, `r375/contrat.png`, `r768/admin.png` — noter tout débordement ou chevauchement visible (à recouper avec `debordement-*.json` de la Task 2 pour la Task 6). **Constat : aucun débordement ni chevauchement sur les 4 échantillons ; cohérent avec les JSON (0 débordement partout).**
+- [x] **Step 3:** `npm test`. Cocher la Task 3, checkpoint README jury, puis :
 
 ```powershell
 git add docs/jury/captures/r320 docs/jury/captures/r375 docs/jury/captures/r768 docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md
