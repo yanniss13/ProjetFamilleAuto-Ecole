@@ -137,9 +137,13 @@ Puis vérifier dans un navigateur :
 - Task 3 livrée : `docs/jury/veille-securite.md` — 8 fiches menace → source
   datée (OWASP Top 10 **2025**, cheat sheets vérifiées le 2026-07-10) →
   décision → preuve ; note honnête Argon2id vs bcrypt pour la production.
-- Prochaine tâche : **Task 4** — `docs/jury/veille-technique.md` (sources
-  officielles anglophones vérifiées en ligne : Node.js releases, Express,
-  Prisma releases, MDN ; solde le dernier critère MANQUANT).
+- Task 4 livrée : `docs/jury/veille-technique.md` — 4 sources officielles
+  anglophones vérifiées le 2026-07-10 (Node LTS 22/24, Express 5.2.1,
+  Prisma 7.8.0 vs 6.19.3 du projet, MDN), chaque relevé relié à une décision
+  du dépôt ; **le dernier critère MANQUANT est soldé** (statut d'audit à
+  passer en Task 8).
+- Prochaine tâche : **Task 5** — `docs/jury/soutenance/questions-reponses.md`
+  (~30 Q/R par thème, réponse courte + preuve, questions pièges incluses).
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.
