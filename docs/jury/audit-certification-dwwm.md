@@ -1,6 +1,7 @@
 # Audit de préparation à la certification DWWM
 
-- Date de l'audit : 2026-07-10 (mis à jour après intégration des documents historiques)
+- Date de l'audit : 2026-07-10 (mis à jour après intégration des documents
+  historiques, puis après la livraison du chantier « consolidation du dossier »)
 - Projet : MoniteurConnect
 - Source : `Checklist_certification_DWWM.xlsx.zip`, feuilles « Dossier Projet » et
   « Vérification Application » transmises par l'utilisateur.
@@ -16,27 +17,32 @@
 
 ## Synthèse
 
-Sur les 33 critères relevés dans la checklist :
+Sur les 33 critères relevés dans la checklist (après le chantier
+« consolidation du dossier » du 2026-07-10) :
 
-- **14 sont validés** par le code, les tests ou les documents présents ;
-- **16 sont à renforcer** pour devenir démontrables devant le jury ;
-- **3 sont manquants**.
+- **19 sont validés** par le code, les tests ou les documents présents ;
+- **12 sont à renforcer** pour devenir démontrables devant le jury ;
+- **2 sont manquants** (validation W3C, veille technique anglophone).
 
 Le produit est plus avancé que son dossier. Le principal risque n'est pas l'absence de
 fonctionnalités : ce sont les preuves obligatoires ou attendues qui manquent. Le
 `README.md` et `docs/DESIGN.md` décrivent encore un « squelette », alors que les lots A
 à L sont livrés. Cette contradiction doit être corrigée avant la soutenance.
 
-Priorités absolues :
+Fait au 2026-07-10 (chantier « consolidation du dossier ») : maquettes
+préservées et écarts expliqués, diagramme BDD v2 (8 modèles), résumé, besoin
+v2 et matrice de compétences livrés sous `docs/jury/`.
 
-1. préserver les **maquettes initiales** et expliquer les écarts avec l'application ;
-2. actualiser le **diagramme de base de données** de 4 à 8 modèles ;
-3. actualiser le résumé, le besoin, les compétences et les spécifications générales ;
-4. documenter création, migration, sauvegarde et restauration de la base ;
-5. produire une preuve de validation **W3C** ;
-6. vérifier réellement le responsive et l'accessibilité ;
-7. préparer une veille sécurité et une veille technique fondée sur des sources en
-   anglais.
+Priorités restantes :
+
+1. produire une preuve de validation **W3C** ;
+2. vérifier réellement le responsive et l'accessibilité (réutiliser
+   `scripts/captures-jury.js --largeur=320/375/768`) ;
+3. actualiser `README.md` et `docs/DESIGN.md` (toujours au statut « squelette ») ;
+4. documenter sauvegarde et restauration de la base ;
+5. préparer une veille sécurité et une veille technique fondée sur des sources en
+   anglais ;
+6. écrire le script de soutenance (35 min, démo 11 min).
 
 L'inventaire et les écarts des sources de juin sont détaillés dans
 [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md).
@@ -45,14 +51,14 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 
 | Statut | Critère de la checklist | Constat et preuves dans le dépôt | Action nécessaire |
 |---|---|---|---|
-| À RENFORCER | Résumé du projet en français | La vision se trouve dans `docs/DESIGN.md` et le début de `README.md`, mais ces documents annoncent encore un squelette. | Rédiger un résumé actuel d'une page : problème, acteurs, solution, valeur et périmètre livré. |
-| À RENFORCER | Cahier des charges / expression du besoin | `docs/DESIGN.md` contient les acteurs, décisions et flux initiaux ; les spécifications par lot complètent le besoin. L'ensemble est dispersé et le document principal est obsolète. | Consolider besoin, objectifs, contraintes, critères d'acceptation et hors-périmètre dans le dossier jury. |
-| MANQUANT | Liste des compétences | Aucun document ne relie explicitement le projet aux compétences du titre DWWM. | Créer une matrice « compétence DWWM → réalisation MoniteurConnect → preuve ». |
+| VALIDÉ | Résumé du projet en français | [`resume-projet.md`](resume-projet.md) (2026-07-10) : problème, acteurs, solution, valeur, périmètre livré lot par lot, stack. | Le relire avant la soutenance ; `README.md` et `docs/DESIGN.md` restent à actualiser (chantier séparé). |
+| VALIDÉ | Cahier des charges / expression du besoin | [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md) : besoin, objectifs, contraintes, critères d'acceptation adossés aux tests, hors-périmètre, chronologie v1 → v2. | Présenter la chronologie (v1 intacte, v2 datée) comme preuve de méthode. |
+| VALIDÉ | Liste des compétences | [`competences-dwwm.md`](competences-dwwm.md) : matrice des 8 compétences REAC RNCP37674 (libellés vérifiés) avec réalisations et preuves. | Assumer à l'oral les couvertures partielles (NoSQL, déploiement) telles que documentées. |
 | À RENFORCER | Découpage fonctionnel avec descriptions (facultatif) | Les lots et l'architecture `routes → contrôleurs → services → vues` donnent un découpage réel, mais pas une vue fonctionnelle destinée au jury. | Ajouter un schéma simple des trois parcours : candidat, auto-école et administrateur. |
 | VALIDÉ | Maquette (obligatoire) | `docs/historique/2026-06/wireframes/` contient 11 écrans HTML navigables, un sommaire, 11 exports PNG associés et une planche SVG datés du 23 juin. Ils constituent une vraie maquette basse fidélité du MVP initial. | Ne pas écraser ces originaux. Les présenter comme v1 et documenter les écarts avec les lots livrés ensuite. |
 | À RENFORCER | Charte graphique (facultative) | Les couleurs, espacements et composants sont centralisés dans `public/css/style.css`, sans document de charte. | Extraire une page de charte : palette, typographie, boutons, cartes, badges, messages et règles d'accessibilité. |
 | À RENFORCER | Description de la BDD, création, restauration et comparaison | `prisma/schema.prisma`, 13 migrations, `.env.example` et les commandes Prisma prouvent la création et l'évolution. Il n'existe pas de procédure de sauvegarde/restauration ni de comparaison argumentée SQLite/PostgreSQL. | Documenter création, migration, seed, sauvegarde et restauration ; justifier SQLite en développement et PostgreSQL en production. |
-| À RENFORCER | Diagramme de base de données | MCD, MLD, SQL Looping, SVG, PNG et PDF sont présents et lisibles, mais ils ne décrivent que 4 entités historiques sur les 8 modèles actuels. | Produire une v2 depuis `prisma/schema.prisma` en ajoutant Session, Admin, Alert et PurgeRun, ainsi que les champs des lots récents. |
+| VALIDÉ | Diagramme de base de données | [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg) + PNG (8 modèles, colonnes réelles, cardinalités, cascades) et lecture guidée dans [`base-de-donnees.md`](base-de-donnees.md) ; le MCD/MLD v1 reste la preuve initiale. | Montrer v1 puis v2 côte à côte pour illustrer l'évolution 4 → 8. |
 | À RENFORCER | Choix des technologies | La stack est listée dans `README.md`, `docs/DESIGN.md` et `package.json`. Les compromis et alternatives sont peu explicités. | Justifier Express/Twig/Prisma, le rendu serveur, les sessions, SQLite/PostgreSQL et les bibliothèques principales. |
 | À RENFORCER | Description des environnements | `.env.example` distingue développement et production ; `src/app.js` adapte proxy et cookie sécurisé. Aucun environnement de préproduction/production n'est démontré. | Décrire poste de développement, environnement de test et cible de production, variables, secrets, HTTPS, stockage et SMTP. |
 | VALIDÉ | Description de la méthodologie de travail | `AGENTS.md` impose TDD et le cycle spécification → plan → implémentation. `docs/superpowers/{specs,plans}` et l'historique Git matérialisent cette méthode. | En faire une diapositive avec un exemple de lot et son test écrit en premier. |
@@ -79,7 +85,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | VALIDÉ | Mécanisme d'authentification | Comptes auto-écoles et admins, bcrypt, vérification email, reset à jeton haché, régénération de session et sessions persistantes Prisma. | Expliquer pourquoi les sessions HTTP conviennent mieux ici qu'un JWT. |
 | VALIDÉ | Politique de droits d'accès | Visiteur/candidat, école et admin ont des espaces distincts. `requireAuth`, `requireAdmin`, `loadSchool`, `loadAdmin` et le scoping `schoolId` protègent les données. | Montrer le test où une école reçoit 404 sur les documents d'une autre école. |
 | À RENFORCER | Interfaces responsives | Les grilles utilisent `auto-fit`, les formulaires sont fluides et plusieurs actions utilisent `flex-wrap`. Il n'y a pas de stratégie mobile complète ; la navigation et certains tableaux restent à contrôler. | Tester 320/375/768 px, corriger les débordements, puis conserver des captures desktop/mobile. |
-| À RENFORCER | Cohérence entre maquette initiale et application finale | Les maquettes initiales existent. La comparaison n'est pas encore rédigée et les lots E à L ont fortement enrichi la carte, le suivi, la signature, les statistiques, les alertes et l'administration. | Créer un tableau « maquette v1 / application finale / écart justifié » avec captures actuelles. |
+| VALIDÉ | Cohérence entre maquette initiale et application finale | [`comparaison-maquettes.md`](comparaison-maquettes.md) : 11 écrans v1 comparés à leurs captures 1440 px ([`captures/`](captures/)), 4 écrans nés des lots E–L, 7 écarts justifiés. | Réutiliser `scripts/captures-jury.js --largeur=` pour les captures responsive du chantier « conformité visible ». |
 | À RENFORCER | Cohérence entre spécifications et application finale | Les spécifications et plans par lot correspondent au code et aux tests, mais `README.md` et `docs/DESIGN.md` ne reflètent pas les lots livrés. | Actualiser les documents de référence et produire une matrice exigence → route/test/démonstration. |
 | MANQUANT | Validation W3C | Aucune preuve de passage au validateur W3C n'a été trouvée. | Valider les principales pages HTML rendues, corriger les erreurs, conserver date, URL/page et résultat. |
 | À RENFORCER | Validateur d'accessibilité (facultatif) | Présence d'un lien d'évitement, de `:focus-visible`, de labels, de régions `aria-live`, de rôles d'alerte et d'une réduction des animations. Aucun audit automatisé ou clavier n'est archivé. | Effectuer Lighthouse/axe ou équivalent, navigation clavier et contrôle de contraste ; consigner les résultats. |
@@ -142,18 +148,20 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 ### Priorité 0 — critères obligatoires et contradictions documentaires
 
 - [ ] Actualiser `README.md` et `docs/DESIGN.md` ;
-- [ ] versionner les documents historiques sans écraser les maquettes initiales ;
-- [ ] créer le résumé, le cahier des charges actuel et la liste des compétences ;
+- [x] versionner les documents historiques sans écraser les maquettes initiales ;
+- [x] créer le résumé, le cahier des charges actuel et la liste des compétences ;
 - [x] identifier et contrôler les maquettes initiales obligatoires ;
-- [ ] produire la version actuelle du diagramme de base de données ;
-- [ ] documenter création, migration, sauvegarde et restauration de la base.
+- [x] produire la version actuelle du diagramme de base de données ;
+- [ ] documenter création, migration, sauvegarde et restauration de la base
+  (création/migration/seed couvertes par `base-de-donnees.md` ; reste
+  sauvegarde/restauration).
 
 ### Priorité 1 — preuves de conformité
 
 - [ ] valider les pages principales avec W3C ;
 - [ ] contrôler le responsive à 320, 375, 768 et 1440 px ;
 - [ ] effectuer un audit accessibilité automatisé et clavier ;
-- [ ] produire le tableau de comparaison maquettes v1 / application finale ;
+- [x] produire le tableau de comparaison maquettes v1 / application finale ;
 - [ ] remettre à jour la matrice spécifications → application → tests.
 
 ### Priorité 2 — soutenance et démonstration
