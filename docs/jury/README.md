@@ -122,17 +122,16 @@ Puis vérifier dans un navigateur :
   `jury-conformite-visible`, plan :
   `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
   cochées — reprendre à la première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 2** —
-  `scripts/conformite-jury.js` écrit (axe-core en devDependency), 45/45
-  contrôles exécutés, constat brut archivé sous `docs/jury/conformite/`
-  (dont `resume-avant-corrections.json`) : W3C 3 erreurs (inscription,
-  contrat, compte) + 2 avertissements ; axe 1-2 violations/page ;
-  débordement : AUCUN.
-- Vérifications exécutées : 45 ✓ au run de conformité ; `npm test`
-  (15 suites, 438 assertions) avant le commit.
-- Prochaine tâche : **Task 3** — captures responsive 320/375/768 (3 runs de
-  `scripts/captures-jury.js --largeur=… --sortie=docs/jury/captures/r…`,
-  prérequis : `npm run seed:demo` + serveur `$env:PORT='4071'`).
+- Dernière action terminée (2026-07-10, Claude) : **Task 3** — captures
+  responsive 15/15 à 320, 375 et 768 px sous `docs/jury/captures/r{320,375,768}/`,
+  4 échantillons contrôlés visuellement : aucun débordement ni chevauchement
+  (cohérent avec les JSON de débordement : 0 partout).
+- Vérifications exécutées : 3 × 15/15 aux captures ; `npm test` (15 suites,
+  438 assertions) avant le commit.
+- Prochaine tâche : **Task 4** — corrections W3C : 3 erreurs à corriger
+  (inscription, contrat, compte — détail dans `docs/jury/conformite/w3c-*.json`),
+  puis re-run `node scripts/conformite-jury.js --controle=w3c` jusqu'à
+  0 erreur (prérequis : seed + serveur 4071).
 - Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
   `main` le 2026-07-10 avec le rangement Codex et le Lot L.
 - `main` local a ~91 commits d'avance sur `origin/main` — pousser quand
