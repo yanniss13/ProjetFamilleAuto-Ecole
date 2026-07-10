@@ -6,13 +6,14 @@
     <p>Bienvenue, <strong>{{ currentSchool.businessName }}</strong>.</p>
   </section>
 
-  <section class="stats-grid">
+  {# div et non section : un section sans titre est signalé par le validateur W3C. #}
+  <div class="stats-grid">
     <div class="stat-card"><span class="stat-value">{{ stats.tiles.openListings }}</span><span class="stat-label">Annonces ouvertes</span></div>
     <div class="stat-card"><span class="stat-value">{{ stats.tiles.totalViews }}</span><span class="stat-label">Vues</span></div>
     <div class="stat-card"><span class="stat-value">{{ stats.tiles.applications }}</span><span class="stat-label">Candidatures</span></div>
     <div class="stat-card"><span class="stat-value">{{ stats.tiles.acceptRate }} %</span><span class="stat-label">Taux d’acceptation</span></div>
     <div class="stat-card"><span class="stat-value">{{ stats.tiles.signedContracts }}</span><span class="stat-label">Contrats signés</span></div>
-  </section>
+  </div>
 
   <section class="charts-grid">
     <div class="chart-card">

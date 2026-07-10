@@ -105,7 +105,7 @@ body {
 }
 .form-card h1, .form-card h2 { margin-top: 0; }
 .form-group { margin-bottom: 1rem; }
-.form-group label { display: block; margin-bottom: 0.35rem; font-weight: 600; }
+.form-group label, .form-group .label-titre { display: block; margin-bottom: 0.35rem; font-weight: 600; }
 .form-group input,
 .form-group select,
 .form-group textarea {

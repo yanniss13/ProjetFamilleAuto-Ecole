@@ -1,16 +1,5 @@
 {
-  "erreurs": 1,
+  "erreurs": 0,
   "avertissements": 0,
-  "messages": [
-    {
-      "type": "error",
-      "lastLine": 60,
-      "lastColumn": 218,
-      "firstColumn": 9,
-      "message": "Bad value “street-address” for attribute “autocomplete” on element “input”: The autofill field name “street-address” is not allowed in this context.",
-      "extract": ">\n        <input id=\"address\" name=\"address\" type=\"text\" autocomplete=\"street-address\" data-adresse-autocomplete=\"\" value=\"\" placeholder=\"ex. 12 rue de la République, 13001 Marseille\" list=\"address-adresse-autocomplete\">\n     ",
-      "hiliteStart": 10,
-      "hiliteLength": 210
-    }
-  ]
+  "messages": []
 }
