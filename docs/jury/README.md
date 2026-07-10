@@ -15,6 +15,14 @@ l'utilisateur.
 - Audit détaillé : [`audit-certification-dwwm.md`](audit-certification-dwwm.md)
 - Inventaire historique :
   [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md)
+- **Dossier consolidé (2026-07-10)** :
+  - Résumé du projet : [`resume-projet.md`](resume-projet.md)
+  - Expression du besoin v2 : [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md)
+  - Compétences DWWM (REAC RNCP37674) : [`competences-dwwm.md`](competences-dwwm.md)
+  - Comparaison maquettes v1 / finale : [`comparaison-maquettes.md`](comparaison-maquettes.md)
+    (captures 1440 px sous [`captures/`](captures/))
+  - Base de données v2 : [`base-de-donnees.md`](base-de-donnees.md)
+    (diagramme [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg))
 - Conception initiale classée :
   [`../historique/2026-06/README.md`](../historique/2026-06/README.md)
 - Spécification historique : [`../DESIGN.md`](../DESIGN.md)
@@ -24,12 +32,16 @@ l'utilisateur.
   `C:\Users\yanni\Downloads\Checklist_certification_DWWM.xlsx.zip`
   (le contenu utile est entièrement retranscrit dans l'audit).
 
-## État au 2026-07-10
+## État au 2026-07-10 (après consolidation du dossier)
 
-- Audit DWWM mis à jour : **14 validés / 16 à renforcer / 3 manquants**.
-- Aucun code métier modifié pendant l'audit.
-- Trois documents jury créés : ce point de reprise, l'audit détaillé et l'inventaire
-  des documents historiques.
+- Audit DWWM mis à jour : **19 validés / 12 à renforcer / 2 manquants**
+  (W3C et veille technique anglophone).
+- Le chantier « consolidation du dossier » est **livré** : résumé, besoin v2,
+  matrice de compétences, comparaison maquettes (avec 15 captures réelles) et
+  diagramme BDD v2 — voir la liste ci-dessus.
+- Un script réutilisable `scripts/captures-jury.js` capture l'application en
+  Edge headless (largeur paramétrable pour le futur contrôle responsive).
+- Aucun code métier modifié.
 - Les sources de juin sont classées sous `docs/historique/2026-06/` et les huit
   captures de cours sont isolées sous `docs/_a_retirer_du_projet/`.
 - `AGENTS.md` pointe vers le présent dossier.
@@ -52,16 +64,18 @@ prioritaires sont désormais :
 
 ## Prochaine action recommandée
 
-Avant de modifier le code, faire valider par l'utilisateur le premier chantier parmi :
+Le chantier 1 (consolidation du dossier) est livré. Restent, dans l'ordre
+recommandé :
 
-1. **Consolidation du dossier** — résumé, besoin, compétences, comparaison des
-   maquettes v1 et diagramme BDD actuel (recommandé) ;
-2. **Conformité visible** — W3C, responsive et accessibilité ;
-3. **Script de soutenance** — support 35 minutes, démo 11 minutes et questions/réponses.
+1. **Conformité visible** — validation W3C des pages rendues, responsive
+   (320/375/768/1440 px — réutiliser `scripts/captures-jury.js --largeur=`)
+   et audit accessibilité (automatisé + clavier) ;
+2. **Script de soutenance** — support 35 minutes, démo 11 minutes et
+   questions/réponses ; inclut les veilles sécurité et technique (sources
+   anglophones) et la mise à jour de `README.md`/`docs/DESIGN.md`.
 
-Ne pas traiter ces trois chantiers dans une seule spécification. Chacun doit suivre le
-cycle déjà utilisé dans le projet : spécification → plan → TDD/implémentation si du code
-est nécessaire.
+Chaque chantier suit le cycle du projet : spécification → plan →
+TDD/implémentation si du code est nécessaire.
 
 ## Vérifications à lancer dès que l'environnement le permet
 
@@ -104,17 +118,25 @@ Puis vérifier dans un navigateur :
 
 ### Dernier checkpoint
 
-- Action terminée : audit critère par critère, revue et rangement des documents
-  historiques, création du point de reprise et isolement des fichiers retirables.
-- Fichiers concernés : `docs/jury/audit-certification-dwwm.md`,
-  `docs/jury/inventaire-documents-historiques.md`, `docs/jury/README.md`,
-  `docs/README.md`, `docs/historique/2026-06/`, `docs/_a_retirer_du_projet/`,
-  `docs/superpowers/plans/2026-07-10-rangement-documents-jury.md` et `AGENTS.md`.
-- Vérifications exécutées : 49 fichiers historiques classés, 12 HTML de wireframes,
-  11 exports PNG de maquettes et 8 captures retirables recensés ; liens Markdown/HTML
-  valides, aucune ancienne référence, `git diff --check` réussi ; `npm test` réussi
-  avec 438 assertions ; `npx prisma validate` réussi.
-- Vérifications restantes : rendu navigateur, W3C et accessibilité.
-- Premier travail restant : demander à l'utilisateur lequel des trois chantiers ci-dessus
-  il veut lancer ; recommander la consolidation du dossier.
-- Aucun commit ni staging n'a été effectué.
+- Action terminée (2026-07-10, Claude) : chantier « consolidation du dossier »
+  livré en entier sur la branche `jury-consolidation-dossier` — script de
+  captures + 15 PNG, `resume-projet.md`, `expression-du-besoin-v2.md`,
+  `competences-dwwm.md` (REAC RNCP37674 vérifié en ligne),
+  `base-de-donnees.md` + `diagrammes/bdd-v2.{svg,png}`,
+  `comparaison-maquettes.md`, audit et présent README mis à jour. Le travail
+  précédent (rangement Codex + audit) a été commité puis fusionné dans `main`
+  avec le Lot L.
+- Spécification et plan du chantier :
+  `docs/superpowers/{specs,plans}/2026-07-10-consolidation-dossier-jury*.md`
+  (plan entièrement coché).
+- Vérifications exécutées : `npm test` (15 suites, 438 assertions) avant
+  chaque commit ; `npx prisma validate` réussi ; liens Markdown relatifs
+  contrôlés par script sur tous les documents créés/modifiés (0 cassé) ;
+  15 captures contrôlées visuellement ; SVG validé XML.
+- Vérifications restantes : rendu navigateur multi-largeurs, W3C,
+  accessibilité (chantier « conformité visible »).
+- Premier travail restant : lancer le chantier « conformité visible »
+  (spécification d'abord) ; `main` local a ~90 commits d'avance sur
+  `origin/main` — pousser quand l'utilisateur le demandera.
+- Décision utilisateur attendue : aucune pour continuer ; valider le moment
+  du `git push`.
