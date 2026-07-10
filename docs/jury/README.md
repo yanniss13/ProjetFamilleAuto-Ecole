@@ -27,6 +27,14 @@ l'utilisateur.
   0 erreur/0 avertissement, responsive 0 débordement (45 captures),
   accessibilité 0 violation axe ; checklist clavier à dérouler avant la
   soutenance. JSON bruts sous [`conformite/`](conformite/).
+- **Soutenance (2026-07-10)** :
+  - Deck des 35 minutes : [`soutenance/soutenance.html`](soutenance/soutenance.html)
+    (28 diapos — flèches pour naviguer, touche N pour les notes orateur) ;
+  - Démo scénarisée : [`soutenance/demo-11-minutes.md`](soutenance/demo-11-minutes.md) ;
+  - Questions/réponses : [`soutenance/questions-reponses.md`](soutenance/questions-reponses.md).
+- **Veilles (2026-07-10)** : [`veille-securite.md`](veille-securite.md)
+  (OWASP Top 10 2025, 8 fiches) et [`veille-technique.md`](veille-technique.md)
+  (4 sources officielles anglophones).
 - Conception initiale classée :
   [`../historique/2026-06/README.md`](../historique/2026-06/README.md)
 - Spécification historique :
@@ -70,18 +78,22 @@ prioritaires sont désormais :
 
 ## Prochaine action recommandée
 
-Les chantiers 1 (consolidation du dossier) et 2 (conformité visible) sont
-livrés. Reste :
+**Les trois chantiers de préparation sont livrés** — l'audit est à
+29 validés / 4 à renforcer / 0 manquant. Il ne reste que des actions côté
+utilisateur :
 
-1. **Script de soutenance** — support 35 minutes, démo 11 minutes et
-   préparation des 45 minutes de questions ; inclut les veilles sécurité et
-   technique (sources anglophones, dernier critère MANQUANT) et la mise à
-   jour de `README.md`/`docs/DESIGN.md`.
-2. Côté utilisateur, avant la soutenance : dérouler la checklist clavier de
-   [`conformite.md`](conformite.md) et relancer `npm run seed:demo`.
+1. **Répéter** en chronométrant : ouvrir
+   [`soutenance/soutenance.html`](soutenance/soutenance.html) (touche N =
+   notes orateur), dérouler la démo
+   ([`soutenance/demo-11-minutes.md`](soutenance/demo-11-minutes.md)),
+   relire les [Q/R](soutenance/questions-reponses.md) ;
+2. dérouler la **checklist clavier** de [`conformite.md`](conformite.md) ;
+3. avant chaque répétition : démarrer le serveur PUIS `npm run seed:demo` ;
+4. décider du **`git push`** (main local est très en avance sur origin).
 
-Chaque chantier suit le cycle du projet : spécification → plan →
-TDD/implémentation si du code est nécessaire.
+Pour un agent : plus aucun chantier documentaire jury planifié. Les restes
+hors jury (sauvegarde/restauration, hébergement production, migration
+Prisma 7, Argon2id) sont listés dans l'audit et les veilles.
 
 ## Vérifications à lancer dès que l'environnement le permet
 
@@ -124,55 +136,31 @@ Puis vérifier dans un navigateur :
 
 ### Dernier checkpoint
 
-- **Chantier en cours : « script de soutenance »**, branche
-  `jury-script-soutenance`, plan :
-  `docs/superpowers/plans/2026-07-10-script-soutenance.md` (reprendre à la
-  première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 2** — `README.md`
-  réécrit (état réel A→L, 442 assertions, plus aucun « squelette ») ;
-  `DESIGN.md` déplacé vers `docs/historique/2026-06/DESIGN.md` avec bandeau ;
-  références mises à jour (docs/README.md, présent fichier, README
-  historique) ; 0 lien cassé. Task 1 déjà livrée (micro-fix Mailpit TDD,
-  suite à 442 assertions).
-- Task 3 livrée : `docs/jury/veille-securite.md` — 8 fiches menace → source
-  datée (OWASP Top 10 **2025**, cheat sheets vérifiées le 2026-07-10) →
-  décision → preuve ; note honnête Argon2id vs bcrypt pour la production.
-- Task 4 livrée : `docs/jury/veille-technique.md` — 4 sources officielles
-  anglophones vérifiées le 2026-07-10 (Node LTS 22/24, Express 5.2.1,
-  Prisma 7.8.0 vs 6.19.3 du projet, MDN), chaque relevé relié à une décision
-  du dépôt ; **le dernier critère MANQUANT est soldé** (statut d'audit à
-  passer en Task 8).
-- Task 5 livrée : `docs/jury/soutenance/questions-reponses.md` — 26 Q/R en
-  7 thèmes (réponse courte + preuve), toutes les questions pièges du plan
-  couvertes (framework front, JWT, POO, SQLite, prod, validité juridique,
-  pad clavier, panne d'API…).
-- Task 6 livrée : `docs/jury/soutenance/demo-11-minutes.md` — préparation,
-  déroulé minuté 14:00→25:00 (13 étapes, phrase clé + critère couvert par
-  étape), secours sur captures, reset ; 8 URLs publiques vérifiées en 200.
-  ⚠️ Piège documenté : seeder APRÈS le démarrage du serveur (la purge
-  automatique consomme l'alerte de démo 30 s après le boot).
-- Task 7 livrée : `docs/jury/soutenance/soutenance.html` — deck autonome de
-  **28 diapositives** (navigation flèches/clic, notes orateur touche N,
-  minutage par section, mode impression), 3 diapos de secours pour la démo ;
-  9 chemins relatifs vérifiés, rendu contrôlé sur 3 diapos, export PDF
-  possible via Edge `--print-to-pdf` (1,3 Mo).
-- Prochaine tâche : **Task 8** — cohérence finale : audit (veilles → VALIDÉ,
-  critères README/DESIGN, synthèse recomptée, cases P0/P2), index et
-  checkpoint du présent README, `AGENTS.md`, liens globaux,
-  `npx prisma validate`, commit final.
-- Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
-  — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
-  Audit : 22 validés / 10 à renforcer / 1 manquant.
-- ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
-  vue/CSS/JS (cache Twig + fichiers statiques), sinon l'ancien état est
-  contrôlé.
-- Vérifications exécutées : run final `--controle=tout` 45/45 à zéro ;
-  `npm test` (15 suites, 438 assertions) avant chaque commit ;
-  `npx prisma validate` ; liens Markdown contrôlés (0 cassé).
-- Premier travail restant : chantier « **script de soutenance** »
-  (spécification d'abord — support 35 min, démo 11 min, questions, veilles,
-  README/DESIGN). Côté utilisateur : checklist clavier de `conformite.md`.
-- Chantiers précédents fusionnés dans `main` le 2026-07-10 (rangement Codex,
-  Lot L, consolidation du dossier).
-- `main` local a ~97 commits d'avance sur `origin/main` — pousser quand
-  l'utilisateur le demandera. Aucune autre décision utilisateur attendue.
+- Action terminée (2026-07-10, Claude) : **chantier « script de soutenance »
+  LIVRÉ en entier** sur la branche `jury-script-soutenance` (plan
+  entièrement coché :
+  `docs/superpowers/plans/2026-07-10-script-soutenance.md`). Livrables :
+  deck de 28 diapositives, démo minutée + scénario de secours, 26 Q/R,
+  veille sécurité (OWASP Top 10 2025), veille technique anglophone,
+  `README.md` réécrit, `DESIGN.md` classé en historique, micro-fix Mailpit
+  en TDD (suite à 442 assertions). **La préparation documentaire du jury est
+  TERMINÉE : audit à 29 validés / 4 à renforcer (2 critères facultatifs +
+  2 compléments de production) / 0 manquant.**
+- Vérifications exécutées sur ce chantier : `npm test` (15 suites,
+  442 assertions) avant chaque commit ; `npx prisma validate` ; liens
+  contrôlés par script ; 8 URLs publiques de la démo en 200 ; deck contrôlé
+  visuellement (3 diapos) + export PDF (1,3 Mo) ; sources des deux veilles
+  vérifiées en ligne le 2026-07-10.
+- ⚠️ Pièges appris (valables pour toute reprise) : redémarrer le serveur
+  4071 après toute modification de vue/CSS/JS (cache Twig) ; seeder APRÈS le
+  démarrage du serveur (la purge automatique consomme l'alerte de démo
+  30 s après le boot).
+- Premier travail restant : **côté utilisateur uniquement** — répétitions
+  chronométrées, checklist clavier de `conformite.md`, décision du
+  `git push`. Pour un agent : plus aucun chantier jury planifié ; les restes
+  hors jury (sauvegarde/restauration, hébergement production, Prisma 7,
+  Argon2id) sont listés dans l'audit et les veilles.
+- Chantiers précédents tous fusionnés dans `main` le 2026-07-10 (rangement
+  Codex, Lot L, consolidation du dossier, conformité visible).
+- `main` local est très en avance sur `origin/main` (~110 commits après
+  fusion de cette branche) — pousser quand l'utilisateur le demandera.

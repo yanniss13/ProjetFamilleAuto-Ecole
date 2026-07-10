@@ -9,7 +9,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (15 fichiers `.cjs`, ~400 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (15 fichiers `.cjs`, 442 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 - `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le
@@ -54,20 +54,21 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   30/min/IP), service cache 10 min jamais bloquant, datalist navigateur sur les
   champs `address` d'inscription et de profil. Tests : `test/lot-l.cjs` (port
   4070, 20 assertions).
-- **Prochain travail : préparation jury DWWM — chantier « script de soutenance »**
-  (support 35 min, démo 11 min, 45 min de questions, veilles sécurité +
-  technique anglophone, mise à jour README/DESIGN). Commencer par
-  `docs/jury/README.md` (point de reprise à jour). Chantiers livrés le
-  2026-07-10 : « consolidation du dossier » (résumé, besoin v2, compétences
-  REAC, comparaison maquettes, BDD v2) et « conformité visible » (W3C
-  0 erreur, responsive 0 débordement, axe 0 violation — preuves dans
-  `docs/jury/conformite.md`, re-jouables via `scripts/conformite-jury.js` et
-  `scripts/captures-jury.js`, prérequis seed + serveur PORT=4071 ; ⚠️
-  redémarrer le serveur après toute modif de vue, cache Twig). Audit :
-  22 validés / 10 à renforcer / 1 manquant. Les documents de juin sous
-  `docs/historique/2026-06/` restent des v1 intactes. Côté utilisateur : config
-  Mailpit (`SMTP_HOST=localhost`, `SMTP_PORT=1025`) — si l'envoi échoue, micro-fix :
-  ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
+- **La préparation documentaire du jury DWWM est TERMINÉE (2026-07-10)** :
+  trois chantiers livrés le même jour — « consolidation du dossier »,
+  « conformité visible » (W3C 0 erreur, responsive 0 débordement, axe
+  0 violation) et « script de soutenance » (deck 28 diapos
+  `docs/jury/soutenance/soutenance.html`, démo minutée, 26 Q/R, deux
+  veilles, README réécrit, DESIGN classé, Mailpit géré nativement — `auth`
+  seulement si `SMTP_USER`). Audit : **29 validés / 4 à renforcer /
+  0 manquant**. Point de reprise : `docs/jury/README.md`. **Prochain
+  travail : côté utilisateur uniquement** (répétitions, checklist clavier,
+  décision de push) ; pour un agent, les restes hors jury sont la
+  sauvegarde/restauration BDD et l'hébergement de production. ⚠️ Pièges :
+  redémarrer le serveur après toute modif de vue (cache Twig) ; seeder
+  APRÈS le démarrage du serveur (la purge auto consomme l'alerte de démo
+  30 s après le boot). Les documents de juin sous `docs/historique/2026-06/`
+  restent des v1 intactes.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )
