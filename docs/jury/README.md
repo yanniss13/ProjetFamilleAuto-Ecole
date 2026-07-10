@@ -23,6 +23,10 @@ l'utilisateur.
     (captures 1440 px sous [`captures/`](captures/))
   - Base de données v2 : [`base-de-donnees.md`](base-de-donnees.md)
     (diagramme [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg))
+- **Conformité (2026-07-10)** : [`conformite.md`](conformite.md) — W3C
+  0 erreur/0 avertissement, responsive 0 débordement (45 captures),
+  accessibilité 0 violation axe ; checklist clavier à dérouler avant la
+  soutenance. JSON bruts sous [`conformite/`](conformite/).
 - Conception initiale classée :
   [`../historique/2026-06/README.md`](../historique/2026-06/README.md)
 - Spécification historique : [`../DESIGN.md`](../DESIGN.md)
@@ -64,15 +68,15 @@ prioritaires sont désormais :
 
 ## Prochaine action recommandée
 
-Le chantier 1 (consolidation du dossier) est livré. Restent, dans l'ordre
-recommandé :
+Les chantiers 1 (consolidation du dossier) et 2 (conformité visible) sont
+livrés. Reste :
 
-1. **Conformité visible** — validation W3C des pages rendues, responsive
-   (320/375/768/1440 px — réutiliser `scripts/captures-jury.js --largeur=`)
-   et audit accessibilité (automatisé + clavier) ;
-2. **Script de soutenance** — support 35 minutes, démo 11 minutes et
-   questions/réponses ; inclut les veilles sécurité et technique (sources
-   anglophones) et la mise à jour de `README.md`/`docs/DESIGN.md`.
+1. **Script de soutenance** — support 35 minutes, démo 11 minutes et
+   préparation des 45 minutes de questions ; inclut les veilles sécurité et
+   technique (sources anglophones, dernier critère MANQUANT) et la mise à
+   jour de `README.md`/`docs/DESIGN.md`.
+2. Côté utilisateur, avant la soutenance : dérouler la checklist clavier de
+   [`conformite.md`](conformite.md) et relancer `npm run seed:demo`.
 
 Chaque chantier suit le cycle du projet : spécification → plan →
 TDD/implémentation si du code est nécessaire.
@@ -118,26 +122,25 @@ Puis vérifier dans un navigateur :
 
 ### Dernier checkpoint
 
-- **Chantier en cours : « conformité visible »**, branche
-  `jury-conformite-visible`, plan :
-  `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
-  cochées — reprendre à la première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Tasks 5, 6 et 7** —
-  accessibilité : `--color-muted` #6b7280→#5b6470 (contraste 5,5:1/6:1) et
-  `aria-label` sur les 4 SVG de graphiques → **0 violation axe tous niveaux
-  sur les 15 pages** ; responsive : aucune correction nécessaire ; run
-  complet final : **0 erreur W3C, 0 violation axe, 0 débordement sur les
-  45 contrôles** ; rapport daté rédigé : `docs/jury/conformite.md`.
-  ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
+- Action terminée (2026-07-10, Claude) : **chantier « conformité visible »
+  LIVRÉ en entier** sur la branche `jury-conformite-visible` (plan
+  entièrement coché : `docs/superpowers/plans/2026-07-10-conformite-visible.md`).
+  Livrables : lib CDP partagée (`scripts/lib/`), `scripts/conformite-jury.js`
+  (W3C/axe/débordement), 45 captures responsive, corrections W3C (3 erreurs)
+  et accessibilité (2 violations serious), rapport daté
+  `docs/jury/conformite.md`. **Résultat final : 0 erreur W3C, 0 violation
+  axe, 0 débordement sur les 45 contrôles.** Audit : 22 validés /
+  10 à renforcer / 1 manquant.
+- ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
   vue/CSS/JS (cache Twig + fichiers statiques), sinon l'ancien état est
   contrôlé.
 - Vérifications exécutées : run final `--controle=tout` 45/45 à zéro ;
-  `npm test` (15 suites, 438 assertions) avant chaque commit.
-- Prochaine tâche : **Task 8** — cohérence finale : audit (W3C
-  MANQUANT→VALIDÉ, responsive et accessibilité →VALIDÉ, synthèse recomptée,
-  cases P1 cochées), index et checkpoint du présent README, `AGENTS.md`,
-  contrôle global des liens, `npx prisma validate`, commit final.
-- Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
-  `main` le 2026-07-10 avec le rangement Codex et le Lot L.
-- `main` local a ~91 commits d'avance sur `origin/main` — pousser quand
+  `npm test` (15 suites, 438 assertions) avant chaque commit ;
+  `npx prisma validate` ; liens Markdown contrôlés (0 cassé).
+- Premier travail restant : chantier « **script de soutenance** »
+  (spécification d'abord — support 35 min, démo 11 min, questions, veilles,
+  README/DESIGN). Côté utilisateur : checklist clavier de `conformite.md`.
+- Chantiers précédents fusionnés dans `main` le 2026-07-10 (rangement Codex,
+  Lot L, consolidation du dossier).
+- `main` local a ~97 commits d'avance sur `origin/main` — pousser quand
   l'utilisateur le demandera. Aucune autre décision utilisateur attendue.
