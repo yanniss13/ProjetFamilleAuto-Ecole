@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoniteurConnect — soutenance DWWM</title>
+<style>
+  /* Deck autonome, hors application (pas de contrainte CSP). Charte du site :
+     #2563eb (primaire), #1f2933 (encre), #f4f6f8 (fond), #5b6470 (atténué). */
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; background: #1f2933; }
+  .diapo { display: none; width: 100vw; height: 100vh; padding: 5vh 7vw;
+           background: #f4f6f8; color: #1f2933; flex-direction: column; }
+  .diapo.active { display: flex; }
+  .diapo h1 { color: #2563eb; font-size: 2.7rem; margin-bottom: 1.4rem; }
+  .diapo h2 { color: #2563eb; font-size: 2rem; margin-bottom: 1.1rem; }
+  .diapo p, .diapo li { font-size: 1.3rem; line-height: 1.85; }
+  .diapo ul { padding-left: 1.4rem; }
+  .diapo img { max-width: 100%; max-height: 60vh; object-fit: contain;
+               border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; }
+  .colonnes { display: flex; gap: 2.2rem; align-items: flex-start; }
+  .colonnes > * { flex: 1; min-width: 0; }
+  .carte { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+           padding: 1rem 1.3rem; }
+  .chiffre { color: #2563eb; font-size: 2.4rem; font-weight: 700; }
+  .legende { color: #5b6470; font-size: 1.05rem; }
+  code { background: #e8ecf2; padding: 0.1em 0.35em; border-radius: 4px;
+         font-size: 0.95em; }
+  .pied { margin-top: auto; padding-top: 1rem; display: flex;
+          justify-content: space-between; color: #5b6470; font-size: 0.95rem; }
+  .notes { display: none; background: #fff8dc; border-left: 4px solid #c98a2b;
+           padding: 0.7rem 1rem; margin-top: 0.9rem; font-size: 1.05rem;
+           line-height: 1.5; }
+  body.avec-notes .notes { display: block; }
+  .titre-principal { justify-content: center; text-align: center; }
+  .titre-principal h1 { font-size: 3.6rem; }
+  .titre-principal p { font-size: 1.5rem; color: #5b6470; }
+  @media print {
+    .diapo { display: flex; page-break-after: always; height: auto;
+             min-height: 100vh; }
+    .notes { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<section class="diapo titre-principal" data-minutage="">
+  <h1>MoniteurConnect</h1>
+  <p>La plateforme qui relie les auto-écoles et les moniteurs indépendants —<br>
+     de l'annonce au contrat signé électroniquement.</p>
+  <p style="margin-top:2.5rem;">Soutenance du titre professionnel<br>
+     <strong>Développeur web et web mobile</strong> (RNCP37674)</p>
+  <aside class="notes">Se présenter : prénom, parcours, pourquoi ce projet.
+    Annoncer le plan : le besoin, la conception, la technique, une démo de
+    11 minutes, un focus code, puis sécurité et conformité. 35 minutes.</aside>
+  <div class="pied"><span></span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="0–3 min · le besoin">
+  <h2>Le problème</h2>
+  <ul>
+    <li>Les auto-écoles peinent à recruter des moniteurs diplômés ;</li>
+    <li>les canaux généralistes ne vérifient ni le diplôme, ni l'autorisation
+        d'enseigner, et imposent un compte aux candidats ;</li>
+    <li>le dossier de recrutement (CV, identité, permis, autorisation) puis le
+        contrat restent un processus manuel et dispersé.</li>
+  </ul>
+  <aside class="notes">Poser le décor en 40 secondes. Insister sur la double
+    friction : côté école (dossiers incomplets) et côté moniteur (un compte par
+    plateforme).</aside>
+  <div class="pied"><span>0–3 min · le besoin</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="0–3 min · le besoin">
+  <h2>Trois acteurs, trois besoins</h2>
+  <div class="colonnes">
+    <div class="carte"><p><strong>L'auto-école</strong></p>
+      <p class="legende">Publie, reçoit des dossiers complets, contractualise.
+      Seul compte en libre-service.</p></div>
+    <div class="carte"><p><strong>Le moniteur indépendant</strong></p>
+      <p class="legende">Cherche, postule avec ses pièces, suit son dossier et
+      contresigne — <strong>sans créer de compte</strong>.</p></div>
+    <div class="carte"><p><strong>L'administrateur</strong></p>
+      <p class="legende">Modère, suspend, purge — espace séparé, compte créé
+      par script.</p></div>
+  </div>
+  <aside class="notes">« Sans compte moniteur » est LE choix produit central —
+    il reviendra dans la démo et sûrement dans les questions.</aside>
+  <div class="pied"><span>0–3 min · le besoin</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="0–3 min · le besoin">
+  <h2>La solution : un job board métier</h2>
+  <img src="../captures/accueil.png" alt="Page d'accueil de MoniteurConnect">
+  <aside class="notes">Annonces qualifiées, candidature en une page avec
+    4 pièces vérifiées, workflow d'acceptation jusqu'au contrat PDF signé par
+    les deux parties. Pas une marketplace : pas de paiement, pas de planning.</aside>
+  <div class="pied"><span>0–3 min · le besoin</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="3–6 min · cadrage">
+  <h2>Ce qui est livré</h2>
+  <div class="colonnes">
+    <div>
+      <ul>
+        <li>MVP : comptes écoles, annonces, candidatures à 4 pièces, contrats PDF ;</li>
+        <li>12 lots itératifs (A → L) : suivi candidat, administration, carte + rayon,
+            vérification SIRET, <strong>signature électronique</strong>, statistiques,
+            alertes email, purge RGPD, jeu de démo, autocomplétion d'adresse.</li>
+      </ul>
+    </div>
+    <div class="carte" style="text-align:center;">
+      <p><span class="chiffre">15</span><br><span class="legende">fichiers de tests</span></p>
+      <p style="margin-top:0.8rem;"><span class="chiffre">442</span><br><span class="legende">assertions, TDD systématique</span></p>
+    </div>
+  </div>
+  <aside class="notes">Chaque lot = spécification → plan → test d'abord.
+    Les 442 assertions tournent avant chaque commit.</aside>
+  <div class="pied"><span>3–6 min · cadrage</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="3–6 min · cadrage">
+  <h2>Compétences du référentiel couvertes</h2>
+  <div class="colonnes">
+    <div class="carte"><p><strong>Bloc front-end</strong></p>
+      <ul class="legende" style="font-size:1.1rem;">
+        <li>Environnement de travail</li>
+        <li>Maquettage (11 wireframes)</li>
+        <li>Interfaces statiques (Twig)</li>
+        <li>Interfaces dynamiques (carte, pad, graphiques — sous CSP)</li>
+      </ul></div>
+    <div class="carte"><p><strong>Bloc back-end</strong></p>
+      <ul class="legende" style="font-size:1.1rem;">
+        <li>BDD relationnelle (8 modèles, 13 migrations)</li>
+        <li>Composants d'accès aux données (services Prisma)</li>
+        <li>Composants métier (signature, purge, stats)</li>
+        <li>Documentation du déploiement (partielle, assumée)</li>
+      </ul></div>
+  </div>
+  <p class="legende" style="margin-top:0.8rem;">Matrice détaillée avec preuves :
+    <code>docs/jury/competences-dwwm.md</code></p>
+  <aside class="notes">Dire honnêtement : la compétence « déploiement » est
+    partiellement couverte (env documentés, bascule PostgreSQL décrite) — la
+    procédure d'hébergement complète est le chantier suivant.</aside>
+  <div class="pied"><span>3–6 min · cadrage</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="3–6 min · cadrage">
+  <h2>Maquettes d'abord : la v1 de juin</h2>
+  <img src="../../historique/2026-06/spec-assets/wf-annonces.png" alt="Wireframe v1 de la liste des annonces">
+  <aside class="notes">11 écrans maquettés en HTML basse fidélité AVANT le
+    code, conservés intacts comme preuve de conception. Montrer que la
+    structure (recherche, cartes d'annonces, pagination) était posée.</aside>
+  <div class="pied"><span>3–6 min · cadrage</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="3–6 min · cadrage">
+  <h2>… et l'écran livré</h2>
+  <img src="../captures/annonces.png" alt="Liste des annonces réelle">
+  <aside class="notes">Fidèle à la maquette, enrichi par les lots : recherche
+    par rayon avec distances, badge « École vérifiée », bascule carte, lien
+    alertes. Chaque écart est justifié dans comparaison-maquettes.md — c'est
+    de l'itération documentée, pas de la dérive.</aside>
+  <div class="pied"><span>3–6 min · cadrage</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="6–10 min · technique">
+  <h2>Architecture</h2>
+  <div class="carte" style="text-align:center; font-size:1.4rem; padding:1.6rem;">
+    <p><code>navigateur</code> → <code>routes</code> → <code>middlewares</code>
+      (session · CSRF · auth) → <code>contrôleurs</code> → <code>services</code>
+      (Prisma, PDF, emails, géo) → <code>vues Twig</code></p>
+  </div>
+  <ul style="margin-top:1.2rem;">
+    <li>Une responsabilité par couche, un module par domaine ;</li>
+    <li>toute requête de gestion scopée par <code>schoolId</code> (isolation entre écoles) ;</li>
+    <li>services externes (Sirene, Adresse, Nominatim) relayés en interne et
+        <strong>jamais bloquants</strong>.</li>
+  </ul>
+  <aside class="notes">Rendu serveur assumé : chaque page est indexable, le JS
+    n'existe que là où il apporte (carte, pad, graphiques, autocomplétion).</aside>
+  <div class="pied"><span>6–10 min · technique</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="6–10 min · technique">
+  <h2>Technologies et pourquoi</h2>
+  <ul>
+    <li><strong>Express 5 + Twig</strong> : rendu serveur, autoescape, SEO naturel ;</li>
+    <li><strong>Prisma</strong> : schéma versionné, migrations, requêtes paramétrées ;</li>
+    <li><strong>SQLite → PostgreSQL</strong> : zéro install en dev, bascule par
+        changement de provider, sans changement de code ;</li>
+    <li><strong>sessions en base</strong> plutôt que JWT : révocables, HTTP-only ;</li>
+    <li><strong>Leaflet auto-hébergé</strong>, PDFKit, Nodemailer — aucune ressource
+        externe dans les pages (CSP stricte).</li>
+  </ul>
+  <aside class="notes">Chaque choix a son alternative rejetée et sa raison —
+    détails prêts pour les questions (questions-reponses.md).</aside>
+  <div class="pied"><span>6–10 min · technique</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="6–10 min · technique">
+  <h2>Environnements</h2>
+  <ul>
+    <li>Configuration par variables d'environnement (<code>.env.example</code> versionné) ;</li>
+    <li><strong>fail-fast</strong> : refus de démarrer sans <code>SESSION_SECRET</code> ;</li>
+    <li>développement : SQLite, emails en console ou Mailpit local ;</li>
+    <li>production (préparée) : PostgreSQL, cookies <code>secure</code>,
+        <code>trust proxy</code>, SMTP authentifié ;</li>
+    <li>tests : ports dédiés (4055-4070), services externes court-circuités
+        par variables (<code>GEOCODING_DISABLED</code>…).</li>
+  </ul>
+  <aside class="notes">Le même code sert les trois environnements — seules les
+    variables changent. C'est vérifiable dans src/app.js.</aside>
+  <div class="pied"><span>6–10 min · technique</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="6–10 min · technique">
+  <h2>Méthode : le test d'abord</h2>
+  <ul>
+    <li>Chaque lot : <strong>spécification → plan → TDD</strong> (test écrit, vu
+        échouer, implémentation minimale) ;</li>
+    <li>30 spécifications et plans versionnés dans le dépôt ;</li>
+    <li>revues de code documentées (9 durcissements en une revue) ;</li>
+    <li>exemple : la signature électronique — 49 assertions écrites avant le code.</li>
+  </ul>
+  <aside class="notes">Si le jury veut une preuve : n'importe quel plan dans
+    docs/superpowers/plans/ montre les étapes « le voir échouer / le voir
+    passer » avec les sorties attendues.</aside>
+  <div class="pied"><span>6–10 min · technique</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="10–14 min · données">
+  <h2>Le modèle de données (v2 — 8 modèles)</h2>
+  <img src="../diagrammes/bdd-v2.png" alt="Diagramme de la base de données version 2">
+  <aside class="notes">Rangée du haut : le cœur métier (École 1-N Annonce 1-N
+    Candidature 1-1 Contrat, cascades). Rangée du bas : les entités autonomes
+    apportées par les lots (sessions, admin, alertes, journal de purge).
+    Montrer la chronologie : le MCD v1 avait 4 entités.</aside>
+  <div class="pied"><span>10–14 min · données</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="10–14 min · données">
+  <h2>L'intégrité vient de la base</h2>
+  <ul>
+    <li><code>School.siret</code> unique — la collision en course devient un
+        message utilisateur (erreur Prisma <code>P2002</code> gérée) ;</li>
+    <li><code>Contract.applicationId</code> unique — le 1-1 est garanti par la
+        base : impossible de générer deux contrats pour une candidature ;</li>
+    <li>cascades <code>onDelete</code> — pas d'orphelins, et le code supprime
+        les fichiers privés avant la ligne ;</li>
+    <li><strong>13 migrations versionnées</strong> rejouables :
+        <code>npx prisma migrate deploy</code>.</li>
+  </ul>
+  <aside class="notes">Le point qui compte : ces contraintes sont testées
+    (correctifs, lot G, smoke). La base n'est pas qu'un rangement, c'est une
+    ligne de défense.</aside>
+  <div class="pied"><span>10–14 min · données</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="10–14 min · données">
+  <h2>SQLite en dev, PostgreSQL en prod</h2>
+  <ul>
+    <li>Bascule déclarative : provider + <code>DATABASE_URL</code>, aucun
+        changement de code ;</li>
+    <li>portabilité anticipée : recherche insensible à la casse par colonnes
+        <code>*Lower</code> maintenues à l'écriture, agrégations hebdomadaires
+        en JavaScript (pas de SQL dépendant du dialecte) ;</li>
+    <li>reste pour la production : la procédure de sauvegarde/restauration
+        (chantier identifié).</li>
+  </ul>
+  <aside class="notes">Anticiper la question « pourquoi SQLite » : zéro
+    installation pour développer et pour les tests ; les pièges de moteur ont
+    été traités au moment où ils sont apparus (lot A).</aside>
+  <div class="pied"><span>10–14 min · données</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="14–25 min · démonstration">
+  <h2>Démonstration — 11 minutes</h2>
+  <ul>
+    <li>Moniteur : recherche + carte → annonce → candidature 4 pièces →
+        email → page de suivi ;</li>
+    <li>École : candidatures → acceptation avec <strong>signature au pad</strong> →
+        invitation ;</li>
+    <li>Candidat : contre-signature en ligne → <strong>PDF final, empreintes
+        SHA-256</strong> ;</li>
+    <li>École : tableau de bord statistiques ;</li>
+    <li>Admin : modération + <strong>purge RGPD en direct</strong>.</li>
+  </ul>
+  <p class="legende">Déroulé minuté : <code>demo-11-minutes.md</code> — en cas de
+    pépin, les trois diapositives suivantes montrent les mêmes écrans.</p>
+  <aside class="notes">Basculer vers le navigateur (onglets préparés). Revenir
+    au deck à 25:00. Si le direct casse : avancer sur les diapos 18-20 sans
+    s'excuser plus de 5 secondes.</aside>
+  <div class="pied"><span>14–25 min · démonstration</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="14–25 min · secours démo">
+  <h2>La recherche et la carte</h2>
+  <img src="../captures/carte.png" alt="Vue carte des annonces">
+  <aside class="notes">Diapositive de secours uniquement — annonces groupées
+    par école, recherche ville + rayon, école suspendue absente de la carte.</aside>
+  <div class="pied"><span>14–25 min · secours démo</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="14–25 min · secours démo">
+  <h2>Le suivi candidat et la signature</h2>
+  <div class="colonnes">
+    <img src="../captures/suivi.png" alt="Page de suivi candidat, contrat signé">
+    <img src="../captures/contrat.png" alt="Formulaire d'acceptation avec pad de signature">
+  </div>
+  <aside class="notes">Secours — à gauche l'état final côté candidat (contrat
+    signé, téléchargement), à droite le formulaire école avec le pad en bas.</aside>
+  <div class="pied"><span>14–25 min · secours démo</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="14–25 min · secours démo">
+  <h2>Les tableaux de bord</h2>
+  <div class="colonnes">
+    <img src="../captures/dashboard.png" alt="Tableau de bord école">
+    <img src="../captures/admin.png" alt="Espace d'administration">
+  </div>
+  <aside class="notes">Secours — école : tuiles, candidatures par semaine,
+    entonnoir, top annonces. Admin : stats plateforme et bloc purge RGPD avec
+    son journal.</aside>
+  <div class="pied"><span>14–25 min · secours démo</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="25–31 min · focus code">
+  <h2>Focus code : la signature électronique</h2>
+  <div class="carte" style="font-size:1.25rem; padding:1.4rem;">
+    <p>signature école (pad/import) → <strong>validation de l'image</strong> →
+       PDF proposé + <strong>SHA-256</strong> + horodatage → invitation email →
+       contre-signature par jeton → <strong>PDF final</strong> (2 signatures,
+       nouvelle empreinte) → invalidation si ré-édition</p>
+  </div>
+  <ul style="margin-top:1rem;">
+    <li>Front, back, base, fichiers privés, crypto et emails dans un seul flux ;</li>
+    <li>49 assertions écrites avant le code (<code>test/lot-g.cjs</code>).</li>
+  </ul>
+  <aside class="notes">Annoncer le plan des 3 diapos suivantes : l'image, le
+    PDF et ses empreintes, le contreseing et l'invalidation. Code ouvert dans
+    l'éditeur en parallèle si le jury veut voir les fichiers.</aside>
+  <div class="pied"><span>25–31 min · focus code</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="25–31 min · focus code">
+  <h2>1. Ne jamais faire confiance à l'image</h2>
+  <ul>
+    <li>Le pad envoie une data URL PNG — <code>signatureImage.js</code> vérifie
+        le préfixe, décode le base64, contrôle les <strong>magic bytes PNG</strong>
+        réels et plafonne à 200 Ko ;</li>
+    <li>un JPEG déguisé en PNG est refusé (testé) ;</li>
+    <li>le fichier validé est écrit sous <code>storage/signatures/</code> —
+        privé, nom régénéré.</li>
+  </ul>
+  <aside class="notes">Même philosophie que les uploads de candidature : on
+    valide le contenu, jamais la déclaration. Fichier : src/services/
+    signatureImage.js (~60 lignes, lisible en séance).</aside>
+  <div class="pied"><span>25–31 min · focus code</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="25–31 min · focus code">
+  <h2>2. Le PDF et ses empreintes</h2>
+  <ul>
+    <li><code>contractPdf.js</code> génère le PDF (écriture asynchrone) avec une
+        page de signatures : images, horodatages, empreintes ;</li>
+    <li>l'empreinte <strong>SHA-256</strong> du PDF proposé est stockée — le
+        candidat contresigne exactement ce document, c'est prouvable ;</li>
+    <li>le PDF final porte les deux signatures et sa propre empreinte.</li>
+  </ul>
+  <aside class="notes">Question probable : « valeur légale ? » — signature
+    simple au sens eIDAS : intégrité + consentement + horodatage, pas une
+    signature qualifiée. L'application l'affiche (modèles indicatifs).</aside>
+  <div class="pied"><span>25–31 min · focus code</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="25–31 min · focus code">
+  <h2>3. Contre-signature et invalidation</h2>
+  <ul>
+    <li>Le candidat signe via son jeton de suivi — ouvrir ce lien
+        <strong>neutralise la session école du navigateur</strong> (anti-usurpation) ;</li>
+    <li>consentement explicite obligatoire (case « j'ai lu et j'accepte ») ;</li>
+    <li>si l'école ré-édite le contrat : signature candidat et PDF signé
+        <strong>invalidés et supprimés du disque</strong> — jamais d'état incohérent ;</li>
+    <li>un refus nettoie tous les fichiers du contrat (testé).</li>
+  </ul>
+  <aside class="notes">Le plus dur du lot : ne laisser aucun état incohérent.
+    C'est là que le TDD a payé — les cas de nettoyage étaient des assertions
+    avant d'être du code.</aside>
+  <div class="pied"><span>25–31 min · focus code</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="31–34 min · qualité">
+  <h2>Sécurité en profondeur</h2>
+  <div class="colonnes">
+    <ul style="font-size:1.15rem;">
+      <li>CSRF : jeton de session, multipart vérifié après upload ;</li>
+      <li>CSP stricte : aucun script inline ;</li>
+      <li>bcrypt + limite 72 octets ;</li>
+      <li>uploads : magic bytes, stockage privé, accès scopé ;</li>
+    </ul>
+    <ul style="font-size:1.15rem;">
+      <li>rate limiting + réponses neutres (anti-énumération) ;</li>
+      <li>sessions régénérées, révocables, invalidées après reset ;</li>
+      <li>jetons email/reset hachés en base ;</li>
+      <li>purge RGPD automatique et journalisée.</li>
+    </ul>
+  </div>
+  <aside class="notes">Chaque mesure a sa fiche dans veille-securite.md :
+    menace → source OWASP datée → décision → preuve testée.</aside>
+  <div class="pied"><span>31–34 min · qualité</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="31–34 min · qualité">
+  <h2>Tests et conformité — chiffres du 10 juillet 2026</h2>
+  <div class="colonnes">
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">442</span><br>
+      <span class="legende">assertions, 15 suites, avant chaque commit</span></p></div>
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
+      <span class="legende">erreur et avertissement W3C (validateur Nu, 15 pages)</span></p></div>
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
+      <span class="legende">violation axe-core (accessibilité, 15 pages)</span></p></div>
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
+      <span class="legende">débordement sur 4 largeurs (320 → 1440 px)</span></p></div>
+  </div>
+  <p class="legende" style="margin-top:1rem;">Contrôles re-jouables en deux
+    commandes — méthode et preuves datées : <code>docs/jury/conformite.md</code>.</p>
+  <aside class="notes">Limite assumée si question : le pad de signature se
+    dessine à la souris — l'alternative accessible est l'import de fichier,
+    atteignable au clavier.</aside>
+  <div class="pied"><span>31–34 min · qualité</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="31–34 min · qualité">
+  <h2>Veille : datée, sourcée, appliquée</h2>
+  <ul>
+    <li><strong>Sécurité</strong> : OWASP Top 10 <strong>édition 2025</strong> +
+        cheat sheets — 8 fiches menace → décision → preuve ; à suivre : chaîne
+        d'approvisionnement (A03), migration Argon2id en production ;</li>
+    <li><strong>Technique (sources en anglais)</strong> : Node.js (v22/v24 LTS —
+        le projet est sur une LTS), Express 5.2.1 (breaking changes déjà
+        absorbés), Prisma (7.8.0 disponible — migration planifiée hors jury), MDN.</li>
+  </ul>
+  <aside class="notes">Le point différenciant : chaque relevé de veille a une
+    conséquence datée dans le dépôt — ce n'est pas une liste de liens.</aside>
+  <div class="pied"><span>31–34 min · qualité</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo" data-minutage="34–35 min · conclusion">
+  <h2>Limites et suite</h2>
+  <ul>
+    <li>Contrats : modèles indicatifs, à valider juridiquement (affiché) ;</li>
+    <li>production : hébergement HTTPS, PostgreSQL, SMTP, sauvegardes —
+        le code est prêt, c'est un chantier d'infrastructure identifié ;</li>
+    <li>évolutions naturelles : Argon2id, migration Prisma 7, recherche
+        tolérante aux accents.</li>
+  </ul>
+  <aside class="notes">Montrer la prise de recul : ce qui manque est connu,
+    listé, priorisé — pas découvert par le jury.</aside>
+  <div class="pied"><span>34–35 min · conclusion</span><span class="compteur"></span></div>
+</section>
+
+<section class="diapo titre-principal" data-minutage="35 min">
+  <h1>Merci</h1>
+  <p>MoniteurConnect — de l'annonce au contrat signé.</p>
+  <p style="margin-top:2rem;">Place aux questions.</p>
+  <aside class="notes">Respirer. Les 26 réponses préparées sont dans
+    questions-reponses.md — reformuler chaque question avant de répondre.</aside>
+  <div class="pied"><span>35 min</span><span class="compteur"></span></div>
+</section>
+
+<script>
+  // Navigation : flèches / espace / clic = suivant, N = notes orateur.
+  // Fichier local autonome, hors application : pas de contrainte CSP.
+  var diapos = Array.prototype.slice.call(document.querySelectorAll('.diapo'));
+  var index = 0;
+  function affiche(i) {
+    index = Math.max(0, Math.min(diapos.length - 1, i));
+    diapos.forEach(function (d, j) { d.classList.toggle('active', j === index); });
+    diapos[index].querySelector('.compteur').textContent = (index + 1) + ' / ' + diapos.length;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') affiche(index + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') affiche(index - 1);
+    else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('avec-notes');
+  });
+  document.addEventListener('click', function () { affiche(index + 1); });
+  affiche(0);
+</script>
+</body>
+</html>
