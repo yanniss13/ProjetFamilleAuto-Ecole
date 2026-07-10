@@ -377,9 +377,9 @@ git commit -m "Jury: corrections W3C - 0 erreur sur les 15 pages"
 **Interfaces:**
 - Consumes: `docs/jury/conformite/axe-*.json` (Task 2) ; `node scripts/conformite-jury.js --controle=axe`.
 
-- [ ] **Step 1:** Lister les violations par impact décroissant. Corriger TOUTES les critical et serious, plus les moderate/minor triviales — remèdes types : contraste insuffisant (ajuster la couleur dans `style.css`, jamais en inline), libellé manquant (`label`/`aria-label`), `alt` manquant, ordre des landmarks/headings, `html lang`. Ce qui reste (moderate/minor non trivial) : consigner id + justification pour le rapport. **STOP utilisateur** si une correction demande du JS nouveau (ex. gestion de focus scriptée).
-- [ ] **Step 2:** Seed + serveur 4071, `node scripts/conformite-jury.js --controle=axe`. Attendu : 0 violation critical/serious sur les 15 pages. Boucler jusqu'à y arriver.
-- [ ] **Step 3:** `npm test`. Cocher la Task 5, checkpoint README jury, puis :
+- [x] **Step 1:** Lister les violations par impact décroissant. Corriger TOUTES les critical et serious, plus les moderate/minor triviales. **Constat : 2 violations distinctes, toutes serious — (a) `color-contrast` sur `.muted`/footer (toutes pages) : `--color-muted` #6b7280 → #5b6470 (5,5:1 sur fond, 6:1 sur blanc, ratios calculés) + constante `MUTED` alignée dans `dashboard-charts.js` ; (b) `svg-img-alt` sur les 4 graphiques : `aria-label` français ajouté aux SVG générés (paramètre `libelle` sur `renderBarChart`/`renderFunnel` — modification minime du JS existant, remède canonique, PAS de comportement nouveau ; le test lot-h ne vérifie que `createElementNS`/absence d'`innerHTML`).**
+- [x] **Step 2:** Seed + serveur 4071, `node scripts/conformite-jury.js --controle=axe`. **Résultat : 0 violation TOUS niveaux confondus sur les 15 pages.**
+- [x] **Step 3:** `npm test`. Cocher la Task 5, checkpoint README jury, puis :
 
 ```powershell
 git add views public/css/style.css docs/jury/conformite docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md
@@ -395,9 +395,9 @@ git commit -m "Jury: corrections accessibilite - 0 violation axe critical/seriou
 **Interfaces:**
 - Consumes: `docs/jury/conformite/debordement-*.json` + observations Task 3 ; `node scripts/conformite-jury.js --controle=debordement`.
 
-- [ ] **Step 1:** Pour chaque `deborde: true`, identifier le coupable (`coupables[]`) et corriger — remèdes types : tableau large (l'envelopper d'un conteneur `overflow-x: auto` via une classe CSS existante ou nouvelle dans `style.css`), image/carte à largeur fixe (`max-width: 100%`), grille sans `minmax(0, ...)`, texte insécable long (`overflow-wrap`). Pas de `!important`.
-- [ ] **Step 2:** Seed + serveur 4071, `node scripts/conformite-jury.js --controle=debordement`. Attendu : `deborde: false` partout (15 pages × 4 largeurs). Regénérer les captures responsive des pages corrigées uniquement (relancer les trois commandes de la Task 3 — elles écrasent en place).
-- [ ] **Step 3:** `npm test`. Cocher la Task 6, checkpoint README jury, puis :
+- [x] **Step 1 (SANS OBJET):** aucun `deborde: true` au constat initial ni au re-run final — aucune correction nécessaire. Pour chaque `deborde: true`, identifier le coupable (`coupables[]`) et corriger — remèdes types : tableau large (l'envelopper d'un conteneur `overflow-x: auto` via une classe CSS existante ou nouvelle dans `style.css`), image/carte à largeur fixe (`max-width: 100%`), grille sans `minmax(0, ...)`, texte insécable long (`overflow-wrap`). Pas de `!important`.
+- [x] **Step 2:** Re-vérifié via un run complet final `--controle=tout` après les corrections des Tasks 4-5 : **0 erreur W3C, 0 violation axe, 0 débordement sur les 45 contrôles** (`resume.json` final). Aucune capture à regénérer (aucune page corrigée pour du responsive).
+- [x] **Step 3:** `npm test`. Cocher la Task 6, checkpoint README jury, puis (fusionné avec le commit de la Task 5 — aucune correction responsive) :
 
 ```powershell
 git add public/css/style.css views docs/jury/conformite docs/jury/captures docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md
@@ -412,13 +412,13 @@ git commit -m "Jury: corrections responsive - 0 debordement horizontal (4 largeu
 **Interfaces:**
 - Consumes: `resume-avant-corrections.json`, `resume.json`, les JSON par page, les captures `r320/r375/r768`.
 
-- [ ] **Step 1:** Rédiger le rapport daté, sections (données réelles des JSON, jamais d'estimation) :
+- [x] **Step 1:** Rédiger le rapport daté, sections (données réelles des JSON, jamais d'estimation) :
   1. **Méthodologie reproductible** — commandes exactes (seed, serveur 4071, `conformite-jury.js`, `captures-jury.js --largeur=`), versions (Edge, axe-core depuis `package-lock.json`, validateur Nu + date d'appel), périmètre (les 15 pages, jeu de démo), limite documentée : HTML sérialisé DOM vs source.
   2. **Validation W3C** — tableau 15 lignes : erreurs avant → après (0), avertissements restants justifiés un par un.
   3. **Responsive** — tableau par page × largeur avant → après, corrections apportées (fichier + nature), liens vers `captures/r320|r375|r768/`.
   4. **Accessibilité** — tableau par page : violations par impact avant → après, corrections apportées, violations restantes justifiées (id axe + raison).
   5. **Checklist clavier manuelle** (à dérouler avant la soutenance) : tabulation complète parcours candidat (annonces → détail → formulaire → envoi) et école (connexion → dashboard → acceptation), lien d'évitement au premier Tab, focus visible sur chaque arrêt, aucune souricière de focus, pad de signature = limite connue (souris/doigt — documentée, alternative import de fichier).
-- [ ] **Step 2:** Contrôle des liens relatifs du rapport (script des chantiers précédents). `npm test`. Cocher la Task 7, checkpoint README jury, puis :
+- [x] **Step 2:** Contrôle des liens relatifs du rapport (script des chantiers précédents). `npm test`. Cocher la Task 7, checkpoint README jury, puis :
 
 ```powershell
 git add docs/jury/conformite.md docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md
