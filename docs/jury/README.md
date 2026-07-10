@@ -142,8 +142,13 @@ Puis vérifier dans un navigateur :
   Prisma 7.8.0 vs 6.19.3 du projet, MDN), chaque relevé relié à une décision
   du dépôt ; **le dernier critère MANQUANT est soldé** (statut d'audit à
   passer en Task 8).
-- Prochaine tâche : **Task 5** — `docs/jury/soutenance/questions-reponses.md`
-  (~30 Q/R par thème, réponse courte + preuve, questions pièges incluses).
+- Task 5 livrée : `docs/jury/soutenance/questions-reponses.md` — 26 Q/R en
+  7 thèmes (réponse courte + preuve), toutes les questions pièges du plan
+  couvertes (framework front, JWT, POO, SQLite, prod, validité juridique,
+  pad clavier, panne d'API…).
+- Prochaine tâche : **Task 6** — `docs/jury/soutenance/demo-11-minutes.md`
+  (préparation, déroulé minuté, secours, reset ; vérification scriptée des
+  URLs publiques sur le serveur seedé, port 4071).
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.
