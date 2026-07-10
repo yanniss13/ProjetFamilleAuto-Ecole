@@ -151,9 +151,15 @@ Puis vérifier dans un navigateur :
   étape), secours sur captures, reset ; 8 URLs publiques vérifiées en 200.
   ⚠️ Piège documenté : seeder APRÈS le démarrage du serveur (la purge
   automatique consomme l'alerte de démo 30 s après le boot).
-- Prochaine tâche : **Task 7** — `docs/jury/soutenance/soutenance.html`
-  (deck HTML autonome ~28 diapos, notes orateur touche N, minutage,
-  vérifications Edge headless + PDF + chemins relatifs).
+- Task 7 livrée : `docs/jury/soutenance/soutenance.html` — deck autonome de
+  **28 diapositives** (navigation flèches/clic, notes orateur touche N,
+  minutage par section, mode impression), 3 diapos de secours pour la démo ;
+  9 chemins relatifs vérifiés, rendu contrôlé sur 3 diapos, export PDF
+  possible via Edge `--print-to-pdf` (1,3 Mo).
+- Prochaine tâche : **Task 8** — cohérence finale : audit (veilles → VALIDÉ,
+  critères README/DESIGN, synthèse recomptée, cases P0/P2), index et
+  checkpoint du présent README, `AGENTS.md`, liens globaux,
+  `npx prisma validate`, commit final.
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.
