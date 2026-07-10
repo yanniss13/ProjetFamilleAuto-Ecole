@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 700" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .ent-box{fill:#ffffff;stroke:#3b5b8c;stroke-width:1.8;}
+    .ent-head{fill:#1a4d8f;stroke:#1a4d8f;}
+    .ent-name{fill:#ffffff;font-size:16px;font-weight:700;letter-spacing:.5px;}
+    .attr{font-size:13.5px;fill:#1f2933;}
+    .attr.id{font-weight:700;text-decoration:underline;}
+    .assoc-e{fill:#fdf2e2;stroke:#c98a2b;stroke-width:1.8;}
+    .assoc-name{font-size:14px;font-weight:700;fill:#8a4b00;letter-spacing:.5px;}
+    .patte{stroke:#444;stroke-width:1.7;}
+    .card{font-size:13px;font-weight:700;fill:#1f2933;}
+  </style>
+  <line x1="290" y1="290" x2="334" y2="290" class="patte"/>
+<line x1="466" y1="290" x2="510" y2="290" class="patte"/>
+<line x1="760" y1="290" x2="804" y2="290" class="patte"/>
+<line x1="936" y1="290" x2="980" y2="290" class="patte"/>
+<line x1="1250" y1="290" x2="1294" y2="290" class="patte"/>
+<line x1="1426" y1="290" x2="1470" y2="290" class="patte"/>
+  
+  <g>
+    <rect x="40" y="120" width="250" height="376" class="ent-box"/>
+    <rect x="40" y="120" width="250" height="32" class="ent-head"/>
+    <text x="165" y="142" text-anchor="middle" class="ent-name">ECOLE</text>
+    <text x="52" y="168" class="attr id">id</text><text x="52" y="189" class="attr">email</text><text x="52" y="210" class="attr">motDePasse</text><text x="52" y="231" class="attr">raisonSociale</text><text x="52" y="252" class="attr">siret</text><text x="52" y="273" class="attr">telephone</text><text x="52" y="294" class="attr">adresse</text><text x="52" y="315" class="attr">latitude</text><text x="52" y="336" class="attr">longitude</text><text x="52" y="357" class="attr">emailVerifie</text><text x="52" y="378" class="attr">jetonVerifEmail</text><text x="52" y="399" class="attr">expVerifEmail</text><text x="52" y="420" class="attr">jetonResetMdp</text><text x="52" y="441" class="attr">expResetMdp</text><text x="52" y="462" class="attr">dateCreation</text><text x="52" y="483" class="attr">dateMaj</text>
+  </g>
+  <g>
+    <rect x="510" y="120" width="250" height="271" class="ent-box"/>
+    <rect x="510" y="120" width="250" height="32" class="ent-head"/>
+    <text x="635" y="142" text-anchor="middle" class="ent-name">ANNONCE</text>
+    <text x="522" y="168" class="attr id">id</text><text x="522" y="189" class="attr">titre</text><text x="522" y="210" class="attr">description</text><text x="522" y="231" class="attr">typeContrat</text><text x="522" y="252" class="attr">ville</text><text x="522" y="273" class="attr">departement</text><text x="522" y="294" class="attr">heuresParSemaine</text><text x="522" y="315" class="attr">remuneration</text><text x="522" y="336" class="attr">statut</text><text x="522" y="357" class="attr">dateCreation</text><text x="522" y="378" class="attr">dateMaj</text>
+  </g>
+  <g>
+    <rect x="980" y="120" width="270" height="271" class="ent-box"/>
+    <rect x="980" y="120" width="270" height="32" class="ent-head"/>
+    <text x="1115" y="142" text-anchor="middle" class="ent-name">CANDIDATURE</text>
+    <text x="992" y="168" class="attr id">id</text><text x="992" y="189" class="attr">nomCandidat</text><text x="992" y="210" class="attr">emailCandidat</text><text x="992" y="231" class="attr">telephoneCandidat</text><text x="992" y="252" class="attr">message</text><text x="992" y="273" class="attr">cheminCV</text><text x="992" y="294" class="attr">cheminPieceIdentite</text><text x="992" y="315" class="attr">cheminPermis</text><text x="992" y="336" class="attr">cheminCarteEnseignant</text><text x="992" y="357" class="attr">statut</text><text x="992" y="378" class="attr">dateCreation</text>
+  </g>
+  <g>
+    <rect x="1470" y="120" width="290" height="544" class="ent-box"/>
+    <rect x="1470" y="120" width="290" height="32" class="ent-head"/>
+    <text x="1615" y="142" text-anchor="middle" class="ent-name">CONTRAT</text>
+    <text x="1482" y="168" class="attr id">id</text><text x="1482" y="189" class="attr">type</text><text x="1482" y="210" class="attr">dateDebut</text><text x="1482" y="231" class="attr">dateFin</text><text x="1482" y="252" class="attr">motif</text><text x="1482" y="273" class="attr">salaireBrut</text><text x="1482" y="294" class="attr">heuresHebdo</text><text x="1482" y="315" class="attr">periodeEssai</text><text x="1482" y="336" class="attr">lieuTravail</text><text x="1482" y="357" class="attr">siretPrestataire</text><text x="1482" y="378" class="attr">adresseEcole</text><text x="1482" y="399" class="attr">adresseCandidat</text><text x="1482" y="420" class="attr">clausesSupplementaires</text><text x="1482" y="441" class="attr">dateNaissance</text><text x="1482" y="462" class="attr">lieuNaissance</text><text x="1482" y="483" class="attr">nationalite</text><text x="1482" y="504" class="attr">numAutorisationEnseigner</text><text x="1482" y="525" class="attr">validiteAutorisation</text><text x="1482" y="546" class="attr">numPermis</text><text x="1482" y="567" class="attr">categoriesPermis</text><text x="1482" y="588" class="attr">cheminPdf</text><text x="1482" y="609" class="attr">envoyeLe</text><text x="1482" y="630" class="attr">dateCreation</text><text x="1482" y="651" class="attr">dateMaj</text>
+  </g>
+  <g><ellipse cx="400" cy="290" rx="66" ry="34" class="assoc-e"/><text x="400" y="295" text-anchor="middle" class="assoc-name">PUBLIER</text></g><g><ellipse cx="870" cy="290" rx="66" ry="34" class="assoc-e"/><text x="870" y="295" text-anchor="middle" class="assoc-name">RECEVOIR</text></g><g><ellipse cx="1360" cy="290" rx="66" ry="34" class="assoc-e"/><text x="1360" y="295" text-anchor="middle" class="assoc-name">GENERER</text></g>
+  <text x="312" y="278" text-anchor="middle" class="card">0,n</text>
+<text x="488" y="278" text-anchor="middle" class="card">1,1</text>
+<text x="782" y="278" text-anchor="middle" class="card">0,n</text>
+<text x="958" y="278" text-anchor="middle" class="card">1,1</text>
+<text x="1272" y="278" text-anchor="middle" class="card">0,1</text>
+<text x="1448" y="278" text-anchor="middle" class="card">1,1</text>
+</svg>

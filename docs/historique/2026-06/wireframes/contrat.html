@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceptation + contrat — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Acceptation de candidature + génération de contrat</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="mes-annonces.html">Mes annonces</a>
+      <a href="candidatures.html" class="is-active">Candidatures</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="accueil.html">Déconnexion</a>
+    </span>
+  </nav>
+
+  <div class="wf-container wf-narrow" style="max-width:720px;">
+    <p class="wf-note"><a href="candidatures.html">← Retour aux candidatures</a></p>
+    <h1>Accepter Camille Martin</h1>
+    <p class="wf-sub">Annonce « Moniteur·trice auto-école B ». Les informations ci-dessous alimentent le contrat PDF.</p>
+
+    <div class="wf-panel">
+      <h3>Type de contrat</h3>
+      <div class="wf-field">
+        <select class="wf-select">
+          <option>CDI</option><option>CDD</option><option>Freelance</option>
+          <option>Apprentissage</option><option>Générique</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="wf-panel">
+      <h3>État civil du candidat <span class="wf-tag">optionnel</span></h3>
+      <div class="wf-row">
+        <div class="wf-field"><label>Date de naissance</label><input class="wf-input" type="text" placeholder="JJ/MM/AAAA"></div>
+        <div class="wf-field"><label>Lieu de naissance</label><input class="wf-input" type="text" placeholder="Marseille"></div>
+      </div>
+      <div class="wf-row">
+        <div class="wf-field"><label>Nationalité</label><input class="wf-input" type="text" placeholder="Française"></div>
+        <div class="wf-field"><label>Adresse du candidat</label><input class="wf-input" type="text" placeholder="12 rue …, 13000 Marseille"></div>
+      </div>
+    </div>
+
+    <div class="wf-panel">
+      <h3>Autorisation d'enseigner <span class="wf-tag">optionnel</span></h3>
+      <div class="wf-row">
+        <div class="wf-field"><label>N° d'autorisation</label><input class="wf-input" type="text" placeholder="A-0000000"></div>
+        <div class="wf-field"><label>Validité jusqu'au</label><input class="wf-input" type="text" placeholder="JJ/MM/AAAA"></div>
+      </div>
+    </div>
+
+    <div class="wf-panel">
+      <h3>Permis de conduire <span class="wf-tag">optionnel</span></h3>
+      <div class="wf-row">
+        <div class="wf-field"><label>N° de permis</label><input class="wf-input" type="text" placeholder="00000000000"></div>
+        <div class="wf-field"><label>Catégories</label><input class="wf-input" type="text" placeholder="B, BE"></div>
+      </div>
+    </div>
+
+    <div class="wf-panel">
+      <h3>Termes du contrat</h3>
+      <div class="wf-row">
+        <div class="wf-field"><label>Date de début</label><input class="wf-input" type="text" placeholder="JJ/MM/AAAA"></div>
+        <div class="wf-field"><label>Date de fin (si CDD)</label><input class="wf-input" type="text" placeholder="JJ/MM/AAAA"></div>
+      </div>
+      <div class="wf-row">
+        <div class="wf-field"><label>Rémunération</label><input class="wf-input" type="text" placeholder="2 200 € brut / mois"></div>
+        <div class="wf-field"><label>Lieu de travail</label><input class="wf-input" type="text" placeholder="Marseille (13)"></div>
+      </div>
+      <div class="wf-field"><label>SIRET prestataire <span class="wf-tag">freelance</span></label><input class="wf-input" type="text" placeholder="123 456 789 00012"></div>
+      <div class="wf-field"><label>Clauses additionnelles</label><textarea class="wf-textarea" placeholder="Période d'essai, clauses spécifiques…"></textarea></div>
+    </div>
+
+    <div class="wf-panel" style="background:#f6f6f6;">
+      <p class="wf-help" style="margin:0;">⚠ Le contrat généré est un modèle indicatif à faire valider juridiquement avant tout usage réel.</p>
+    </div>
+
+    <div class="wf-row" style="margin-top:16px;">
+      <a class="wf-btn wf-btn--primary" href="candidatures.html">Accepter & générer le contrat PDF</a>
+      <a class="wf-btn wf-btn--ghost" href="candidatures.html">Annuler</a>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

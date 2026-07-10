@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Tableau de bord auto-école</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="dashboard.html" class="is-active">Dashboard</a>
+      <a href="mes-annonces.html">Mes annonces</a>
+      <a href="candidatures.html">Candidatures</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="accueil.html">Déconnexion</a>
+    </span>
+  </nav>
+
+  <div class="wf-container">
+    <div class="wf-flex-between">
+      <div>
+        <h1>Bonjour, Auto-école du Centre</h1>
+        <p class="wf-sub">Voici un aperçu de votre activité.</p>
+      </div>
+      <a class="wf-btn wf-btn--primary" href="annonce-form.html">+ Nouvelle annonce</a>
+    </div>
+
+    <div class="wf-stats">
+      <div class="wf-stat"><div class="wf-num">3</div><div class="wf-cap">Annonces ouvertes</div></div>
+      <div class="wf-stat"><div class="wf-num">5</div><div class="wf-cap">Candidatures en attente</div></div>
+      <div class="wf-stat"><div class="wf-num">2</div><div class="wf-cap">Candidatures acceptées</div></div>
+      <div class="wf-stat"><div class="wf-num">1</div><div class="wf-cap">Contrats envoyés</div></div>
+    </div>
+
+    <h2>Raccourcis</h2>
+    <div class="wf-grid">
+      <a class="wf-card" href="mes-annonces.html" style="text-decoration:none; color:inherit;">
+        <h3>Gérer mes annonces</h3>
+        <p class="wf-note">Créer, éditer, clôturer une annonce.</p>
+        <span class="wf-btn wf-btn--sm wf-mt">Ouvrir →</span>
+      </a>
+      <a class="wf-card" href="candidatures.html" style="text-decoration:none; color:inherit;">
+        <h3>Voir les candidatures</h3>
+        <p class="wf-note">Consulter les pièces, accepter ou refuser.</p>
+        <span class="wf-btn wf-btn--sm wf-mt">Ouvrir →</span>
+      </a>
+      <a class="wf-card" href="compte.html" style="text-decoration:none; color:inherit;">
+        <h3>Mon compte</h3>
+        <p class="wf-note">Téléphone, adresse (utilisée pour la carte).</p>
+        <span class="wf-btn wf-btn--sm wf-mt">Ouvrir →</span>
+      </a>
+    </div>
+
+    <h2>Dernières candidatures</h2>
+    <table class="wf-table">
+      <thead>
+        <tr><th>Candidat</th><th>Annonce</th><th>Reçue le</th><th>Statut</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Camille Martin</td><td>Moniteur·trice B</td><td>22/06/2026</td>
+          <td><span class="wf-badge">En attente</span></td>
+          <td><a class="wf-btn wf-btn--sm" href="candidatures.html">Voir</a></td>
+        </tr>
+        <tr>
+          <td>Sofiane Baki</td><td>Freelance</td><td>21/06/2026</td>
+          <td><span class="wf-badge wf-badge--solid">Acceptée</span></td>
+          <td><a class="wf-btn wf-btn--sm" href="candidatures.html">Voir</a></td>
+        </tr>
+        <tr>
+          <td>Léa Dubois</td><td>CDD Paris</td><td>20/06/2026</td>
+          <td><span class="wf-badge">Refusée</span></td>
+          <td><a class="wf-btn wf-btn--sm" href="candidatures.html">Voir</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

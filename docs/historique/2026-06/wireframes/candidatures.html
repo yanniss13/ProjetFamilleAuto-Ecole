@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidatures — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Candidatures reçues</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="mes-annonces.html">Mes annonces</a>
+      <a href="candidatures.html" class="is-active">Candidatures</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="accueil.html">Déconnexion</a>
+    </span>
+  </nav>
+
+  <div class="wf-container">
+    <h1>Candidatures reçues</h1>
+    <p class="wf-sub">Annonce : <strong>Moniteur·trice auto-école B</strong> — Marseille (13)</p>
+
+    <div class="wf-search">
+      <select class="wf-select">
+        <option>Toutes les annonces</option>
+        <option>Moniteur·trice B</option>
+        <option>Freelance Aix</option>
+      </select>
+      <select class="wf-select">
+        <option>Tous les statuts</option>
+        <option>En attente</option>
+        <option>Acceptée</option>
+        <option>Refusée</option>
+      </select>
+    </div>
+
+    <!-- Carte candidature 1 -->
+    <div class="wf-panel">
+      <div class="wf-flex-between">
+        <div>
+          <h3>Camille Martin <span class="wf-badge">En attente</span></h3>
+          <p class="wf-note">camille.martin@exemple.fr · 06 00 00 00 00 · reçue le 22/06/2026</p>
+        </div>
+        <div class="wf-row">
+          <a class="wf-btn wf-btn--primary wf-btn--sm" href="contrat.html">Accepter</a>
+          <a class="wf-btn wf-btn--sm wf-btn--ghost" href="#">Refuser</a>
+        </div>
+      </div>
+      <p class="wf-note wf-mt">« Bonjour, 8 ans d'expérience en boîte manuelle et auto, disponible immédiatement… »</p>
+      <p class="wf-help" style="margin-top:12px; font-weight:600; color:var(--wf-text);">Pièces (téléchargement protégé)</p>
+      <div class="wf-meta-row">
+        <a class="wf-btn wf-btn--sm" href="#">📎 CV</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Pièce d'identité</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Permis</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Carte d'enseignant</a>
+      </div>
+    </div>
+
+    <!-- Carte candidature 2 -->
+    <div class="wf-panel">
+      <div class="wf-flex-between">
+        <div>
+          <h3>Sofiane Baki <span class="wf-badge wf-badge--solid">Acceptée</span></h3>
+          <p class="wf-note">sofiane.baki@exemple.fr · 06 11 22 33 44 · reçue le 21/06/2026</p>
+        </div>
+        <div class="wf-row">
+          <a class="wf-btn wf-btn--sm" href="#">Télécharger le contrat</a>
+          <a class="wf-btn wf-btn--sm" href="#">Envoyer au candidat</a>
+        </div>
+      </div>
+      <p class="wf-note wf-mt">Contrat généré (PDF) le 21/06/2026 — non encore envoyé.</p>
+      <div class="wf-meta-row">
+        <a class="wf-btn wf-btn--sm" href="#">📎 CV</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Pièce d'identité</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Permis</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Carte d'enseignant</a>
+      </div>
+    </div>
+
+    <!-- Carte candidature 3 -->
+    <div class="wf-panel">
+      <div class="wf-flex-between">
+        <div>
+          <h3>Léa Dubois <span class="wf-badge">Refusée</span></h3>
+          <p class="wf-note">lea.dubois@exemple.fr · 06 55 66 77 88 · reçue le 20/06/2026</p>
+        </div>
+      </div>
+      <div class="wf-meta-row wf-mt">
+        <a class="wf-btn wf-btn--sm" href="#">📎 CV</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Pièce d'identité</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Permis</a>
+        <a class="wf-btn wf-btn--sm" href="#">📎 Carte d'enseignant</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Détail annonce — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Détail d'une annonce + candidature</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="accueil.html">Accueil</a>
+      <a href="annonces.html" class="is-active">Annonces</a>
+      <a href="connexion.html">Connexion</a>
+      <a href="inscription.html">Inscription</a>
+      <a href="index.html">Sommaire</a>
+    </span>
+  </nav>
+
+  <div class="wf-container">
+    <p class="wf-note"><a href="annonces.html">← Retour aux annonces</a></p>
+
+    <div class="wf-flex-between">
+      <div>
+        <span class="wf-badge wf-badge--open">Ouverte</span>
+        <h1 style="margin-top:8px;">Moniteur·trice auto-école B</h1>
+        <p class="wf-sub">Auto-école du Centre · Marseille (13)</p>
+      </div>
+    </div>
+
+    <div class="wf-row" style="align-items:flex-start;">
+      <!-- Colonne gauche : détails -->
+      <div style="flex:2 1 360px;">
+        <div class="wf-panel">
+          <h3>Le poste</h3>
+          <div class="wf-meta-row">
+            <span class="wf-tag">CDI</span>
+            <span class="wf-tag">35 h / semaine</span>
+            <span class="wf-tag">2 200 € brut / mois</span>
+            <span class="wf-tag">Marseille — 13</span>
+          </div>
+          <p class="wf-note">
+            Description du poste — missions, public, véhicules, horaires, avantages.
+            Texte multiligne saisi par l'auto-école lors de la création de l'annonce.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+          </p>
+        </div>
+
+        <div class="wf-panel">
+          <h3>L'auto-école</h3>
+          <p class="wf-note">Auto-école du Centre · 12 rue de la République, 13001 Marseille · 04 91 00 00 00</p>
+          <div class="wf-map wf-mt">Carte (placeholder Leaflet / OpenStreetMap)</div>
+          <p class="wf-help">Affichée seulement si l'auto-école a renseigné une adresse géocodée. Sinon : « Localisation indisponible ».</p>
+        </div>
+      </div>
+
+      <!-- Colonne droite : formulaire de candidature -->
+      <div style="flex:1.4 1 320px;">
+        <div class="wf-panel">
+          <span class="wf-tag">Candidature — sans compte</span>
+          <h3 class="wf-mt">Postuler à cette offre</h3>
+
+          <div class="wf-field">
+            <label>Nom complet</label>
+            <input class="wf-input" type="text" placeholder="Prénom Nom">
+          </div>
+          <div class="wf-field">
+            <label>E-mail</label>
+            <input class="wf-input" type="text" placeholder="vous@exemple.fr">
+          </div>
+          <div class="wf-field">
+            <label>Téléphone</label>
+            <input class="wf-input" type="text" placeholder="06 00 00 00 00">
+          </div>
+          <div class="wf-field">
+            <label>Message</label>
+            <textarea class="wf-textarea" placeholder="Présentez-vous en quelques lignes…"></textarea>
+          </div>
+
+          <p class="wf-help" style="margin:14px 0 6px; font-weight:600; color:var(--wf-text);">Pièces justificatives (obligatoires)</p>
+          <div class="wf-field"><div class="wf-file">📎 CV — PDF</div></div>
+          <div class="wf-field"><div class="wf-file">📎 Pièce d'identité — PDF / JPG / PNG</div></div>
+          <div class="wf-field"><div class="wf-file">📎 Permis de conduire — PDF / JPG / PNG</div></div>
+          <div class="wf-field"><div class="wf-file">📎 Carte / autorisation d'enseigner — PDF / JPG / PNG</div></div>
+
+          <button class="wf-btn wf-btn--primary wf-btn--block" type="button">Envoyer ma candidature</button>
+          <p class="wf-help">Aucun compte requis. L'auto-école reçoit une notification par e-mail.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>
