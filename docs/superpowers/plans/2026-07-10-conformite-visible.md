@@ -433,9 +433,9 @@ git commit -m "Jury: rapport de conformite date (W3C, responsive, accessibilite)
 - Modify: `AGENTS.md`
 - Modify: `docs/superpowers/plans/2026-07-10-conformite-visible.md` (tout coché)
 
-- [ ] **Step 1:** Audit : « Validation W3C » MANQUANT → VALIDÉ, « Interfaces responsives » et « Validateur d'accessibilité » À RENFORCER → VALIDÉ (constats sourcés vers [`conformite.md`](../jury/conformite.md)) ; recompter la synthèse (attendu : 22 validés / 10 à renforcer / 1 manquant — recompter réellement) ; cocher les cases P1 correspondantes ; retirer W3C/responsive/accessibilité des « priorités restantes ».
-- [ ] **Step 2:** `docs/jury/README.md` : `conformite.md` ajouté aux documents de référence ; « Prochaine action recommandée » → script de soutenance ; checkpoint final réécrit (chantier livré, vérifications, premier travail restant). `AGENTS.md` : « Prochain travail » → script de soutenance (+ mention que les contrôles se relancent via `conformite-jury.js`).
-- [ ] **Step 3:** Contrôle global des liens sur tous les `.md` touchés (0 cassé attendu) ; `git status` (aucun fichier personnel) ; `npm test` + `npx prisma validate` ; cocher tout ce plan. Commit final :
+- [x] **Step 1:** Audit : « Validation W3C » MANQUANT → VALIDÉ, « Interfaces responsives » et « Validateur d'accessibilité » À RENFORCER → VALIDÉ (constats sourcés vers [`conformite.md`](../jury/conformite.md)) ; synthèse recomptée : **22 validés / 10 à renforcer / 1 manquant** (le manquant : veille technique anglophone) ; cases P1 cochées ; priorités restantes réordonnées (script de soutenance en tête).
+- [x] **Step 2:** `docs/jury/README.md` : `conformite.md` ajouté aux documents de référence ; « Prochaine action recommandée » → script de soutenance ; checkpoint final réécrit (chantier livré, vérifications, premier travail restant). `AGENTS.md` : « Prochain travail » → script de soutenance (+ mention que les contrôles se relancent via `conformite-jury.js`).
+- [x] **Step 3:** Contrôle global des liens sur tous les `.md` touchés (0 cassé attendu) ; `git status` (aucun fichier personnel) ; `npm test` + `npx prisma validate` ; cocher tout ce plan. Commit final :
 
 ```powershell
 git add docs/jury/audit-certification-dwwm.md docs/jury/README.md AGENTS.md docs/superpowers/plans/2026-07-10-conformite-visible.md

@@ -17,32 +17,35 @@
 
 ## Synthèse
 
-Sur les 33 critères relevés dans la checklist (après le chantier
-« consolidation du dossier » du 2026-07-10) :
+Sur les 33 critères relevés dans la checklist (après les chantiers
+« consolidation du dossier » et « conformité visible » du 2026-07-10) :
 
-- **19 sont validés** par le code, les tests ou les documents présents ;
-- **12 sont à renforcer** pour devenir démontrables devant le jury ;
-- **2 sont manquants** (validation W3C, veille technique anglophone).
+- **22 sont validés** par le code, les tests ou les documents présents ;
+- **10 sont à renforcer** pour devenir démontrables devant le jury ;
+- **1 est manquant** (veille technique avec sources en anglais).
 
 Le produit est plus avancé que son dossier. Le principal risque n'est pas l'absence de
 fonctionnalités : ce sont les preuves obligatoires ou attendues qui manquent. Le
 `README.md` et `docs/DESIGN.md` décrivent encore un « squelette », alors que les lots A
 à L sont livrés. Cette contradiction doit être corrigée avant la soutenance.
 
-Fait au 2026-07-10 (chantier « consolidation du dossier ») : maquettes
-préservées et écarts expliqués, diagramme BDD v2 (8 modèles), résumé, besoin
-v2 et matrice de compétences livrés sous `docs/jury/`.
+Fait au 2026-07-10 (chantiers « consolidation du dossier » puis « conformité
+visible ») : maquettes préservées et écarts expliqués, diagramme BDD v2
+(8 modèles), résumé, besoin v2 et matrice de compétences sous `docs/jury/` ;
+preuves W3C (0 erreur/0 avertissement), responsive (0 débordement,
+45 captures) et accessibilité (0 violation axe) archivées dans
+[`conformite.md`](conformite.md).
 
 Priorités restantes :
 
-1. produire une preuve de validation **W3C** ;
-2. vérifier réellement le responsive et l'accessibilité (réutiliser
-   `scripts/captures-jury.js --largeur=320/375/768`) ;
+1. écrire le script de soutenance (35 min, démo 11 min) et préparer les
+   45 minutes de questions ;
+2. préparer une veille sécurité et une veille technique fondée sur des sources
+   en anglais ;
 3. actualiser `README.md` et `docs/DESIGN.md` (toujours au statut « squelette ») ;
 4. documenter sauvegarde et restauration de la base ;
-5. préparer une veille sécurité et une veille technique fondée sur des sources en
-   anglais ;
-6. écrire le script de soutenance (35 min, démo 11 min).
+5. dérouler la checklist clavier manuelle de `conformite.md` avant la
+   soutenance.
 
 L'inventaire et les écarts des sources de juin sont détaillés dans
 [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md).
@@ -84,11 +87,11 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | VALIDÉ | Contrôle de saisie des formulaires | Six validateurs serveur contrôlent présence, format, listes autorisées et longueurs. Les uploads vérifient taille, mimetype et magic bytes. | Montrer une saisie invalide puis le validateur correspondant. |
 | VALIDÉ | Mécanisme d'authentification | Comptes auto-écoles et admins, bcrypt, vérification email, reset à jeton haché, régénération de session et sessions persistantes Prisma. | Expliquer pourquoi les sessions HTTP conviennent mieux ici qu'un JWT. |
 | VALIDÉ | Politique de droits d'accès | Visiteur/candidat, école et admin ont des espaces distincts. `requireAuth`, `requireAdmin`, `loadSchool`, `loadAdmin` et le scoping `schoolId` protègent les données. | Montrer le test où une école reçoit 404 sur les documents d'une autre école. |
-| À RENFORCER | Interfaces responsives | Les grilles utilisent `auto-fit`, les formulaires sont fluides et plusieurs actions utilisent `flex-wrap`. Il n'y a pas de stratégie mobile complète ; la navigation et certains tableaux restent à contrôler. | Tester 320/375/768 px, corriger les débordements, puis conserver des captures desktop/mobile. |
+| VALIDÉ | Interfaces responsives | Contrôlé le 2026-07-10 sur rendu réel : **0 débordement horizontal sur 15 pages × 4 largeurs** (320/375/768/1440), 45 captures archivées sous `captures/r{320,375,768}/` — voir [`conformite.md`](conformite.md). | Montrer 2-3 captures mobiles au jury ; re-jouer les contrôles avant la soutenance pour des preuves fraîches. |
 | VALIDÉ | Cohérence entre maquette initiale et application finale | [`comparaison-maquettes.md`](comparaison-maquettes.md) : 11 écrans v1 comparés à leurs captures 1440 px ([`captures/`](captures/)), 4 écrans nés des lots E–L, 7 écarts justifiés. | Réutiliser `scripts/captures-jury.js --largeur=` pour les captures responsive du chantier « conformité visible ». |
 | À RENFORCER | Cohérence entre spécifications et application finale | Les spécifications et plans par lot correspondent au code et aux tests, mais `README.md` et `docs/DESIGN.md` ne reflètent pas les lots livrés. | Actualiser les documents de référence et produire une matrice exigence → route/test/démonstration. |
-| MANQUANT | Validation W3C | Aucune preuve de passage au validateur W3C n'a été trouvée. | Valider les principales pages HTML rendues, corriger les erreurs, conserver date, URL/page et résultat. |
-| À RENFORCER | Validateur d'accessibilité (facultatif) | Présence d'un lien d'évitement, de `:focus-visible`, de labels, de régions `aria-live`, de rôles d'alerte et d'une réduction des animations. Aucun audit automatisé ou clavier n'est archivé. | Effectuer Lighthouse/axe ou équivalent, navigation clavier et contrôle de contraste ; consigner les résultats. |
+| VALIDÉ | Validation W3C | Validateur Nu officiel le 2026-07-10 sur les 15 pages rendues : 3 erreurs corrigées puis **0 erreur et 0 avertissement partout** — méthode, dates et résultats dans [`conformite.md`](conformite.md), JSON bruts sous `conformite/`. | Citer la correction la plus parlante (label sur canvas) si la question vient. |
+| VALIDÉ | Validateur d'accessibilité (facultatif) | Audit **axe-core** du 2026-07-10 : 2 violations serious corrigées (contraste `--color-muted`, `aria-label` des SVG) puis **0 violation tous niveaux sur les 15 pages** ; acquis déjà en place (lien d'évitement, `:focus-visible`, `aria-live`). | Dérouler la checklist clavier manuelle de [`conformite.md`](conformite.md) avant la soutenance ; assumer la limite du pad de signature (alternative : import de fichier). |
 
 ## 3. Fonctionnalité significative recommandée
 
@@ -158,9 +161,10 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 
 ### Priorité 1 — preuves de conformité
 
-- [ ] valider les pages principales avec W3C ;
-- [ ] contrôler le responsive à 320, 375, 768 et 1440 px ;
-- [ ] effectuer un audit accessibilité automatisé et clavier ;
+- [x] valider les pages principales avec W3C ;
+- [x] contrôler le responsive à 320, 375, 768 et 1440 px ;
+- [x] effectuer un audit accessibilité automatisé (le contrôle clavier manuel
+  reste à dérouler avant la soutenance, checklist dans `conformite.md`) ;
 - [x] produire le tableau de comparaison maquettes v1 / application finale ;
 - [ ] remettre à jour la matrice spécifications → application → tests.
 
