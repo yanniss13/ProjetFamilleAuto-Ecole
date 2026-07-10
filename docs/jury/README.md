@@ -29,7 +29,8 @@ l'utilisateur.
   soutenance. JSON bruts sous [`conformite/`](conformite/).
 - Conception initiale classée :
   [`../historique/2026-06/README.md`](../historique/2026-06/README.md)
-- Spécification historique : [`../DESIGN.md`](../DESIGN.md)
+- Spécification historique :
+  [`../historique/2026-06/DESIGN.md`](../historique/2026-06/DESIGN.md)
 - Spécifications et plans livrés : `docs/superpowers/{specs,plans}/`
 - Guide d'exécution du dépôt : [`../../AGENTS.md`](../../AGENTS.md)
 - Source externe transmise :
@@ -60,7 +61,8 @@ prioritaires sont désormais :
 
 1. diagramme BDD limité à 4 entités alors que Prisma en contient 8 ;
 2. spécifications de juin annonçant encore admin et purge comme futurs ;
-3. `README.md` et `docs/DESIGN.md` encore au statut « squelette » ;
+3. ~~`README.md` et `docs/DESIGN.md` encore au statut « squelette »~~ —
+   réglé le 2026-07-10 (README réécrit, DESIGN classé en historique) ;
 4. liste des compétences absente ;
 5. aucune preuve W3C ;
 6. responsive et accessibilité non vérifiés sur navigateur ;
@@ -126,14 +128,15 @@ Puis vérifier dans un navigateur :
   `jury-script-soutenance`, plan :
   `docs/superpowers/plans/2026-07-10-script-soutenance.md` (reprendre à la
   première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 1** — micro-fix
-  Mailpit en TDD : `mailer.buildTransportOptions()` n'ajoute `auth` que si
-  `SMTP_USER` est défini ; 4 assertions ajoutées à `test/ameliorations.cjs`
-  (rouge constaté puis vert). La suite passe à **442 assertions**.
-- Prochaine tâche : **Task 2** — réécrire `README.md` (état réel), déplacer
-  `docs/DESIGN.md` → `docs/historique/2026-06/DESIGN.md` avec bandeau,
-  mettre à jour les références (docs/README.md, présent fichier, README
-  historique).
+- Dernière action terminée (2026-07-10, Claude) : **Task 2** — `README.md`
+  réécrit (état réel A→L, 442 assertions, plus aucun « squelette ») ;
+  `DESIGN.md` déplacé vers `docs/historique/2026-06/DESIGN.md` avec bandeau ;
+  références mises à jour (docs/README.md, présent fichier, README
+  historique) ; 0 lien cassé. Task 1 déjà livrée (micro-fix Mailpit TDD,
+  suite à 442 assertions).
+- Prochaine tâche : **Task 3** — `docs/jury/veille-securite.md` (fiches
+  menace → source datée → impact → décision → preuve ; URLs OWASP vérifiées
+  en ligne le jour de la rédaction).
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.

@@ -1,17 +1,38 @@
 # MoniteurConnect
 
-Plateforme d'annonces reliant les **auto-écoles** et les **moniteurs indépendants**.
-Les auto-écoles publient leurs besoins ; les moniteurs **postulent directement depuis
-le site** (avec CV), sans créer de compte.
+Plateforme d'annonces reliant les **auto-écoles** et les **moniteurs
+indépendants**. Les auto-écoles publient leurs besoins et gèrent les
+candidatures jusqu'au **contrat signé électroniquement** ; les moniteurs
+consultent les annonces (recherche, carte, rayon), **postulent sans créer de
+compte** avec leurs pièces justificatives, suivent leur dossier par un lien
+privé et contresignent leur contrat en ligne.
 
-> 🛠️ **État : squelette.** L'architecture, la configuration, le modèle de données et le
-> socle de sécurité sont en place. La logique des fonctionnalités reste à implémenter —
-> voir **[`docs/DESIGN.md`](docs/DESIGN.md)** (spécification complète, à lire en premier).
+Le MVP et douze lots itératifs (A → L) sont livrés : notifications et suivi
+candidat, administration/modération, carte des annonces, vérification SIRET,
+signature électronique, tableaux de bord statistiques, alertes email en
+double opt-in, purge RGPD automatique, jeu de démonstration et autocomplétion
+d'adresse. Résumé complet : [`docs/jury/resume-projet.md`](docs/jury/resume-projet.md).
+
+## Fonctionnalités livrées
+
+- Recherche d'annonces par mots-clés, département, ville + rayon, et vue carte ;
+- candidature publique avec 4 pièces (CV, identité, permis, autorisation
+  d'enseigner), stockées en privé et vérifiées (types, magic bytes) ;
+- suivi de candidature sans compte, par jeton opaque reçu par email ;
+- acceptation avec génération de contrat PDF, signature au pad par l'école,
+  contreseing du candidat, empreintes SHA-256 et horodatages ;
+- inscription auto-école avec email vérifié et SIRET contrôlé (répertoire
+  Sirene), autocomplétion d'adresse (API Adresse) ;
+- tableaux de bord statistiques (école et plateforme) ;
+- alertes email moniteurs en double opt-in, désabonnement réel ;
+- espace d'administration : modération, suspension, purge RGPD journalisée.
 
 ## Stack
 
-Node.js · Express 5 · Twig (rendu serveur) · Prisma 6 · SQLite (dev) / PostgreSQL (prod) ·
-bcrypt · helmet · express-rate-limit · multer · nodemailer.
+Node.js · Express 5 · Twig (rendu serveur) · Prisma (SQLite en dev,
+PostgreSQL prévu en production par simple changement de provider) · sessions
+persistées en base · bcrypt · helmet (CSP stricte) · express-rate-limit ·
+multer · nodemailer · PDFKit · Leaflet auto-hébergé.
 
 ## Démarrage
 
@@ -22,8 +43,9 @@ npm install
 copy .env.example .env       # Windows  (cp .env.example .env sous macOS/Linux)
 #   -> renseigner au minimum SESSION_SECRET
 
-# Base de données (crée prisma/dev.db + le client Prisma)
-npm run prisma:migrate
+# Base de données (applique les migrations + génère le client Prisma)
+npx prisma migrate deploy
+npx prisma generate
 
 # Lancement
 npm run dev                  # rechargement auto
@@ -38,33 +60,31 @@ Application sur http://localhost:3000
 |---|---|
 | `npm run dev` | Serveur en mode développement (watch) |
 | `npm start` | Serveur en mode standard |
-| `npm run prisma:migrate` | Crée/applique une migration + génère le client |
+| `npm test` | Suite complète : 15 fichiers, 442 assertions (TDD, sans framework) |
+| `npm run seed:demo` | Jeu de démonstration relançable (comptes affichés en fin de script) |
+| `npm run admin:create -- <email> <mdp>` | Crée ou met à jour un administrateur |
+| `npm run purge` | Purge RGPD à la demande (sinon automatique, toutes les 24 h) |
 | `npm run prisma:studio` | Explorateur de base |
-| `npm test` | Smoke test de bout en bout (à écrire) |
 
 ## Variables d'environnement
 
-Voir [`.env.example`](.env.example). `SESSION_SECRET` est **obligatoire** (fail-fast au
-démarrage si absent). Sans `SMTP_HOST`, les emails ne sont pas envoyés : les liens de
-vérification/réinitialisation sont affichés dans la console (mode dev).
+Voir [`.env.example`](.env.example). `SESSION_SECRET` est **obligatoire**
+(fail-fast au démarrage si absent). Sans `SMTP_HOST`, les emails ne partent
+pas : les liens sont affichés en console (mode dev). Avec Mailpit en local :
+`SMTP_HOST=localhost`, `SMTP_PORT=1025` (sans `SMTP_USER`, aucun bloc
+d'authentification n'est envoyé).
 
-## Structure
+## Documentation
 
-```
-moniteur-connect/
-├── docs/DESIGN.md          # Spécification de référence
-├── prisma/schema.prisma    # Modèle School / Listing / Application
-├── src/
-│   ├── app.js              # Câblage Express (sécurité, vues, routes)
-│   ├── server.js           # Point d'entrée (fail-fast env + arrêt propre)
-│   ├── config/             # Client Prisma (singleton)
-│   ├── middlewares/        # csrf, flash, requireAuth, redirectIfAuth, loadSchool, upload
-│   ├── controllers/        # auth, listing (public + gestion), application, dashboard
-│   ├── services/           # accès données + mailer + tokens
-│   ├── validators/         # validation serveur
-│   ├── routes/             # routeurs + agrégation
-│   └── utils/              # password (bcrypt), http (parseId/notFound)
-├── views/                  # templates Twig
-├── public/                 # CSS + uploads (CV)
-└── test/smoke.cjs          # test de bout en bout (à écrire)
-```
+- [`docs/README.md`](docs/README.md) — index de la documentation ;
+- [`docs/jury/README.md`](docs/jury/README.md) — dossier de soutenance DWWM
+  (résumé, besoin, compétences, BDD, conformité W3C/accessibilité, veilles) ;
+- [`AGENTS.md`](AGENTS.md) — guide d'exécution du dépôt (conventions, pièges) ;
+- conception initiale de juin 2026 :
+  [`docs/historique/2026-06/`](docs/historique/2026-06/README.md) (préservée
+  comme v1).
+
+## Avertissement
+
+Les contrats générés sont des **modèles indicatifs** : ils doivent être
+validés juridiquement avant tout usage réel.

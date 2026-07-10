@@ -15,9 +15,10 @@
   initiaux à conserver comme version 1 ;
 - `superpowers/` : spécifications et plans détaillés des lots livrés ;
 - `_a_retirer_du_projet/` : fichiers isolés pour examen et suppression manuelle par
-  l'utilisateur ;
-- `DESIGN.md` : ancienne spécification de référence, encore à consolider dans le futur
-  dossier jury.
+  l'utilisateur.
+
+L'ancienne spécification de cadrage (`DESIGN.md`) est classée avec la
+conception initiale : [`historique/2026-06/DESIGN.md`](historique/2026-06/DESIGN.md).
 
 Les documents historiques ne décrivent pas tous les lots A à L. Consulter
 [`jury/inventaire-documents-historiques.md`](jury/inventaire-documents-historiques.md)

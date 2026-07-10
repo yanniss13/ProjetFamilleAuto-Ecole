@@ -5,6 +5,8 @@ Ce dossier conserve les documents de conception produits entre le 22 et le 25 ju
 
 ## Contenu
 
+- `DESIGN.md` : document de cadrage initial (13 juin, classé ici le
+  10 juillet avec un bandeau — l'état actuel est dans `docs/jury/`) ;
 - `CAHIER-DES-CHARGES.md` : expression initiale du besoin ;
 - `SPECIFICATIONS-FONCTIONNELLES-ET-TECHNIQUES.md` : source éditable du dossier de
   conception ;

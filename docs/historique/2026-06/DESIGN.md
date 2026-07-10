@@ -1,5 +1,12 @@
 # MoniteurConnect — Design / Spécification
 
+> **Document de cadrage initial (juin 2026), conservé comme preuve de
+> conception.** Il décrit le projet tel qu'envisagé au démarrage — l'état
+> actuel de l'application (MVP + lots A à L livrés) est décrit dans
+> [docs/jury/](../../jury/README.md), en particulier
+> [resume-projet.md](../../jury/resume-projet.md) et
+> [expression-du-besoin-v2.md](../../jury/expression-du-besoin-v2.md).
+
 > Document de référence issu du cadrage. **À lire en premier** pour reprendre le projet.
 > Date : 2026-06-13. Statut : squelette généré, implémentation des fonctionnalités à faire.
 
