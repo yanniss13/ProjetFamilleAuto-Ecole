@@ -134,9 +134,12 @@ Puis vérifier dans un navigateur :
   références mises à jour (docs/README.md, présent fichier, README
   historique) ; 0 lien cassé. Task 1 déjà livrée (micro-fix Mailpit TDD,
   suite à 442 assertions).
-- Prochaine tâche : **Task 3** — `docs/jury/veille-securite.md` (fiches
-  menace → source datée → impact → décision → preuve ; URLs OWASP vérifiées
-  en ligne le jour de la rédaction).
+- Task 3 livrée : `docs/jury/veille-securite.md` — 8 fiches menace → source
+  datée (OWASP Top 10 **2025**, cheat sheets vérifiées le 2026-07-10) →
+  décision → preuve ; note honnête Argon2id vs bcrypt pour la production.
+- Prochaine tâche : **Task 4** — `docs/jury/veille-technique.md` (sources
+  officielles anglophones vérifiées en ligne : Node.js releases, Express,
+  Prisma releases, MDN ; solde le dernier critère MANQUANT).
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.
