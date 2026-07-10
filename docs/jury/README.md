@@ -122,16 +122,20 @@ Puis vérifier dans un navigateur :
   `jury-conformite-visible`, plan :
   `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
   cochées — reprendre à la première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 3** — captures
-  responsive 15/15 à 320, 375 et 768 px sous `docs/jury/captures/r{320,375,768}/`,
-  4 échantillons contrôlés visuellement : aucun débordement ni chevauchement
-  (cohérent avec les JSON de débordement : 0 partout).
-- Vérifications exécutées : 3 × 15/15 aux captures ; `npm test` (15 suites,
-  438 assertions) avant le commit.
-- Prochaine tâche : **Task 4** — corrections W3C : 3 erreurs à corriger
-  (inscription, contrat, compte — détail dans `docs/jury/conformite/w3c-*.json`),
-  puis re-run `node scripts/conformite-jury.js --controle=w3c` jusqu'à
-  0 erreur (prérequis : seed + serveur 4071).
+- Dernière action terminée (2026-07-10, Claude) : **Task 4** — corrections
+  W3C : `autocomplete=street-address→address-line1` (inscription, compte),
+  label sur canvas remplacé par `span.label-titre` + `aria-label` (contrat +
+  page de signature candidat), `section.stats-grid→div` (dashboard, admin).
+  Re-validation : **0 erreur, 0 avertissement sur les 15 pages**.
+  ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
+  vue (cache Twig), sinon l'ancien HTML est validé.
+- Vérifications exécutées : `--controle=w3c` 15/15 à zéro ; `npm test`
+  (15 suites, 438 assertions) avant le commit.
+- Prochaine tâche : **Task 5** — corrections accessibilité : lire les
+  `docs/jury/conformite/axe-*.json` (1-2 violations par page, 0 sur carte),
+  corriger critical/serious + moderate triviales, re-run
+  `node scripts/conformite-jury.js --controle=axe` (serveur à redémarrer
+  après chaque modification de vue).
 - Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
   `main` le 2026-07-10 avec le rangement Codex et le Lot L.
 - `main` local a ~91 commits d'avance sur `origin/main` — pousser quand

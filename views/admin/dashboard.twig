@@ -7,12 +7,13 @@
   </section>
 
   {% if stats %}
-    <section class="stats-grid">
+    {# div et non section : un section sans titre est signalé par le validateur W3C. #}
+    <div class="stats-grid">
       <div class="stat-card"><span class="stat-value">{{ stats.tiles.schools }}</span><span class="stat-label">Auto-écoles</span></div>
       <div class="stat-card"><span class="stat-value">{{ stats.tiles.listings }}</span><span class="stat-label">Annonces</span></div>
       <div class="stat-card"><span class="stat-value">{{ stats.tiles.applications }}</span><span class="stat-label">Candidatures</span></div>
       <div class="stat-card"><span class="stat-value">{{ stats.tiles.signedContracts }}</span><span class="stat-label">Contrats signés</span></div>
-    </section>
+    </div>
 
     <section class="charts-grid">
       <div class="chart-card">

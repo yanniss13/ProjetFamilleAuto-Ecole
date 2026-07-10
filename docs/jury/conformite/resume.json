@@ -1,234 +1,97 @@
 {
-  "date": "2026-07-10T11:35:19.919Z",
+  "date": "2026-07-10T11:48:03.008Z",
   "controles": [
-    "w3c",
-    "axe",
-    "debordement"
+    "w3c"
   ],
   "pages": {
     "accueil": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "annonces": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "annonce-detail": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "carte": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 0
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "inscription": {
       "w3c": {
-        "erreurs": 1,
+        "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "connexion": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "alertes": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "suivi": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "dashboard": {
       "w3c": {
         "erreurs": 0,
-        "avertissements": 1
-      },
-      "axe": {
-        "violations": 2
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
+        "avertissements": 0
       }
     },
     "mes-annonces": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "annonce-form": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "candidatures": {
       "w3c": {
         "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "contrat": {
       "w3c": {
-        "erreurs": 1,
+        "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "compte": {
       "w3c": {
-        "erreurs": 1,
+        "erreurs": 0,
         "avertissements": 0
-      },
-      "axe": {
-        "violations": 1
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
       }
     },
     "admin": {
       "w3c": {
         "erreurs": 0,
-        "avertissements": 1
-      },
-      "axe": {
-        "violations": 2
-      },
-      "debordement": {
-        "320": false,
-        "375": false,
-        "768": false,
-        "1440": false
+        "avertissements": 0
       }
     }
   }

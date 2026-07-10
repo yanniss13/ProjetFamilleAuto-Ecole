@@ -1,16 +1,5 @@
 {
-  "erreurs": 1,
+  "erreurs": 0,
   "avertissements": 0,
-  "messages": [
-    {
-      "type": "error",
-      "lastLine": 158,
-      "lastColumn": 38,
-      "firstColumn": 9,
-      "message": "The value of the “for” attribute of the “label” element must be the ID of a non-hidden form control.",
-      "extract": ">\n        <label for=\"signature-canvas\">Signat",
-      "hiliteStart": 10,
-      "hiliteLength": 30
-    }
-  ]
+  "messages": []
 }

@@ -29,9 +29,11 @@
       </div>
 
       <div class="form-group">
-        <label for="signature-canvas">Votre signature</label>
+        {# Un label ne peut pas cibler un canvas (pas un contrôle de formulaire) :
+           titre stylé comme un label + aria-label sur la zone de dessin. #}
+        <span class="label-titre">Votre signature</span>
         <p class="muted">Dessinez votre signature ci-dessous (souris ou doigt).</p>
-        <canvas id="signature-canvas" data-signature-pad width="420" height="140" class="signature-pad"></canvas>
+        <canvas id="signature-canvas" data-signature-pad width="420" height="140" class="signature-pad" aria-label="Zone de dessin de la signature"></canvas>
         <div class="signature-actions">
           <button type="button" class="btn btn-small" data-signature-clear>Effacer</button>
           <button type="button" class="btn btn-small" data-signature-import-trigger>Importer une signature</button>
