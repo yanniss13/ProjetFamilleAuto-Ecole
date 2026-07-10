@@ -146,9 +146,14 @@ Puis vérifier dans un navigateur :
   7 thèmes (réponse courte + preuve), toutes les questions pièges du plan
   couvertes (framework front, JWT, POO, SQLite, prod, validité juridique,
   pad clavier, panne d'API…).
-- Prochaine tâche : **Task 6** — `docs/jury/soutenance/demo-11-minutes.md`
-  (préparation, déroulé minuté, secours, reset ; vérification scriptée des
-  URLs publiques sur le serveur seedé, port 4071).
+- Task 6 livrée : `docs/jury/soutenance/demo-11-minutes.md` — préparation,
+  déroulé minuté 14:00→25:00 (13 étapes, phrase clé + critère couvert par
+  étape), secours sur captures, reset ; 8 URLs publiques vérifiées en 200.
+  ⚠️ Piège documenté : seeder APRÈS le démarrage du serveur (la purge
+  automatique consomme l'alerte de démo 30 s après le boot).
+- Prochaine tâche : **Task 7** — `docs/jury/soutenance/soutenance.html`
+  (deck HTML autonome ~28 diapos, notes orateur touche N, minutage,
+  vérifications Edge headless + PDF + chemins relatifs).
 - Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
   — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
   Audit : 22 validés / 10 à renforcer / 1 manquant.
