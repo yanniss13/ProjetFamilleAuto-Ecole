@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon compte — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Mon compte</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="mes-annonces.html">Mes annonces</a>
+      <a href="candidatures.html">Candidatures</a>
+      <a href="compte.html" class="is-active">Mon compte</a>
+      <a href="accueil.html">Déconnexion</a>
+    </span>
+  </nav>
+
+  <div class="wf-container wf-narrow" style="max-width:560px;">
+    <h1>Mon compte</h1>
+    <p class="wf-sub">Auto-école du Centre · contact@auto-ecole.fr</p>
+
+    <div class="wf-panel">
+      <h3>Coordonnées</h3>
+      <div class="wf-field">
+        <label>Téléphone</label>
+        <input class="wf-input" type="text" placeholder="04 91 00 00 00">
+      </div>
+      <div class="wf-field">
+        <label>Adresse</label>
+        <input class="wf-input" type="text" placeholder="12 rue de la République, 13001 Marseille">
+        <p class="wf-help">L'adresse est géocodée et affichée sur la carte de vos annonces.</p>
+      </div>
+      <div class="wf-map" style="min-height:160px;">Aperçu carte (placeholder)</div>
+      <button class="wf-btn wf-btn--primary wf-mt" type="button">Enregistrer</button>
+    </div>
+
+    <div class="wf-panel">
+      <h3>Sécurité</h3>
+      <p class="wf-note">Changer le mot de passe, gérer la vérification e-mail.</p>
+      <a class="wf-btn wf-btn--sm" href="#">Modifier le mot de passe</a>
+    </div>
+
+    <div class="wf-panel">
+      <h3>Informations légales</h3>
+      <p class="wf-note">SIRET : 123 456 789 00012 · E-mail vérifié ✓</p>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

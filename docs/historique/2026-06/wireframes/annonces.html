@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Annonces — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Liste des annonces</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="accueil.html">Accueil</a>
+      <a href="annonces.html" class="is-active">Annonces</a>
+      <a href="connexion.html">Connexion</a>
+      <a href="inscription.html">Inscription</a>
+      <a href="index.html">Sommaire</a>
+    </span>
+  </nav>
+
+  <div class="wf-container">
+    <h1>Annonces ouvertes</h1>
+    <p class="wf-sub">Postes de moniteur disponibles près de chez vous.</p>
+
+    <form class="wf-search">
+      <input class="wf-input" type="text" placeholder="Rechercher (mot-clé, ville, type de contrat…)">
+      <select class="wf-select">
+        <option>Tous les départements</option>
+        <option>13 — Bouches-du-Rhône</option>
+        <option>75 — Paris</option>
+        <option>69 — Rhône</option>
+      </select>
+      <button class="wf-btn wf-btn--primary" type="button">Filtrer</button>
+    </form>
+
+    <p class="wf-note" style="margin-bottom:14px;">4 annonces — <span class="wf-tag">résultats</span></p>
+
+    <div class="wf-grid">
+      <a class="wf-card" href="annonce-detail.html" style="text-decoration:none; color:inherit;">
+        <span class="wf-badge wf-badge--open">Ouverte</span>
+        <h3 class="wf-mt">Moniteur·trice auto-école B</h3>
+        <p class="wf-meta">Auto-école du Centre · Marseille (13)</p>
+        <div class="wf-meta-row">
+          <span class="wf-tag">CDI</span>
+          <span class="wf-tag">35 h / sem.</span>
+          <span class="wf-tag">2 200 € brut</span>
+        </div>
+        <span class="wf-btn wf-btn--sm">Voir le détail →</span>
+      </a>
+
+      <a class="wf-card" href="annonce-detail.html" style="text-decoration:none; color:inherit;">
+        <span class="wf-badge wf-badge--open">Ouverte</span>
+        <h3 class="wf-mt">Moniteur indépendant (freelance)</h3>
+        <p class="wf-meta">Conduite Plus · Aix-en-Provence (13)</p>
+        <div class="wf-meta-row">
+          <span class="wf-tag">Freelance</span>
+          <span class="wf-tag">Temps partiel</span>
+          <span class="wf-tag">Selon volume</span>
+        </div>
+        <span class="wf-btn wf-btn--sm">Voir le détail →</span>
+      </a>
+
+      <a class="wf-card" href="annonce-detail.html" style="text-decoration:none; color:inherit;">
+        <span class="wf-badge wf-badge--open">Ouverte</span>
+        <h3 class="wf-mt">Enseignant·e de la conduite (CDD)</h3>
+        <p class="wf-meta">Pilote École · Paris (75)</p>
+        <div class="wf-meta-row">
+          <span class="wf-tag">CDD</span>
+          <span class="wf-tag">39 h / sem.</span>
+          <span class="wf-tag">2 400 € brut</span>
+        </div>
+        <span class="wf-btn wf-btn--sm">Voir le détail →</span>
+      </a>
+
+      <a class="wf-card" href="annonce-detail.html" style="text-decoration:none; color:inherit;">
+        <span class="wf-badge wf-badge--open">Ouverte</span>
+        <h3 class="wf-mt">Moniteur·trice — apprentissage</h3>
+        <p class="wf-meta">Lyon Conduite · Lyon (69)</p>
+        <div class="wf-meta-row">
+          <span class="wf-tag">Apprentissage</span>
+          <span class="wf-tag">Temps plein</span>
+          <span class="wf-tag">Grille CERFA</span>
+        </div>
+        <span class="wf-btn wf-btn--sm">Voir le détail →</span>
+      </a>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

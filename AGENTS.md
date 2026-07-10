@@ -54,9 +54,17 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   30/min/IP), service cache 10 min jamais bloquant, datalist navigateur sur les
   champs `address` d'inscription et de profil. Tests : `test/lot-l.cjs` (port
   4070, 20 assertions).
-- **Prochain travail : préparation démo jury (script de démonstration)**. Côté
-  utilisateur : config Mailpit (SMTP_HOST=localhost, SMTP_PORT=1025) — si l'envoi
-  échoue, micro-fix : ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
+- **Prochain travail : préparation jury DWWM**. Commencer par
+  `docs/jury/README.md`, puis `docs/jury/audit-certification-dwwm.md` et
+  `docs/jury/inventaire-documents-historiques.md`. L'audit du 2026-07-10 classe les
+  33 critères : 14 validés, 16 à renforcer, 3 manquants. Des documents historiques
+  datés du 22–25 juin sont classés sous `docs/historique/2026-06/` : les préserver comme v1 et ne pas
+  les confondre avec l'état actuel des lots A à L. Priorité recommandée : consolidation
+  du dossier (résumé/besoin/compétences, comparaison des maquettes v1, diagramme BDD
+  actuel), puis conformité W3C/responsive/accessibilité, puis script des
+  35 minutes et préparation des 45 minutes de questions. Côté utilisateur : config
+  Mailpit (`SMTP_HOST=localhost`, `SMTP_PORT=1025`) — si l'envoi échoue, micro-fix :
+  ne passer `auth` à nodemailer que si `SMTP_USER` est défini.
 - ⚠️ Un seul agent à la fois sur le dépôt : le staging git est partagé (un commit
   concurrent a déjà avalé le travail d'un autre agent une fois).
 - Habitude à surveiller côté exécution : remplacer la typographie française (— … )

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 730" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .tbl-box{fill:#fff;stroke:#3b5b8c;stroke-width:1.8;}
+    .tbl-head{fill:#1a4d8f;stroke:#1a4d8f;}
+    .tbl-name{fill:#fff;font-size:16px;font-weight:700;letter-spacing:.5px;}
+    .col{font-size:13.5px;fill:#1f2933;}
+    .col.pk{font-weight:700;text-decoration:underline;}
+    .col.fk{fill:#8a4b00;font-style:italic;}
+    .rel{stroke:#1f2933;stroke-width:1.8;fill:none;}
+    .rel-lbl{font-size:12px;font-style:italic;fill:#8a4b00;}
+    .lbl-bg{fill:#fff;opacity:0.92;}
+  </style>
+  <line x1="290" y1="250" x2="510" y2="250" class="rel"/>
+<line x1="306" y1="241" x2="306" y2="259" class="rel"/>
+<path d="M490,250 L510,241 M490,250 L510,250 M490,250 L510,259" class="rel" fill="none"/>
+<rect x="369.4" y="224" width="61.2" height="18" rx="3" class="lbl-bg"/>
+<text x="400" y="237" text-anchor="middle" class="rel-lbl">ecole_id</text>
+<line x1="760" y1="250" x2="980" y2="250" class="rel"/>
+<line x1="776" y1="241" x2="776" y2="259" class="rel"/>
+<path d="M960,250 L980,241 M960,250 L980,250 M960,250 L980,259" class="rel" fill="none"/>
+<rect x="833" y="224" width="74" height="18" rx="3" class="lbl-bg"/>
+<text x="870" y="237" text-anchor="middle" class="rel-lbl">annonce_id</text>
+<line x1="1250" y1="250" x2="1470" y2="250" class="rel"/>
+<line x1="1266" y1="241" x2="1266" y2="259" class="rel"/>
+<line x1="1454" y1="241" x2="1454" y2="259" class="rel"/>
+<rect x="1281.4" y="224" width="157.20000000000002" height="18" rx="3" class="lbl-bg"/>
+<text x="1360" y="237" text-anchor="middle" class="rel-lbl">candidature_id (unique)</text>
+  
+  <g>
+    <rect x="40" y="110" width="250" height="376" class="tbl-box"/>
+    <rect x="40" y="110" width="250" height="32" class="tbl-head"/>
+    <text x="165" y="132" text-anchor="middle" class="tbl-name">ECOLE</text>
+    <text x="52" y="158" class="col pk">id</text><text x="52" y="179" class="col">email</text><text x="52" y="200" class="col">motDePasse</text><text x="52" y="221" class="col">raisonSociale</text><text x="52" y="242" class="col">siret</text><text x="52" y="263" class="col">telephone</text><text x="52" y="284" class="col">adresse</text><text x="52" y="305" class="col">latitude</text><text x="52" y="326" class="col">longitude</text><text x="52" y="347" class="col">emailVerifie</text><text x="52" y="368" class="col">jetonVerifEmail</text><text x="52" y="389" class="col">expVerifEmail</text><text x="52" y="410" class="col">jetonResetMdp</text><text x="52" y="431" class="col">expResetMdp</text><text x="52" y="452" class="col">dateCreation</text><text x="52" y="473" class="col">dateMaj</text>
+  </g>
+  <g>
+    <rect x="510" y="110" width="250" height="292" class="tbl-box"/>
+    <rect x="510" y="110" width="250" height="32" class="tbl-head"/>
+    <text x="635" y="132" text-anchor="middle" class="tbl-name">ANNONCE</text>
+    <text x="522" y="158" class="col pk">id</text><text x="522" y="179" class="col">titre</text><text x="522" y="200" class="col">description</text><text x="522" y="221" class="col">typeContrat</text><text x="522" y="242" class="col">ville</text><text x="522" y="263" class="col">departement</text><text x="522" y="284" class="col">heuresParSemaine</text><text x="522" y="305" class="col">remuneration</text><text x="522" y="326" class="col">statut</text><text x="522" y="347" class="col">dateCreation</text><text x="522" y="368" class="col">dateMaj</text><text x="522" y="389" class="col fk"># ecole_id</text>
+  </g>
+  <g>
+    <rect x="980" y="110" width="270" height="292" class="tbl-box"/>
+    <rect x="980" y="110" width="270" height="32" class="tbl-head"/>
+    <text x="1115" y="132" text-anchor="middle" class="tbl-name">CANDIDATURE</text>
+    <text x="992" y="158" class="col pk">id</text><text x="992" y="179" class="col">nomCandidat</text><text x="992" y="200" class="col">emailCandidat</text><text x="992" y="221" class="col">telephoneCandidat</text><text x="992" y="242" class="col">message</text><text x="992" y="263" class="col">cheminCV</text><text x="992" y="284" class="col">cheminPieceIdentite</text><text x="992" y="305" class="col">cheminPermis</text><text x="992" y="326" class="col">cheminCarteEnseignant</text><text x="992" y="347" class="col">statut</text><text x="992" y="368" class="col">dateCreation</text><text x="992" y="389" class="col fk"># annonce_id</text>
+  </g>
+  <g>
+    <rect x="1470" y="110" width="290" height="565" class="tbl-box"/>
+    <rect x="1470" y="110" width="290" height="32" class="tbl-head"/>
+    <text x="1615" y="132" text-anchor="middle" class="tbl-name">CONTRAT</text>
+    <text x="1482" y="158" class="col pk">id</text><text x="1482" y="179" class="col">type</text><text x="1482" y="200" class="col">dateDebut</text><text x="1482" y="221" class="col">dateFin</text><text x="1482" y="242" class="col">motif</text><text x="1482" y="263" class="col">salaireBrut</text><text x="1482" y="284" class="col">heuresHebdo</text><text x="1482" y="305" class="col">periodeEssai</text><text x="1482" y="326" class="col">lieuTravail</text><text x="1482" y="347" class="col">siretPrestataire</text><text x="1482" y="368" class="col">adresseEcole</text><text x="1482" y="389" class="col">adresseCandidat</text><text x="1482" y="410" class="col">clausesSupplementaires</text><text x="1482" y="431" class="col">dateNaissance</text><text x="1482" y="452" class="col">lieuNaissance</text><text x="1482" y="473" class="col">nationalite</text><text x="1482" y="494" class="col">numAutorisationEnseigner</text><text x="1482" y="515" class="col">validiteAutorisation</text><text x="1482" y="536" class="col">numPermis</text><text x="1482" y="557" class="col">categoriesPermis</text><text x="1482" y="578" class="col">cheminPdf</text><text x="1482" y="599" class="col">envoyeLe</text><text x="1482" y="620" class="col">dateCreation</text><text x="1482" y="641" class="col">dateMaj</text><text x="1482" y="662" class="col fk"># candidature_id</text>
+  </g>
+</svg>

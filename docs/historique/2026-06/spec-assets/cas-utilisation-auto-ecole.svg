@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1820 1520" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="open" markerWidth="14" markerHeight="14" refX="11" refY="6" orient="auto"><path d="M2,1 L11,6 L2,11" fill="none" stroke="#444" stroke-width="1.7"/></marker>
+    <marker id="tri" markerWidth="18" markerHeight="16" refX="14" refY="8" orient="auto"><path d="M2,2 L15,8 L2,14 Z" fill="#ffffff" stroke="#1f2933" stroke-width="1.6"/></marker>
+  </defs>
+  <style>
+    .actor circle,.actor line{stroke:#1f2933;stroke-width:2.4;fill:none;}
+    .actor-label{font-size:20px;font-weight:600;fill:#1f2933;}
+    .uc ellipse{fill:#eef4ff;stroke:#3b5b8c;stroke-width:1.8;}
+    .uc-label{font-size:17px;fill:#1f2933;}
+    .assoc{stroke:#1f2933;stroke-width:1.7;}
+    .dep line{stroke:#444;stroke-width:1.7;stroke-dasharray:6 4;}
+    .dep-label{font-size:14px;fill:#7a3b00;font-style:italic;}
+    .lbl-bg{fill:#fff;opacity:0.92;}
+    .gen{stroke:#1f2933;stroke-width:1.8;}
+    .sys-box{fill:none;stroke:#9aa5b1;stroke-width:2;}
+    .sys-name{font-size:23px;font-weight:700;fill:#1a4d8f;}
+  </style>
+  <rect x="290" y="40" width="1490" height="1440" rx="6" class="sys-box"/>
+  <text x="320" y="82" class="sys-name">MoniteurConnect — espace auto-école</text>
+  <g class="uc"><ellipse cx="560" cy="140" rx="124" ry="42"/><text x="560" y="146" text-anchor="middle" class="uc-label"><tspan x="560" dy="0">S'inscrire</tspan></text></g><g class="uc"><ellipse cx="560" cy="300" rx="124" ry="42"/><text x="560" y="306" text-anchor="middle" class="uc-label"><tspan x="560" dy="0">Se connecter</tspan></text></g><g class="uc"><ellipse cx="560" cy="460" rx="124" ry="42"/><text x="560" y="466" text-anchor="middle" class="uc-label"><tspan x="560" dy="-11">Réinitialiser</tspan><tspan x="560" dy="22">le mot de passe</tspan></text></g><g class="uc"><ellipse cx="560" cy="620" rx="124" ry="42"/><text x="560" y="626" text-anchor="middle" class="uc-label"><tspan x="560" dy="-11">Gérer</tspan><tspan x="560" dy="22">son profil</tspan></text></g><g class="uc"><ellipse cx="560" cy="790" rx="124" ry="42"/><text x="560" y="796" text-anchor="middle" class="uc-label"><tspan x="560" dy="-11">Publier</tspan><tspan x="560" dy="22">une annonce</tspan></text></g><g class="uc"><ellipse cx="560" cy="1000" rx="124" ry="42"/><text x="560" y="1006" text-anchor="middle" class="uc-label"><tspan x="560" dy="-11">Gérer ses</tspan><tspan x="560" dy="22">annonces</tspan></text></g><g class="uc"><ellipse cx="560" cy="1300" rx="124" ry="42"/><text x="560" y="1306" text-anchor="middle" class="uc-label"><tspan x="560" dy="-11">Traiter une</tspan><tspan x="560" dy="22">candidature</tspan></text></g><g class="uc"><ellipse cx="1090" cy="140" rx="124" ry="42"/><text x="1090" y="146" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Vérifier</tspan><tspan x="1090" dy="22">l'e-mail</tspan></text></g><g class="uc"><ellipse cx="1090" cy="870" rx="124" ry="42"/><text x="1090" y="876" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Modifier</tspan><tspan x="1090" dy="22">une annonce</tspan></text></g><g class="uc"><ellipse cx="1090" cy="1000" rx="124" ry="42"/><text x="1090" y="1006" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Clôturer</tspan><tspan x="1090" dy="22">une annonce</tspan></text></g><g class="uc"><ellipse cx="1090" cy="1130" rx="124" ry="42"/><text x="1090" y="1136" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Supprimer</tspan><tspan x="1090" dy="22">une annonce</tspan></text></g><g class="uc"><ellipse cx="1090" cy="1250" rx="124" ry="42"/><text x="1090" y="1256" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Accepter</tspan><tspan x="1090" dy="22">la candidature</tspan></text></g><g class="uc"><ellipse cx="1090" cy="1410" rx="124" ry="42"/><text x="1090" y="1416" text-anchor="middle" class="uc-label"><tspan x="1090" dy="-11">Refuser</tspan><tspan x="1090" dy="22">la candidature</tspan></text></g><g class="uc"><ellipse cx="1600" cy="1250" rx="124" ry="42"/><text x="1600" y="1256" text-anchor="middle" class="uc-label"><tspan x="1600" dy="-11">Générer</tspan><tspan x="1600" dy="22">le contrat</tspan></text></g><g class="uc"><ellipse cx="1600" cy="1410" rx="124" ry="42"/><text x="1600" y="1416" text-anchor="middle" class="uc-label"><tspan x="1600" dy="-11">Envoyer</tspan><tspan x="1600" dy="22">le contrat</tspan></text></g>
+<line x1="160" y1="790" x2="436" y2="140" class="assoc"/>
+<line x1="160" y1="796" x2="436" y2="300" class="assoc"/>
+<line x1="160" y1="802" x2="436" y2="460" class="assoc"/>
+<line x1="160" y1="808" x2="436" y2="620" class="assoc"/>
+<line x1="160" y1="814" x2="436" y2="790" class="assoc"/>
+<line x1="160" y1="820" x2="436" y2="1000" class="assoc"/>
+<line x1="160" y1="826" x2="436" y2="1300" class="assoc"/>
+<g class="dep"><line x1="684" y1="140" x2="966" y2="140" marker-end="url(#open)"/>
+    <rect x="783" y="127" width="84" height="20" rx="3" class="lbl-bg"/>
+    <text x="825" y="142" text-anchor="middle" class="dep-label">«include»</text></g>
+<g class="dep"><line x1="1214" y1="1250" x2="1476" y2="1250" marker-end="url(#open)"/>
+    <rect x="1303" y="1237" width="84" height="20" rx="3" class="lbl-bg"/>
+    <text x="1345" y="1252" text-anchor="middle" class="dep-label">«include»</text></g>
+<g class="dep"><line x1="1600" y1="1368" x2="1600" y2="1292" marker-end="url(#open)"/>
+    <rect x="1558" y="1317" width="84" height="20" rx="3" class="lbl-bg"/>
+    <text x="1600" y="1332" text-anchor="middle" class="dep-label">«extends»</text></g>
+<line x1="966" y1="870" x2="684" y2="978" class="gen" marker-end="url(#tri)"/>
+<line x1="966" y1="1000" x2="684" y2="1000" class="gen" marker-end="url(#tri)"/>
+<line x1="966" y1="1130" x2="684" y2="1022" class="gen" marker-end="url(#tri)"/>
+<line x1="966" y1="1250" x2="684" y2="1284" class="gen" marker-end="url(#tri)"/>
+<line x1="966" y1="1410" x2="684" y2="1316" class="gen" marker-end="url(#tri)"/>
+
+  <g class="actor">
+    <circle cx="130" cy="760" r="17"/>
+    <line x1="130" y1="777" x2="130" y2="834"/>
+    <line x1="98" y1="804" x2="162" y2="804"/>
+    <line x1="130" y1="834" x2="104" y2="878"/>
+    <line x1="130" y1="834" x2="156" y2="878"/>
+    <text x="130" y="906" class="actor-label" text-anchor="middle">Auto-école</text>
+  </g>
+</svg>

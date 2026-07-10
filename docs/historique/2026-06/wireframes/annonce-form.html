@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Créer une annonce — MoniteurConnect (wireframe)</title>
+  <link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+  <div class="wf-ribbon">Wireframe — Créer / éditer une annonce</div>
+  <nav class="wf-nav">
+    <span class="wf-logo">MoniteurConnect</span>
+    <span class="wf-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="mes-annonces.html" class="is-active">Mes annonces</a>
+      <a href="candidatures.html">Candidatures</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="accueil.html">Déconnexion</a>
+    </span>
+  </nav>
+
+  <div class="wf-container wf-narrow" style="max-width:640px;">
+    <p class="wf-note"><a href="mes-annonces.html">← Retour à mes annonces</a></p>
+    <h1>Nouvelle annonce</h1>
+    <p class="wf-sub">Renseignez les détails du poste.</p>
+
+    <div class="wf-panel">
+      <div class="wf-field">
+        <label>Titre</label>
+        <input class="wf-input" type="text" placeholder="Moniteur·trice auto-école B">
+      </div>
+      <div class="wf-field">
+        <label>Description</label>
+        <textarea class="wf-textarea" placeholder="Missions, public, véhicules, horaires, avantages…"></textarea>
+      </div>
+
+      <div class="wf-row">
+        <div class="wf-field">
+          <label>Type de contrat</label>
+          <select class="wf-select">
+            <option>CDI</option><option>CDD</option><option>Freelance</option>
+            <option>Apprentissage</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="wf-field">
+          <label>Volume horaire</label>
+          <input class="wf-input" type="text" placeholder="35 h / semaine (optionnel)">
+        </div>
+      </div>
+
+      <div class="wf-row">
+        <div class="wf-field">
+          <label>Ville</label>
+          <input class="wf-input" type="text" placeholder="Marseille">
+        </div>
+        <div class="wf-field">
+          <label>Département</label>
+          <input class="wf-input" type="text" placeholder="13">
+        </div>
+      </div>
+
+      <div class="wf-field">
+        <label>Rémunération</label>
+        <input class="wf-input" type="text" placeholder="2 200 € brut / mois (optionnel)">
+      </div>
+
+      <div class="wf-row" style="margin-top:8px;">
+        <a class="wf-btn wf-btn--primary" href="mes-annonces.html">Publier l'annonce</a>
+        <a class="wf-btn wf-btn--ghost" href="mes-annonces.html">Annuler</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wf-footer">MoniteurConnect — wireframe · <a href="index.html">retour au sommaire</a></footer>
+</body>
+</html>

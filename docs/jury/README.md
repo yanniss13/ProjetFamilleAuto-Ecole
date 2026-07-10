@@ -1,0 +1,120 @@
+# Préparation jury DWWM — point de reprise
+
+Ce fichier est la **porte d'entrée pour Codex, Claude Code ou tout autre agent** qui
+reprend la préparation de la soutenance. Lire d'abord `AGENTS.md`, puis ce document,
+puis l'audit détaillé.
+
+## Objectif courant
+
+Préparer une présentation de **35 minutes**, suivie de **45 minutes de questions**, en
+alignant MoniteurConnect sur la checklist de certification DWWM fournie par
+l'utilisateur.
+
+## Documents de référence
+
+- Audit détaillé : [`audit-certification-dwwm.md`](audit-certification-dwwm.md)
+- Inventaire historique :
+  [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md)
+- Conception initiale classée :
+  [`../historique/2026-06/README.md`](../historique/2026-06/README.md)
+- Spécification historique : [`../DESIGN.md`](../DESIGN.md)
+- Spécifications et plans livrés : `docs/superpowers/{specs,plans}/`
+- Guide d'exécution du dépôt : [`../../AGENTS.md`](../../AGENTS.md)
+- Source externe transmise :
+  `C:\Users\yanni\Downloads\Checklist_certification_DWWM.xlsx.zip`
+  (le contenu utile est entièrement retranscrit dans l'audit).
+
+## État au 2026-07-10
+
+- Audit DWWM mis à jour : **14 validés / 16 à renforcer / 3 manquants**.
+- Aucun code métier modifié pendant l'audit.
+- Trois documents jury créés : ce point de reprise, l'audit détaillé et l'inventaire
+  des documents historiques.
+- Les sources de juin sont classées sous `docs/historique/2026-06/` et les huit
+  captures de cours sont isolées sous `docs/_a_retirer_du_projet/`.
+- `AGENTS.md` pointe vers le présent dossier.
+- Le meilleur focus technique retenu est la **signature électronique du contrat**.
+- Le déroulé recommandé réserve **11 minutes** à la démonstration dans les 35 minutes.
+
+## Diagnostic central
+
+L'application est solide et riche, mais les documents généraux sont en retard. Les
+maquettes obligatoires ont été retrouvées et sont exploitables comme v1. Les risques
+prioritaires sont désormais :
+
+1. diagramme BDD limité à 4 entités alors que Prisma en contient 8 ;
+2. spécifications de juin annonçant encore admin et purge comme futurs ;
+3. `README.md` et `docs/DESIGN.md` encore au statut « squelette » ;
+4. liste des compétences absente ;
+5. aucune preuve W3C ;
+6. responsive et accessibilité non vérifiés sur navigateur ;
+7. veille sécurité et veille technique anglophone non formalisées.
+
+## Prochaine action recommandée
+
+Avant de modifier le code, faire valider par l'utilisateur le premier chantier parmi :
+
+1. **Consolidation du dossier** — résumé, besoin, compétences, comparaison des
+   maquettes v1 et diagramme BDD actuel (recommandé) ;
+2. **Conformité visible** — W3C, responsive et accessibilité ;
+3. **Script de soutenance** — support 35 minutes, démo 11 minutes et questions/réponses.
+
+Ne pas traiter ces trois chantiers dans une seule spécification. Chacun doit suivre le
+cycle déjà utilisé dans le projet : spécification → plan → TDD/implémentation si du code
+est nécessaire.
+
+## Vérifications à lancer dès que l'environnement le permet
+
+```powershell
+npm test
+npx prisma validate
+npm run seed:demo
+npm run dev
+```
+
+Puis vérifier dans un navigateur :
+
+- largeurs 320, 375, 768 et 1440 px ;
+- navigation clavier et focus visible ;
+- absence de débordement de la navigation, des cartes et des tableaux ;
+- pages accueil, annonces liste/carte, détail/candidature, connexion, dashboard école,
+  suivi/signature et admin ;
+- validation W3C des pages HTML rendues ;
+- audit accessibilité automatisé, puis contrôle manuel.
+
+## État Git observé avant l'audit
+
+- Branche : `lot-l-autocomplete-adresse`
+- HEAD au début de l'audit : `102cdc2`
+- Fichiers non suivis préexistants à préserver :
+  `.claude/settings.local.json`, `contexte.md` et
+  `Suivi_candidatures_stage_1_1_mails_plus_naturels_v3.xlsx`.
+- Ne jamais ajouter ces fichiers personnels au staging.
+- Un seul agent à la fois sur le dépôt, conformément à `AGENTS.md`.
+
+## Contrôle de fin de session pour l'agent suivant
+
+À chaque pause ou changement d'agent, mettre à jour cette section avec :
+
+- la dernière action terminée ;
+- les fichiers modifiés ;
+- les commandes de vérification exécutées et leur résultat ;
+- le premier travail restant, formulé sans ambiguïté ;
+- les décisions de l'utilisateur encore attendues.
+
+### Dernier checkpoint
+
+- Action terminée : audit critère par critère, revue et rangement des documents
+  historiques, création du point de reprise et isolement des fichiers retirables.
+- Fichiers concernés : `docs/jury/audit-certification-dwwm.md`,
+  `docs/jury/inventaire-documents-historiques.md`, `docs/jury/README.md`,
+  `docs/README.md`, `docs/historique/2026-06/`, `docs/_a_retirer_du_projet/`,
+  `docs/superpowers/plans/2026-07-10-rangement-documents-jury.md` et `AGENTS.md`.
+- Vérifications exécutées : 49 fichiers historiques classés, 12 HTML de wireframes,
+  11 exports PNG de maquettes et 8 captures retirables recensés ; liens Markdown/HTML
+  valides, aucune ancienne référence, `git diff --check` réussi ; `npm test` réussi
+  avec 438 assertions ; `npx prisma validate` réussi.
+- Vérifications restantes : rendu navigateur, W3C et accessibilité.
+- Premier travail restant : demander à l'utilisateur lequel des trois chantiers ci-dessus
+  il veut lancer ; recommander la consolidation du dossier.
+- Aucun commit ni staging n'a été effectué.
