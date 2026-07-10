@@ -29,7 +29,7 @@
 **Interfaces:**
 - Produces: `mailer.buildTransportOptions(env = process.env)` → `{ host, port, secure, auth? }` — `auth` absent si `env.SMTP_USER` est falsy.
 
-- [ ] **Step 1: Écrire le test qui échoue** — ajouter dans `test/ameliorations.cjs` après le bloc gabarit :
+- [x] **Step 1: Écrire le test qui échoue** — ajouter dans `test/ameliorations.cjs` après le bloc gabarit :
 
 ```js
     // --- Transport SMTP : auth seulement si SMTP_USER est défini (Mailpit) ---
@@ -44,8 +44,8 @@
     }
 ```
 
-- [ ] **Step 2: Le voir échouer** — `node test/ameliorations.cjs` → attendu : échec sur « buildTransportOptions exportée ».
-- [ ] **Step 3: Implémenter** — dans `src/services/mailer.js`, remplacer la construction du transport (lignes 10-17) par :
+- [x] **Step 2: Le voir échouer** — `node test/ameliorations.cjs` → attendu : échec sur « buildTransportOptions exportée ». **Constaté (exit 1).**
+- [x] **Step 3: Implémenter** — dans `src/services/mailer.js`, remplacer la construction du transport (lignes 10-17) par :
 
 ```js
 // Options du transport SMTP. Le bloc `auth` n'est ajouté que si SMTP_USER est
@@ -65,8 +65,8 @@ const transporter = SMTP_CONFIGURE ? nodemailer.createTransport(buildTransportOp
 ```
 
   et ajouter `buildTransportOptions` aux exports du module (fin de fichier).
-- [ ] **Step 4: Le voir passer** — `node test/ameliorations.cjs` → 30 assertions vertes (26 + 4).
-- [ ] **Step 5:** `npm test` complet. Cocher la Task 1, checkpoint `docs/jury/README.md`, commit :
+- [x] **Step 4: Le voir passer** — `node test/ameliorations.cjs` → 30 assertions vertes (26 + 4). **La suite complète passe à 442 assertions.**
+- [x] **Step 5:** `npm test` complet. Cocher la Task 1, checkpoint `docs/jury/README.md`, commit :
 
 ```powershell
 git add test/ameliorations.cjs src/services/mailer.js docs/jury/README.md docs/superpowers/plans/2026-07-10-script-soutenance.md

@@ -122,15 +122,21 @@ Puis vérifier dans un navigateur :
 
 ### Dernier checkpoint
 
-- Action terminée (2026-07-10, Claude) : **chantier « conformité visible »
-  LIVRÉ en entier** sur la branche `jury-conformite-visible` (plan
-  entièrement coché : `docs/superpowers/plans/2026-07-10-conformite-visible.md`).
-  Livrables : lib CDP partagée (`scripts/lib/`), `scripts/conformite-jury.js`
-  (W3C/axe/débordement), 45 captures responsive, corrections W3C (3 erreurs)
-  et accessibilité (2 violations serious), rapport daté
-  `docs/jury/conformite.md`. **Résultat final : 0 erreur W3C, 0 violation
-  axe, 0 débordement sur les 45 contrôles.** Audit : 22 validés /
-  10 à renforcer / 1 manquant.
+- **Chantier en cours : « script de soutenance »**, branche
+  `jury-script-soutenance`, plan :
+  `docs/superpowers/plans/2026-07-10-script-soutenance.md` (reprendre à la
+  première tâche non cochée).
+- Dernière action terminée (2026-07-10, Claude) : **Task 1** — micro-fix
+  Mailpit en TDD : `mailer.buildTransportOptions()` n'ajoute `auth` que si
+  `SMTP_USER` est défini ; 4 assertions ajoutées à `test/ameliorations.cjs`
+  (rouge constaté puis vert). La suite passe à **442 assertions**.
+- Prochaine tâche : **Task 2** — réécrire `README.md` (état réel), déplacer
+  `docs/DESIGN.md` → `docs/historique/2026-06/DESIGN.md` avec bandeau,
+  mettre à jour les références (docs/README.md, présent fichier, README
+  historique).
+- Chantier précédent (« conformité visible ») : LIVRÉ et fusionné dans `main`
+  — 0 erreur W3C, 0 violation axe, 0 débordement (voir `conformite.md`).
+  Audit : 22 validés / 10 à renforcer / 1 manquant.
 - ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
   vue/CSS/JS (cache Twig + fichiers statiques), sinon l'ancien état est
   contrôlé.
