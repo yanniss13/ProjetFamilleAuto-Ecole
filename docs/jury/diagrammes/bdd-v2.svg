@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 930" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .titre{fill:#1a4d8f;font-size:22px;font-weight:700;}
+    .legende{fill:#5b6470;font-size:12.5px;}
+    .ent-box{fill:#ffffff;stroke:#3b5b8c;stroke-width:1.8;}
+    .ent-head{fill:#1a4d8f;stroke:#1a4d8f;}
+    .ent-name{fill:#ffffff;font-size:16px;font-weight:700;letter-spacing:.5px;}
+    .attr{font-size:13.5px;fill:#1f2933;}
+    .attr.id{font-weight:700;text-decoration:underline;}
+    .attr.fk{font-style:italic;}
+    .patte{stroke:#444;stroke-width:1.7;}
+    .assoc-name{font-size:14px;font-weight:700;fill:#8a4b00;letter-spacing:.5px;}
+    .card{font-size:13px;font-weight:700;fill:#1f2933;}
+    .note{font-size:12px;fill:#5b6470;font-style:italic;}
+  </style>
+
+  <text x="40" y="40" class="titre">MoniteurConnect — modèle de données v2 (2026-07-10, 8 modèles Prisma)</text>
+  <text x="40" y="72" class="legende">Souligné = clé primaire · U = contrainte d'unicité · italique (FK) = clé étrangère · v1 (juin 2026) : 4 entités — voir docs/historique/2026-06/diagrammes/</text>
+
+  <!-- Rangée 1 : le cœur relationnel -->
+  <g>
+    <rect x="40" y="100" width="270" height="462" class="ent-box"/>
+    <rect x="40" y="100" width="270" height="32" class="ent-head"/>
+    <text x="175" y="122" text-anchor="middle" class="ent-name">School (auto-école)</text>
+    <text x="52" y="148" class="attr id">id</text>
+    <text x="52" y="169" class="attr">email · U</text>
+    <text x="52" y="190" class="attr">passwordHash</text>
+    <text x="52" y="211" class="attr">businessName</text>
+    <text x="52" y="232" class="attr">siret · U</text>
+    <text x="52" y="253" class="attr">phone</text>
+    <text x="52" y="274" class="attr">suspended</text>
+    <text x="52" y="295" class="attr">address</text>
+    <text x="52" y="316" class="attr">latitude</text>
+    <text x="52" y="337" class="attr">longitude</text>
+    <text x="52" y="358" class="attr">emailVerified</text>
+    <text x="52" y="379" class="attr">verifyTokenHash · U</text>
+    <text x="52" y="400" class="attr">verifyTokenExpiry</text>
+    <text x="52" y="421" class="attr">resetTokenHash · U</text>
+    <text x="52" y="442" class="attr">resetTokenExpiry</text>
+    <text x="52" y="463" class="attr">siretStatus</text>
+    <text x="52" y="484" class="attr">siretVerifiedName</text>
+    <text x="52" y="505" class="attr">siretCheckedAt</text>
+    <text x="52" y="526" class="attr">createdAt</text>
+    <text x="52" y="547" class="attr">updatedAt</text>
+  </g>
+
+  <g>
+    <rect x="430" y="100" width="270" height="378" class="ent-box"/>
+    <rect x="430" y="100" width="270" height="32" class="ent-head"/>
+    <text x="565" y="122" text-anchor="middle" class="ent-name">Listing (annonce)</text>
+    <text x="442" y="148" class="attr id">id</text>
+    <text x="442" y="169" class="attr">title</text>
+    <text x="442" y="190" class="attr">description</text>
+    <text x="442" y="211" class="attr">contractType</text>
+    <text x="442" y="232" class="attr">city</text>
+    <text x="442" y="253" class="attr">department</text>
+    <text x="442" y="274" class="attr">hoursPerWeek</text>
+    <text x="442" y="295" class="attr">compensation</text>
+    <text x="442" y="316" class="attr">status</text>
+    <text x="442" y="337" class="attr">viewsCount</text>
+    <text x="442" y="358" class="attr">titleLower</text>
+    <text x="442" y="379" class="attr">descriptionLower</text>
+    <text x="442" y="400" class="attr">cityLower</text>
+    <text x="442" y="421" class="attr fk">schoolId (FK)</text>
+    <text x="442" y="442" class="attr">createdAt</text>
+    <text x="442" y="463" class="attr">updatedAt</text>
+  </g>
+
+  <g>
+    <rect x="820" y="100" width="280" height="336" class="ent-box"/>
+    <rect x="820" y="100" width="280" height="32" class="ent-head"/>
+    <text x="960" y="122" text-anchor="middle" class="ent-name">Application (candidature)</text>
+    <text x="832" y="148" class="attr id">id</text>
+    <text x="832" y="169" class="attr">applicantName</text>
+    <text x="832" y="190" class="attr">applicantEmail</text>
+    <text x="832" y="211" class="attr">applicantPhone</text>
+    <text x="832" y="232" class="attr">message</text>
+    <text x="832" y="253" class="attr">cvPath</text>
+    <text x="832" y="274" class="attr">idCardPath</text>
+    <text x="832" y="295" class="attr">licensePath</text>
+    <text x="832" y="316" class="attr">teachingCardPath</text>
+    <text x="832" y="337" class="attr">status</text>
+    <text x="832" y="358" class="attr">rejectedAt</text>
+    <text x="832" y="379" class="attr">trackingToken · U</text>
+    <text x="832" y="400" class="attr fk">listingId (FK)</text>
+    <text x="832" y="421" class="attr">createdAt</text>
+  </g>
+
+  <g>
+    <rect x="1220" y="100" width="560" height="378" class="ent-box"/>
+    <rect x="1220" y="100" width="560" height="32" class="ent-head"/>
+    <text x="1500" y="122" text-anchor="middle" class="ent-name">Contract (contrat)</text>
+    <text x="1232" y="148" class="attr id">id</text>
+    <text x="1232" y="169" class="attr">type</text>
+    <text x="1232" y="190" class="attr">startDate</text>
+    <text x="1232" y="211" class="attr">endDate</text>
+    <text x="1232" y="232" class="attr">motif</text>
+    <text x="1232" y="253" class="attr">grossSalary</text>
+    <text x="1232" y="274" class="attr">weeklyHours</text>
+    <text x="1232" y="295" class="attr">trialPeriodWeeks</text>
+    <text x="1232" y="316" class="attr">workplace</text>
+    <text x="1232" y="337" class="attr">providerSiret</text>
+    <text x="1232" y="358" class="attr">schoolAddress</text>
+    <text x="1232" y="379" class="attr">applicantAddress</text>
+    <text x="1232" y="400" class="attr">extraClauses</text>
+    <text x="1232" y="421" class="attr">birthDate</text>
+    <text x="1232" y="442" class="attr">birthPlace</text>
+    <text x="1232" y="463" class="attr">nationality</text>
+    <text x="1510" y="148" class="attr">teachingAuthNumber</text>
+    <text x="1510" y="169" class="attr">teachingAuthValidUntil</text>
+    <text x="1510" y="190" class="attr">licenseNumber</text>
+    <text x="1510" y="211" class="attr">licenseCategories</text>
+    <text x="1510" y="232" class="attr">pdfPath</text>
+    <text x="1510" y="253" class="attr">sentToApplicantAt</text>
+    <text x="1510" y="274" class="attr">schoolSignaturePath</text>
+    <text x="1510" y="295" class="attr">schoolSignedAt</text>
+    <text x="1510" y="316" class="attr">applicantSignaturePath</text>
+    <text x="1510" y="337" class="attr">applicantSignedAt</text>
+    <text x="1510" y="358" class="attr">proposedPdfHash</text>
+    <text x="1510" y="379" class="attr">signedPdfPath</text>
+    <text x="1510" y="400" class="attr">signedPdfHash</text>
+    <text x="1510" y="421" class="attr fk">applicationId (FK) · U</text>
+    <text x="1510" y="442" class="attr">createdAt</text>
+    <text x="1510" y="463" class="attr">updatedAt</text>
+  </g>
+
+  <!-- Relations (cardinalités côté entité, suppression en cascade) -->
+  <line x1="310" y1="300" x2="430" y2="300" class="patte"/>
+  <text x="370" y="290" text-anchor="middle" class="assoc-name">publie</text>
+  <text x="326" y="318" text-anchor="middle" class="card">0,n</text>
+  <text x="414" y="318" text-anchor="middle" class="card">1,1</text>
+  <text x="370" y="336" text-anchor="middle" class="note">onDelete: Cascade</text>
+
+  <line x1="700" y1="300" x2="820" y2="300" class="patte"/>
+  <text x="760" y="290" text-anchor="middle" class="assoc-name">reçoit</text>
+  <text x="716" y="318" text-anchor="middle" class="card">0,n</text>
+  <text x="804" y="318" text-anchor="middle" class="card">1,1</text>
+  <text x="760" y="336" text-anchor="middle" class="note">onDelete: Cascade</text>
+
+  <line x1="1100" y1="300" x2="1220" y2="300" class="patte"/>
+  <text x="1160" y="290" text-anchor="middle" class="assoc-name">génère</text>
+  <text x="1116" y="318" text-anchor="middle" class="card">0,1</text>
+  <text x="1204" y="318" text-anchor="middle" class="card">1,1</text>
+  <text x="1160" y="336" text-anchor="middle" class="note">1-1 : applicationId · U</text>
+  <text x="1160" y="352" text-anchor="middle" class="note">onDelete: Cascade</text>
+
+  <!-- Rangée 2 : entités autonomes (aucune clé étrangère) -->
+  <text x="40" y="622" class="legende">Entités autonomes (aucune clé étrangère — sessions, comptes de modération, alertes publiques, journal de conformité) :</text>
+
+  <g>
+    <rect x="40" y="640" width="270" height="104" class="ent-box"/>
+    <rect x="40" y="640" width="270" height="32" class="ent-head"/>
+    <text x="175" y="662" text-anchor="middle" class="ent-name">Session</text>
+    <text x="52" y="688" class="attr id">sid</text>
+    <text x="52" y="709" class="attr">data (JSON express-session)</text>
+    <text x="52" y="730" class="attr">expiresAt</text>
+    <text x="40" y="764" class="note">sessions persistées en base (revue de code)</text>
+  </g>
+
+  <g>
+    <rect x="430" y="640" width="270" height="146" class="ent-box"/>
+    <rect x="430" y="640" width="270" height="32" class="ent-head"/>
+    <text x="565" y="662" text-anchor="middle" class="ent-name">Admin</text>
+    <text x="442" y="688" class="attr id">id</text>
+    <text x="442" y="709" class="attr">email · U</text>
+    <text x="442" y="730" class="attr">passwordHash</text>
+    <text x="442" y="751" class="attr">createdAt</text>
+    <text x="442" y="772" class="attr">updatedAt</text>
+    <text x="430" y="806" class="note">modération — créé par script CLI (lot C)</text>
+  </g>
+
+  <g>
+    <rect x="820" y="640" width="280" height="230" class="ent-box"/>
+    <rect x="820" y="640" width="280" height="32" class="ent-head"/>
+    <text x="960" y="662" text-anchor="middle" class="ent-name">Alert (alerte email)</text>
+    <text x="832" y="688" class="attr id">id</text>
+    <text x="832" y="709" class="attr">email</text>
+    <text x="832" y="730" class="attr">department</text>
+    <text x="832" y="751" class="attr">keyword</text>
+    <text x="832" y="772" class="attr">keywordLower</text>
+    <text x="832" y="793" class="attr">confirmTokenHash · U</text>
+    <text x="832" y="814" class="attr">confirmedAt</text>
+    <text x="832" y="835" class="attr">unsubscribeToken · U</text>
+    <text x="832" y="856" class="attr">createdAt</text>
+    <text x="820" y="890" class="note">double opt-in (lot I) — @@unique(email, department, keywordLower)</text>
+  </g>
+
+  <g>
+    <rect x="1220" y="640" width="300" height="146" class="ent-box"/>
+    <rect x="1220" y="640" width="300" height="32" class="ent-head"/>
+    <text x="1370" y="662" text-anchor="middle" class="ent-name">PurgeRun (journal de purge)</text>
+    <text x="1232" y="688" class="attr id">id</text>
+    <text x="1232" y="709" class="attr">ranAt</text>
+    <text x="1232" y="730" class="attr">unconfirmedAlerts</text>
+    <text x="1232" y="751" class="attr">rejectedApplications</text>
+    <text x="1232" y="772" class="attr">expiredTokens</text>
+    <text x="1220" y="806" class="note">trace de conformité RGPD (lot J)</text>
+  </g>
+</svg>
