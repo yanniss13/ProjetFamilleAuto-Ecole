@@ -122,20 +122,21 @@ Puis vérifier dans un navigateur :
   `jury-conformite-visible`, plan :
   `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
   cochées — reprendre à la première tâche non cochée).
-- Dernière action terminée (2026-07-10, Claude) : **Task 4** — corrections
-  W3C : `autocomplete=street-address→address-line1` (inscription, compte),
-  label sur canvas remplacé par `span.label-titre` + `aria-label` (contrat +
-  page de signature candidat), `section.stats-grid→div` (dashboard, admin).
-  Re-validation : **0 erreur, 0 avertissement sur les 15 pages**.
+- Dernière action terminée (2026-07-10, Claude) : **Tasks 5, 6 et 7** —
+  accessibilité : `--color-muted` #6b7280→#5b6470 (contraste 5,5:1/6:1) et
+  `aria-label` sur les 4 SVG de graphiques → **0 violation axe tous niveaux
+  sur les 15 pages** ; responsive : aucune correction nécessaire ; run
+  complet final : **0 erreur W3C, 0 violation axe, 0 débordement sur les
+  45 contrôles** ; rapport daté rédigé : `docs/jury/conformite.md`.
   ⚠️ Piège appris : redémarrer le serveur 4071 après toute modification de
-  vue (cache Twig), sinon l'ancien HTML est validé.
-- Vérifications exécutées : `--controle=w3c` 15/15 à zéro ; `npm test`
-  (15 suites, 438 assertions) avant le commit.
-- Prochaine tâche : **Task 5** — corrections accessibilité : lire les
-  `docs/jury/conformite/axe-*.json` (1-2 violations par page, 0 sur carte),
-  corriger critical/serious + moderate triviales, re-run
-  `node scripts/conformite-jury.js --controle=axe` (serveur à redémarrer
-  après chaque modification de vue).
+  vue/CSS/JS (cache Twig + fichiers statiques), sinon l'ancien état est
+  contrôlé.
+- Vérifications exécutées : run final `--controle=tout` 45/45 à zéro ;
+  `npm test` (15 suites, 438 assertions) avant chaque commit.
+- Prochaine tâche : **Task 8** — cohérence finale : audit (W3C
+  MANQUANT→VALIDÉ, responsive et accessibilité →VALIDÉ, synthèse recomptée,
+  cases P1 cochées), index et checkpoint du présent README, `AGENTS.md`,
+  contrôle global des liens, `npx prisma validate`, commit final.
 - Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
   `main` le 2026-07-10 avec le rangement Codex et le Lot L.
 - `main` local a ~91 commits d'avance sur `origin/main` — pousser quand

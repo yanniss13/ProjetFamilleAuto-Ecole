@@ -1,24 +1,4 @@
 {
-  "violations": [
-    {
-      "id": "color-contrast",
-      "impact": "serious",
-      "aide": "Elements must meet minimum color contrast ratio thresholds",
-      "noeuds": 1,
-      "cibles": [
-        "footer > p"
-      ]
-    },
-    {
-      "id": "svg-img-alt",
-      "impact": "serious",
-      "aide": "<svg> elements with an img role must have alternative text",
-      "noeuds": 2,
-      "cibles": [
-        "#chart-schools-weekly > svg",
-        "#chart-applications-weekly > svg"
-      ]
-    }
-  ],
-  "passes": 28
+  "violations": [],
+  "passes": 34
 }

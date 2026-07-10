@@ -15,7 +15,7 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
   var BAR = '#2563eb'; // teinte unique validée (contraste + daltonisme, surface claire)
   var INK = '#374151'; // encre neutre : le texte ne porte jamais la couleur des barres
-  var MUTED = '#6b7280';
+  var MUTED = '#5b6470'; // aligné sur --color-muted (contraste WCAG AA)
   var GRID = '#e5e7eb';
 
   function svgEl(name, attrs) {
@@ -44,7 +44,7 @@
 
   // Barres hebdomadaires : serie = [{ label: 'JJ/MM', count }]. Valeur au-dessus des
   // barres non nulles seulement, libellés d'axe une semaine sur deux (12 = serré).
-  function renderBarChart(el, serie) {
+  function renderBarChart(el, serie, libelle) {
     if (!el || !Array.isArray(serie) || serie.length === 0) return;
     var W = 560;
     var H = 220;
@@ -54,7 +54,8 @@
     var max = 1;
     serie.forEach(function (b) { if (b.count > max) max = b.count; });
 
-    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+    // aria-label : un SVG role="img" doit porter un nom accessible (axe: svg-img-alt).
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': libelle });
     var step = innerW / serie.length;
     var barW = Math.min(26, Math.max(6, step * 0.55));
     var baseline = pad.top + innerH;
@@ -83,7 +84,7 @@
   // Entonnoir horizontal : steps = [{ label, count, rateFromPrevious }]. Barres
   // proportionnelles à la plus grande étape, une seule teinte, % de conversion
   // affiché entre les étapes en encre atténuée.
-  function renderFunnel(el, steps) {
+  function renderFunnel(el, steps, libelle) {
     if (!el || !Array.isArray(steps) || steps.length === 0) return;
     var W = 560;
     var rowH = 34;
@@ -95,7 +96,8 @@
     var max = 1;
     steps.forEach(function (s) { if (s.count > max) max = s.count; });
 
-    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
+    // aria-label : un SVG role="img" doit porter un nom accessible (axe: svg-img-alt).
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': libelle });
     steps.forEach(function (s, i) {
       var y = i * (rowH + gap);
       var w = Math.round((s.count / max) * barMax);
@@ -117,8 +119,12 @@
     el.appendChild(svg);
   }
 
-  renderBarChart(document.getElementById('chart-weekly'), stats.weekly);
-  renderFunnel(document.getElementById('chart-funnel'), stats.funnel);
-  renderBarChart(document.getElementById('chart-schools-weekly'), stats.schoolsWeekly);
-  renderBarChart(document.getElementById('chart-applications-weekly'), stats.applicationsWeekly);
+  renderBarChart(document.getElementById('chart-weekly'), stats.weekly,
+    'Diagramme en barres : candidatures reçues par semaine');
+  renderFunnel(document.getElementById('chart-funnel'), stats.funnel,
+    'Entonnoir de recrutement : des vues aux contrats signés');
+  renderBarChart(document.getElementById('chart-schools-weekly'), stats.schoolsWeekly,
+    'Diagramme en barres : inscriptions d’auto-écoles par semaine');
+  renderBarChart(document.getElementById('chart-applications-weekly'), stats.applicationsWeekly,
+    'Diagramme en barres : candidatures par semaine');
 })();
