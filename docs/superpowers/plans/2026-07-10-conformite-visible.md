@@ -31,7 +31,7 @@
 - Produces (`scripts/lib/cdp.js`) : `lanceEdge({ largeur = 1440, hauteur = 1000 })` → `{ cdp, fermer }` (Edge lancé, WebSocket connecté, `Page.enable` + `Runtime.enable` faits) ; classe `Cdp` avec `cmd(method, params) : Promise<result>` et `attendChargement() : Promise<void>` ; `navigue(cdp, url)` ; `connecte(cdp, urlLogin, { email, password })` ; `pause(ms)`.
 - Produces (`scripts/lib/pages-jury.js`) : `BASE` (string, `process.env.CAPTURE_BASE_URL || 'http://127.0.0.1:4071'`) ; `ECOLE` et `ADMIN` (`{ email, password }`) ; `donneesDemo()` → `{ phareId, pendingId, token }` (Prisma lecture seule) ; `pagesJury(ids)` → tableau de 15 `{ nom, url, session }` dans l'ordre publiques → école → admin.
 
-- [ ] **Step 1:** Créer `scripts/lib/cdp.js` en déplaçant depuis `scripts/captures-jury.js` (contenu identique, seule l'organisation change) : constantes `EDGES` et `PORT_CDP`, `pause`, classe `Cdp`, `navigue`, `connecte`, et le bloc de lancement d'Edge + découverte de cible + connexion WebSocket, emballé ainsi :
+- [x] **Step 1:** Créer `scripts/lib/cdp.js` en déplaçant depuis `scripts/captures-jury.js` (contenu identique, seule l'organisation change) : constantes `EDGES` et `PORT_CDP`, `pause`, classe `Cdp`, `navigue`, `connecte`, et le bloc de lancement d'Edge + découverte de cible + connexion WebSocket, emballé ainsi :
 
 ```js
 // scripts/lib/cdp.js — client Chrome DevTools Protocol minimal partagé par les
@@ -99,7 +99,7 @@ module.exports = { lanceEdge, navigue, connecte, pause };
 
 (Recopier les corps `Cdp`, `navigue`, `connecte` tels quels depuis `scripts/captures-jury.js` — ils y sont complets.)
 
-- [ ] **Step 2:** Créer `scripts/lib/pages-jury.js` en déplaçant depuis `scripts/captures-jury.js` : `BASE`, `DEMO_SUFFIX`, `ECOLE`, `ADMIN`, `donneesDemo()` (INCHANGÉ, Prisma lecture seule avec `$disconnect` en `finally`) et la construction des pages :
+- [x] **Step 2:** Créer `scripts/lib/pages-jury.js` en déplaçant depuis `scripts/captures-jury.js` : `BASE`, `DEMO_SUFFIX`, `ECOLE`, `ADMIN`, `donneesDemo()` (INCHANGÉ, Prisma lecture seule avec `$disconnect` en `finally`) et la construction des pages :
 
 ```js
 // scripts/lib/pages-jury.js — la liste des 15 pages du dossier jury et les IDs
@@ -138,9 +138,9 @@ function pagesJury(ids) {
 module.exports = { BASE, ECOLE, ADMIN, donneesDemo, pagesJury };
 ```
 
-- [ ] **Step 3:** Réécrire `scripts/captures-jury.js` pour consommer les deux libs : il garde `argument()`, `capture()` et la boucle principale (gestion de `sessionCourante`, fail-soft, bilan final, runner CLI) ; il perd tout ce qui a été déplacé. La boucle utilise `lanceEdge({ largeur })`, `pagesJury(await donneesDemo())`, `connecte(cdp, BASE + '/connexion', ECOLE)` / `connecte(cdp, BASE + '/admin/connexion', ADMIN)`, `navigue(cdp, BASE + page.url)` — signatures du bloc Interfaces. L'option `--sortie` existe déjà : ne pas la changer.
-- [ ] **Step 4:** Re-vérifier le comportement : `npm run seed:demo`, serveur sur 4071 en fond, `node scripts/captures-jury.js --sortie=docs/jury/captures` → attendu `15/15 captures`. Arrêter le serveur. (Les PNG regénérés peuvent différer au bit près : NE PAS les commiter — `git checkout -- docs/jury/captures` si modifiés.)
-- [ ] **Step 5:** `npm test` (438 assertions). Cocher la Task 1, mettre à jour le checkpoint de `docs/jury/README.md` (Global Constraints), puis :
+- [x] **Step 3:** Réécrire `scripts/captures-jury.js` pour consommer les deux libs : il garde `argument()`, `capture()` et la boucle principale (gestion de `sessionCourante`, fail-soft, bilan final, runner CLI) ; il perd tout ce qui a été déplacé. La boucle utilise `lanceEdge({ largeur })`, `pagesJury(await donneesDemo())`, `connecte(cdp, BASE + '/connexion', ECOLE)` / `connecte(cdp, BASE + '/admin/connexion', ADMIN)`, `navigue(cdp, BASE + page.url)` — signatures du bloc Interfaces. L'option `--sortie` existe déjà : ne pas la changer.
+- [x] **Step 4:** Re-vérifier le comportement : `npm run seed:demo`, serveur sur 4071 en fond, `node scripts/captures-jury.js --sortie=docs/jury/captures` → attendu `15/15 captures`. Arrêter le serveur. (Les PNG regénérés peuvent différer au bit près : NE PAS les commiter — `git checkout -- docs/jury/captures` si modifiés.)
+- [x] **Step 5:** `npm test` (438 assertions). Cocher la Task 1, mettre à jour le checkpoint de `docs/jury/README.md` (Global Constraints), puis :
 
 ```powershell
 git add scripts/lib/cdp.js scripts/lib/pages-jury.js scripts/captures-jury.js docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md

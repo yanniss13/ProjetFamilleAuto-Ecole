@@ -118,25 +118,21 @@ Puis vérifier dans un navigateur :
 
 ### Dernier checkpoint
 
-- Action terminée (2026-07-10, Claude) : chantier « consolidation du dossier »
-  livré en entier sur la branche `jury-consolidation-dossier` — script de
-  captures + 15 PNG, `resume-projet.md`, `expression-du-besoin-v2.md`,
-  `competences-dwwm.md` (REAC RNCP37674 vérifié en ligne),
-  `base-de-donnees.md` + `diagrammes/bdd-v2.{svg,png}`,
-  `comparaison-maquettes.md`, audit et présent README mis à jour. Le travail
-  précédent (rangement Codex + audit) a été commité puis fusionné dans `main`
-  avec le Lot L.
-- Spécification et plan du chantier :
-  `docs/superpowers/{specs,plans}/2026-07-10-consolidation-dossier-jury*.md`
-  (plan entièrement coché).
-- Vérifications exécutées : `npm test` (15 suites, 438 assertions) avant
-  chaque commit ; `npx prisma validate` réussi ; liens Markdown relatifs
-  contrôlés par script sur tous les documents créés/modifiés (0 cassé) ;
-  15 captures contrôlées visuellement ; SVG validé XML.
-- Vérifications restantes : rendu navigateur multi-largeurs, W3C,
-  accessibilité (chantier « conformité visible »).
-- Premier travail restant : lancer le chantier « conformité visible »
-  (spécification d'abord) ; `main` local a ~90 commits d'avance sur
-  `origin/main` — pousser quand l'utilisateur le demandera.
-- Décision utilisateur attendue : aucune pour continuer ; valider le moment
-  du `git push`.
+- **Chantier en cours : « conformité visible »**, branche
+  `jury-conformite-visible`, plan :
+  `docs/superpowers/plans/2026-07-10-conformite-visible.md` (suivre les cases
+  cochées — reprendre à la première tâche non cochée).
+- Dernière action terminée (2026-07-10, Claude) : **Task 1** — client CDP
+  extrait dans `scripts/lib/cdp.js`, pages partagées dans
+  `scripts/lib/pages-jury.js`, `scripts/captures-jury.js` refactorisé et
+  re-vérifié (15/15 captures identiques en comportement).
+- Vérifications exécutées : `node scripts/captures-jury.js` → 15/15 ;
+  `npm test` (15 suites, 438 assertions) avant le commit.
+- Prochaine tâche : **Task 2** — `npm i -D axe-core`, écrire
+  `scripts/conformite-jury.js` (code complet dans le plan), premier constat
+  brut sur les 15 pages (prérequis : `npm run seed:demo` + serveur
+  `$env:PORT='4071'; node src/server.js`).
+- Chantier précédent (« consolidation du dossier ») : livré et fusionné dans
+  `main` le 2026-07-10 avec le rangement Codex et le Lot L.
+- `main` local a ~91 commits d'avance sur `origin/main` — pousser quand
+  l'utilisateur le demandera. Aucune autre décision utilisateur attendue.
