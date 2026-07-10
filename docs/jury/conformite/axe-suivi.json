@@ -1,0 +1,17 @@
+{
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "aide": "Elements must meet minimum color contrast ratio thresholds",
+      "noeuds": 4,
+      "cibles": [
+        ".muted:nth-child(2)",
+        "strong",
+        ".muted:nth-child(3)",
+        "footer > p"
+      ]
+    }
+  ],
+  "passes": 22
+}

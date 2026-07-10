@@ -1,0 +1,26 @@
+{
+  "320": {
+    "deborde": false,
+    "scrollWidth": 485,
+    "innerWidth": 485,
+    "coupables": []
+  },
+  "375": {
+    "deborde": false,
+    "scrollWidth": 486,
+    "innerWidth": 486,
+    "coupables": []
+  },
+  "768": {
+    "deborde": false,
+    "scrollWidth": 753,
+    "innerWidth": 768,
+    "coupables": []
+  },
+  "1440": {
+    "deborde": false,
+    "scrollWidth": 1425,
+    "innerWidth": 1440,
+    "coupables": []
+  }
+}

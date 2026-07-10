@@ -29,6 +29,7 @@
     "twig": "^3.0.0"
   },
   "devDependencies": {
+    "axe-core": "^4.12.1",
     "leaflet": "^1.9.4",
     "prisma": "^6.0.0"
   }

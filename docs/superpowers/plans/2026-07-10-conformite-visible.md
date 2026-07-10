@@ -158,8 +158,8 @@ git commit -m "Jury: lib CDP et pages partagees (refactorisation, captures re-ve
 - Consumes: `lanceEdge`, `navigue`, `connecte`, `pause` de `scripts/lib/cdp.js` ; `BASE`, `ECOLE`, `ADMIN`, `donneesDemo`, `pagesJury` de `scripts/lib/pages-jury.js`.
 - Produces: `docs/jury/conformite/{w3c,axe,debordement}-<nom>.json` (15 × 3) et `docs/jury/conformite/resume.json` — consommés par les Tasks 4-7.
 
-- [ ] **Step 1:** `npm install --save-dev axe-core` puis vérifier que `require.resolve('axe-core/axe.min.js')` répond (one-liner `node -e`).
-- [ ] **Step 2:** Écrire `scripts/conformite-jury.js` :
+- [x] **Step 1:** `npm install --save-dev axe-core` puis vérifier que `require.resolve('axe-core/axe.min.js')` répond (one-liner `node -e`).
+- [x] **Step 2:** Écrire `scripts/conformite-jury.js` :
 
 ```js
 // scripts/conformite-jury.js — contrôles de conformité pour le dossier jury :
@@ -317,8 +317,8 @@ if (require.main === module) {
 }
 ```
 
-- [ ] **Step 3:** Seed + serveur 4071, puis `node scripts/conformite-jury.js --controle=tout`. Attendu : 45 lignes `✓` (15 pages × 3 contrôles), 46 JSON écrits. Lire `docs/jury/conformite/resume.json` et noter le constat brut (nombres d'erreurs W3C, violations axe, débordements par page) — c'est l'état AVANT corrections, à conserver pour le rapport (copier `resume.json` en `resume-avant-corrections.json`).
-- [ ] **Step 4:** `npm test`. Cocher la Task 2, checkpoint `docs/jury/README.md`, puis :
+- [x] **Step 3:** Seed + serveur 4071, puis `node scripts/conformite-jury.js --controle=tout`. Attendu : 45 lignes `✓` (15 pages × 3 contrôles), 46 JSON écrits. **Constat brut du 2026-07-10 : W3C = 3 erreurs (inscription, contrat, compte : 1 chacune) + 2 avertissements (dashboard, admin) ; axe = 1-2 violations par page (carte : 0) ; débordement = AUCUN (60 combinaisons).** Lire `docs/jury/conformite/resume.json` et noter le constat brut (nombres d'erreurs W3C, violations axe, débordements par page) — c'est l'état AVANT corrections, à conserver pour le rapport (copier `resume.json` en `resume-avant-corrections.json`).
+- [x] **Step 4:** `npm test`. Cocher la Task 2, checkpoint `docs/jury/README.md`, puis :
 
 ```powershell
 git add package.json package-lock.json scripts/conformite-jury.js docs/jury/conformite docs/jury/README.md docs/superpowers/plans/2026-07-10-conformite-visible.md
