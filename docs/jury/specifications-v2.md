@@ -63,6 +63,14 @@ Vue d'ensemble : [`decoupage-fonctionnel.md`](decoupage-fonctionnel.md) et
 | Retirer une annonce | La modération supprime une annonce désignée ; seule une absence Prisma `P2025` devient une 404. | `POST /admin/annonces/:id/supprimer` | `lot-c.cjs`, `correctifs.cjs` |
 | Lancer la purge RGPD | La purge manuelle applique les mêmes règles que la tâche planifiée et journalise un `PurgeRun`. | `POST /admin/purge` | `lot-j.cjs` |
 
+### Maquettes v2
+
+Les 30 écrans et états ci-dessus sont maquettés en filaire sous
+[`wireframes-v2/`](wireframes-v2/index.html) (livrés le 2026-07-11) ; la
+traçabilité écran → route → vue → tests est tenue dans
+[`wireframes-v2/matrice-couverture.md`](wireframes-v2/matrice-couverture.md).
+Les maquettes v1 de juin restent intactes en preuve de conception initiale.
+
 ## 3. Spécifications techniques
 
 - **Stack et justifications** : Node.js CommonJS, Express 5, Twig avec

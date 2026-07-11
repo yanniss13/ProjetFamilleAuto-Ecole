@@ -32,6 +32,11 @@ l'utilisateur.
     [`diagramme-fonctionnel-v2.md`](diagramme-fonctionnel-v2.md)
   - Cas d'utilisation v2 :
     [`diagrammes/cas-utilisation-v2.svg`](diagrammes/cas-utilisation-v2.svg)
+  - Wireframes v2 (30 écrans/états conformes, livrés le 2026-07-11) :
+    sommaire [`wireframes-v2/index.html`](wireframes-v2/index.html),
+    matrice [`wireframes-v2/matrice-couverture.md`](wireframes-v2/matrice-couverture.md),
+    planche [`wireframes-v2/wireframes-v2-planche.svg`](wireframes-v2/wireframes-v2-planche.svg),
+    PDF 32 pages [`wireframes-v2/wireframes-v2.pdf`](wireframes-v2/wireframes-v2.pdf)
 - **Conformité (rejouée le 2026-07-11)** : [`conformite.md`](conformite.md) —
   passage final sur la version mobile livrée : W3C 0/0, axe 0 violation,
   débordement 0/60 avec viewport exact ; faux positif responsive documenté.
@@ -134,9 +139,17 @@ Puis vérifier dans un navigateur :
   cas d'utilisation livrés en v2 sous `docs/jury/` ; les v1 de juin sont
   restées intactes et les wireframes n'ont volontairement pas été modifiés,
   car ils prouvent la maquette initiale.
+- Action terminée le 2026-07-11 (Codex puis Claude) : **30 wireframes v2**
+  livrés sous `wireframes-v2/` — manifeste + générateur + contrôle
+  (`check-wireframes.cjs` à 30/30), 30 PNG 1440 px exacts contrôlés
+  visuellement un à un, matrice de traçabilité 30/30 VALIDÉ, planche SVG et
+  PDF 32 pages vérifié (pypdf + rendu pypdfium2). Wireframes v1 de juin
+  intacts. Codex a livré les tâches 1 à 4 et rédigé les contenus admin ;
+  Claude a généré/contrôlé/commité la fin (blocage sandbox Codex sur Node).
 - Action terminée le 2026-07-11 : découpage fonctionnel et charte graphique
   livrés (`decoupage-fonctionnel.md`, diagrammes SVG/PNG et
-  `charte-graphique.md`) ; audit porté à **32 validés / 1 à renforcer /
+  `charte-graphique.md`), puis specifications-v2, diagramme fonctionnel v2 et
+  cas d'utilisation v2 ; audit porté à **32 validés / 1 à renforcer /
   0 manquant**.
 - Action terminée : **chantier « responsive mobile et présentation » LIVRÉ en
   entier** (les deux plans du 2026-07-10 — corrections d'audit et responsive —
