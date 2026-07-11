@@ -7,7 +7,7 @@
     .assoc{stroke:#9aa5b1;stroke-width:1.2}.include{stroke:#3b5b8c;stroke-width:1.6;stroke-dasharray:6 4;marker-end:url(#open)}.inclabel{fill:#5b6470;font-size:12px;font-style:italic}
   </style>
   <rect width="1900" height="1000" fill="#fff"/><text x="35" y="40" class="titre">MoniteurConnect — cas d'utilisation v2 (2026-07-11)</text>
-  <text x="35" y="68" class="legende">Trois acteurs · associations pleines · relations « include » pointillées uniquement lorsque le sous-processus est obligatoire.</text>
+  <text x="35" y="68" class="legende">Trois acteurs · associations pleines · « include » pointillé = sous-processus obligatoire · « extend » pointillé = comportement conditionnel (signature ouverte après envoi du contrat, réinitialisation depuis la connexion).</text>
   <rect x="235" y="85" width="1630" height="875" rx="8" class="sys"/><text x="260" y="118" class="titre">Système MoniteurConnect</text>
   <rect x="250" y="135" width="1600" height="270" rx="8" class="bande"/><rect x="250" y="420" width="1600" height="310" rx="8" class="bande"/><rect x="250" y="745" width="1600" height="190" rx="8" class="bande"/>
 
@@ -22,23 +22,24 @@
     <ellipse cx="1015" cy="185" rx="135" ry="38"/><text x="1015" y="190">Voir le détail d'une annonce</text>
     <ellipse cx="1310" cy="185" rx="135" ry="38"/><text x="1310" y="181"><tspan x="1310">Postuler avec</tspan><tspan x="1310" dy="16">pièces jointes</tspan></text>
     <ellipse cx="1605" cy="185" rx="135" ry="38"/><text x="1605" y="181"><tspan x="1605">Suivre sa candidature</tspan><tspan x="1605" dy="16">par jeton</tspan></text>
-    <ellipse cx="420" cy="310" rx="135" ry="38"/><text x="420" y="315">Signer le contrat en ligne</text>
-    <ellipse cx="725" cy="310" rx="135" ry="38"/><text x="725" y="315">Télécharger le PDF signé</text>
-    <ellipse cx="1015" cy="310" rx="145" ry="38"/><text x="1015" y="306"><tspan x="1015">S'abonner aux alertes email</tspan><tspan x="1015" dy="16">double opt-in</tspan></text>
-    <ellipse cx="1310" cy="310" rx="145" ry="38"/><text x="1310" y="306"><tspan x="1310">Se désabonner</tspan><tspan x="1310" dy="16">suppression RGPD</tspan></text>
-    <ellipse cx="1605" cy="310" rx="145" ry="38"/><text x="1605" y="306"><tspan x="1605">Contrôle des pièces</tspan><tspan x="1605" dy="16">magic bytes</tspan></text>
+    <ellipse cx="420" cy="310" rx="145" ry="38"/><text x="420" y="306"><tspan x="420">S'abonner aux alertes email</tspan><tspan x="420" dy="16">double opt-in</tspan></text>
+    <ellipse cx="725" cy="310" rx="145" ry="38"/><text x="725" y="306"><tspan x="725">Se désabonner</tspan><tspan x="725" dy="16">suppression RGPD</tspan></text>
+    <ellipse cx="1015" cy="310" rx="135" ry="38"/><text x="1015" y="315">Télécharger le PDF signé</text>
+    <ellipse cx="1310" cy="310" rx="145" ry="38"/><text x="1310" y="306"><tspan x="1310">Contrôle des pièces</tspan><tspan x="1310" dy="16">magic bytes</tspan></text>
+    <ellipse cx="1605" cy="310" rx="135" ry="38"/><text x="1605" y="315">Signer le contrat en ligne</text>
 
     <ellipse cx="410" cy="475" rx="145" ry="38"/><text x="410" y="471"><tspan x="410">S'inscrire</tspan><tspan x="410" dy="16">vérification SIRET + email</tspan></text>
-    <ellipse cx="715" cy="475" rx="145" ry="38"/><text x="715" y="471"><tspan x="715">Se connecter / réinitialiser</tspan><tspan x="715" dy="16">son mot de passe</tspan></text>
+    <ellipse cx="715" cy="475" rx="145" ry="38"/><text x="715" y="471"><tspan x="715">Se connecter</tspan><tspan x="715" dy="16">session régénérée</tspan></text>
     <ellipse cx="1020" cy="475" rx="135" ry="38"/><text x="1020" y="480">Gérer son profil</text>
     <ellipse cx="1325" cy="475" rx="155" ry="38"/><text x="1325" y="471"><tspan x="1325">Créer, modifier, clôturer ou</tspan><tspan x="1325" dy="16">supprimer une annonce</tspan></text>
     <ellipse cx="1650" cy="475" rx="155" ry="38"/><text x="1650" y="471"><tspan x="1650">Consulter les candidatures et</tspan><tspan x="1650" dy="16">télécharger les pièces</tspan></text>
-    <ellipse cx="410" cy="585" rx="150" ry="38"/><text x="410" y="581"><tspan x="410">Accepter une candidature</tspan><tspan x="410" dy="16">contrat + signature</tspan></text>
-    <ellipse cx="715" cy="585" rx="135" ry="38"/><text x="715" y="590">Refuser une candidature</text>
-    <ellipse cx="1020" cy="585" rx="140" ry="38"/><text x="1020" y="590">Envoyer le contrat au candidat</text>
-    <ellipse cx="1325" cy="585" rx="150" ry="38"/><text x="1325" y="590">Télécharger le contrat contresigné</text>
-    <ellipse cx="1650" cy="585" rx="135" ry="38"/><text x="1650" y="590">Consulter ses statistiques</text>
-    <ellipse cx="410" cy="680" rx="145" ry="34"/><text x="410" y="685">Générer le contrat PDF</text>
+    <ellipse cx="410" cy="585" rx="145" ry="38"/><text x="410" y="581"><tspan x="410">Réinitialiser son</tspan><tspan x="410" dy="16">mot de passe</tspan></text>
+    <ellipse cx="715" cy="585" rx="150" ry="38"/><text x="715" y="581"><tspan x="715">Accepter une candidature</tspan><tspan x="715" dy="16">contrat + signature</tspan></text>
+    <ellipse cx="1020" cy="585" rx="135" ry="38"/><text x="1020" y="590">Refuser une candidature</text>
+    <ellipse cx="1325" cy="585" rx="140" ry="38"/><text x="1325" y="590">Envoyer le contrat au candidat</text>
+    <ellipse cx="1650" cy="585" rx="150" ry="38"/><text x="1650" y="590">Télécharger le contrat contresigné</text>
+    <ellipse cx="410" cy="680" rx="135" ry="34"/><text x="410" y="685">Consulter ses statistiques</text>
+    <ellipse cx="715" cy="680" rx="145" ry="34"/><text x="715" y="685">Générer le contrat PDF</text>
 
     <ellipse cx="410" cy="790" rx="145" ry="38"/><text x="410" y="795">Se connecter à l'administration</text>
     <ellipse cx="715" cy="790" rx="145" ry="38"/><text x="715" y="786"><tspan x="715">Consulter les statistiques</tspan><tspan x="715" dy="16">plateforme</tspan></text>
@@ -46,7 +47,9 @@
     <ellipse cx="1325" cy="790" rx="135" ry="38"/><text x="1325" y="795">Retirer une annonce</text>
     <ellipse cx="1630" cy="790" rx="135" ry="38"/><text x="1630" y="795">Lancer la purge RGPD</text>
   </g>
-  <path d="M1445 205L1530 275" class="include"/><text x="1475" y="245" class="inclabel">« include »</text>
-  <path d="M410 623V642" class="include"/><text x="425" y="642" class="inclabel">« include »</text>
-  <text x="260" y="952" class="legende">Les associations acteur → cas sont regroupées par bande pour éviter un faisceau de traits sans valeur métier.</text>
+  <path d="M1310 223V272" class="include"/><text x="1325" y="252" class="inclabel">« include »</text>
+  <path d="M1605 272V223" class="include"/><text x="1620" y="252" class="inclabel">« extend »</text>
+  <path d="M505 555L625 505" class="include"/><text x="520" y="522" class="inclabel">« extend »</text>
+  <path d="M715 623V646" class="include"/><text x="730" y="642" class="inclabel">« include »</text>
+  <text x="260" y="952" class="legende">Les associations acteur → cas sont regroupées par bande pour éviter un faisceau de traits sans valeur métier. « Signer le contrat » étend le suivi (visible seulement après l'envoi du contrat) ; la réinitialisation étend la connexion.</text>
 </svg>
