@@ -58,7 +58,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   — consolidation, conformité visible et script de soutenance (deck 28 diapos
   `docs/jury/soutenance/soutenance.html`, démo minutée, 26 Q/R, deux
   veilles, README réécrit, DESIGN classé, Mailpit géré nativement — `auth`
-  seulement si `SMTP_USER`). Audit : **30 validés / 3 à renforcer /
+  seulement si `SMTP_USER`). Audit : **32 validés / 1 à renforcer /
   0 manquant**. Un faux positif responsive avait été identifié (`innerWidth`
   élargi à environ 485 px pour une demande à 320 px) : burger accessible et
   composition mobile implémentés en TDD, `captures-jury.js` et
