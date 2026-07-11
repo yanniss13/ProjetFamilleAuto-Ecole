@@ -7,11 +7,12 @@ consultent les annonces (recherche, carte, rayon), **postulent sans créer de
 compte** avec leurs pièces justificatives, suivent leur dossier par un lien
 privé et contresignent leur contrat en ligne.
 
-Le MVP et douze lots itératifs (A → L) sont livrés : notifications et suivi
-candidat, administration/modération, carte des annonces, vérification SIRET,
-signature électronique, tableaux de bord statistiques, alertes email en
-double opt-in, purge RGPD automatique, jeu de démonstration et autocomplétion
-d'adresse. Résumé complet : [`docs/jury/resume-projet.md`](docs/jury/resume-projet.md).
+Le MVP et **onze lots itératifs** sont livrés (A–C et E–L ; le lot D est resté
+réservé) : notifications et suivi candidat, administration/modération, carte
+des annonces, vérification SIRET, signature électronique, tableaux de bord
+statistiques, alertes email en double opt-in, purge RGPD automatique, jeu de
+démonstration et autocomplétion d'adresse. Résumé complet :
+[`docs/jury/resume-projet.md`](docs/jury/resume-projet.md).
 
 ## Fonctionnalités livrées
 
@@ -30,7 +31,7 @@ d'adresse. Résumé complet : [`docs/jury/resume-projet.md`](docs/jury/resume-pr
 ## Stack
 
 Node.js · Express 5 · Twig (rendu serveur) · Prisma (SQLite en dev,
-PostgreSQL prévu en production par simple changement de provider) · sessions
+PostgreSQL ciblé en production avec une chaîne de migrations dédiée) · sessions
 persistées en base · bcrypt · helmet (CSP stricte) · express-rate-limit ·
 multer · nodemailer · PDFKit · Leaflet auto-hébergé.
 
@@ -60,7 +61,7 @@ Application sur http://localhost:3000
 |---|---|
 | `npm run dev` | Serveur en mode développement (watch) |
 | `npm start` | Serveur en mode standard |
-| `npm test` | Suite complète : 15 fichiers, 442 assertions (TDD, sans framework) |
+| `npm test` | Suite complète : 15 fichiers, 448 assertions (TDD, sans framework) |
 | `npm run seed:demo` | Jeu de démonstration relançable (comptes affichés en fin de script) |
 | `npm run admin:create -- <email> <mdp>` | Crée ou met à jour un administrateur |
 | `npm run purge` | Purge RGPD à la demande (sinon automatique, toutes les 24 h) |

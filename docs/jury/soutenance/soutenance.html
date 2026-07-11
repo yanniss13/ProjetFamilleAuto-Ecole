@@ -104,18 +104,18 @@
     <div>
       <ul>
         <li>MVP : comptes écoles, annonces, candidatures à 4 pièces, contrats PDF ;</li>
-        <li>12 lots itératifs (A → L) : suivi candidat, administration, carte + rayon,
+        <li>11 lots livrés (A–C, E–L ; D réservé) : suivi candidat, administration, carte + rayon,
             vérification SIRET, <strong>signature électronique</strong>, statistiques,
             alertes email, purge RGPD, jeu de démo, autocomplétion d'adresse.</li>
       </ul>
     </div>
     <div class="carte" style="text-align:center;">
       <p><span class="chiffre">15</span><br><span class="legende">fichiers de tests</span></p>
-      <p style="margin-top:0.8rem;"><span class="chiffre">442</span><br><span class="legende">assertions, TDD systématique</span></p>
+      <p style="margin-top:0.8rem;"><span class="chiffre">448</span><br><span class="legende">assertions, TDD systématique</span></p>
     </div>
   </div>
   <aside class="notes">Chaque lot = spécification → plan → test d'abord.
-    Les 442 assertions tournent avant chaque commit.</aside>
+    Les 448 assertions tournent avant chaque commit.</aside>
   <div class="pied"><span>3–6 min · cadrage</span><span class="compteur"></span></div>
 </section>
 
@@ -187,8 +187,8 @@
   <ul>
     <li><strong>Express 5 + Twig</strong> : rendu serveur, autoescape, SEO naturel ;</li>
     <li><strong>Prisma</strong> : schéma versionné, migrations, requêtes paramétrées ;</li>
-    <li><strong>SQLite → PostgreSQL</strong> : zéro install en dev, bascule par
-        changement de provider, sans changement de code ;</li>
+    <li><strong>SQLite → PostgreSQL</strong> : code Prisma portable, migrations
+        PostgreSQL dédiées et répétées avant production ;</li>
     <li><strong>sessions en base</strong> plutôt que JWT : révocables, HTTP-only ;</li>
     <li><strong>Leaflet auto-hébergé</strong>, PDFKit, Nodemailer — aucune ressource
         externe dans les pages (CSP stricte).</li>
@@ -412,22 +412,23 @@
 </section>
 
 <section class="diapo" data-minutage="31–34 min · qualité">
-  <h2>Tests et conformité — chiffres du 10 juillet 2026</h2>
+  <h2>Tests et conformité — chiffres du 11 juillet 2026</h2>
   <div class="colonnes">
-    <div class="carte" style="text-align:center;"><p><span class="chiffre">442</span><br>
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">448</span><br>
       <span class="legende">assertions, 15 suites, avant chaque commit</span></p></div>
     <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
       <span class="legende">erreur et avertissement W3C (validateur Nu, 15 pages)</span></p></div>
     <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
       <span class="legende">violation axe-core (accessibilité, 15 pages)</span></p></div>
-    <div class="carte" style="text-align:center;"><p><span class="chiffre">0</span><br>
-      <span class="legende">débordement sur 4 largeurs (320 → 1440 px)</span></p></div>
+    <div class="carte" style="text-align:center;"><p><span class="chiffre">0/60</span><br>
+      <span class="legende">débordement à 320/375/768/1440 px (viewport exact)</span></p></div>
   </div>
   <p class="legende" style="margin-top:1rem;">Contrôles re-jouables en deux
     commandes — méthode et preuves datées : <code>docs/jury/conformite.md</code>.</p>
-  <aside class="notes">Limite assumée si question : le pad de signature se
-    dessine à la souris — l'alternative accessible est l'import de fichier,
-    atteignable au clavier.</aside>
+  <aside class="notes">Le chiffre 0/60 est celui du passage final du 11 juillet :
+    faux positif innerWidth corrigé, burger accessible livré, 45 captures
+    exactes régénérées. Limite du pad : l'import de fichier reste l'alternative
+    clavier.</aside>
   <div class="pied"><span>31–34 min · qualité</span><span class="compteur"></span></div>
 </section>
 

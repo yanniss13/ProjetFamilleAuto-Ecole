@@ -46,13 +46,14 @@ empreintes SHA-256), le tout sans jamais exiger de compte côté moniteur.
 ## Le périmètre livré
 
 MVP (inscription école, annonces, candidatures à 4 pièces, contrats PDF,
-emails, carte de localisation), puis douze lots itératifs :
+emails, carte de localisation), puis onze lots itératifs livrés et un numéro
+réservé :
 
 - **A** — correctifs : recherche insensible à la casse, pagination, CSP stricte,
   nettoyage des fichiers orphelins ;
 - **B** — notifications candidat et page de suivi par jeton opaque ;
 - **C** — administration : modération, suspension, cloisonnement des sessions ;
-- **D** — (réservé, non ouvert : qualité et production) ;
+- **D** — numéro réservé, non ouvert et non compté parmi les lots livrés ;
 - **E** — carte des annonces et recherche par ville + rayon ;
 - **F** — vérification SIRET en direct (API Recherche d'entreprises) ;
 - **G** — signature électronique du contrat (pad canvas, PDF final, SHA-256) ;
@@ -68,7 +69,7 @@ bytes, sessions en base, invalidation de sessions après reset...).
 ## La stack
 
 Node.js (CommonJS) + Express 5, rendu serveur Twig, Prisma (SQLite en
-développement, PostgreSQL prévu en production par simple changement de
-provider), sessions persistées en base, Leaflet auto-hébergé, PDFKit,
-Nodemailer. **15 fichiers de tests, 438 assertions**, sans framework de test —
+développement, PostgreSQL ciblé en production avec une chaîne de migrations
+dédiée), sessions persistées en base, Leaflet auto-hébergé, PDFKit,
+Nodemailer. **15 fichiers de tests, 448 assertions**, sans framework de test —
 TDD systématique documenté dans [`../../AGENTS.md`](../../AGENTS.md).

@@ -23,10 +23,10 @@ l'utilisateur.
     (captures 1440 px sous [`captures/`](captures/))
   - Base de données v2 : [`base-de-donnees.md`](base-de-donnees.md)
     (diagramme [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg))
-- **Conformité (2026-07-10)** : [`conformite.md`](conformite.md) — W3C
-  0 erreur/0 avertissement, responsive 0 débordement (45 captures),
-  accessibilité 0 violation axe ; checklist clavier à dérouler avant la
-  soutenance. JSON bruts sous [`conformite/`](conformite/).
+- **Conformité (rejouée le 2026-07-11)** : [`conformite.md`](conformite.md) —
+  passage final sur la version mobile livrée : W3C 0/0, axe 0 violation,
+  débordement 0/60 avec viewport exact ; faux positif responsive documenté.
+  JSON bruts sous [`conformite/`](conformite/).
 - **Soutenance (2026-07-10)** :
   - Deck des 35 minutes : [`soutenance/soutenance.html`](soutenance/soutenance.html)
     (28 diapos — flèches pour naviguer, touche N pour les notes orateur) ;
@@ -45,42 +45,29 @@ l'utilisateur.
   `C:\Users\yanni\Downloads\Checklist_certification_DWWM.xlsx.zip`
   (le contenu utile est entièrement retranscrit dans l'audit).
 
-## État au 2026-07-10 (après consolidation du dossier)
+## État actuel au 2026-07-11
 
-- Audit DWWM mis à jour : **19 validés / 12 à renforcer / 2 manquants**
-  (W3C et veille technique anglophone).
-- Le chantier « consolidation du dossier » est **livré** : résumé, besoin v2,
-  matrice de compétences, comparaison maquettes (avec 15 captures réelles) et
-  diagramme BDD v2 — voir la liste ci-dessus.
-- Un script réutilisable `scripts/captures-jury.js` capture l'application en
-  Edge headless (largeur paramétrable pour le futur contrôle responsive).
-- Aucun code métier modifié.
-- Les sources de juin sont classées sous `docs/historique/2026-06/` et les huit
-  captures de cours sont isolées sous `docs/_a_retirer_du_projet/`.
-- `AGENTS.md` pointe vers le présent dossier.
-- Le meilleur focus technique retenu est la **signature électronique du contrat**.
-- Le déroulé recommandé réserve **11 minutes** à la démonstration dans les 35 minutes.
-
-## Diagnostic central
-
-L'application est solide et riche, mais les documents généraux sont en retard. Les
-maquettes obligatoires ont été retrouvées et sont exploitables comme v1. Les risques
-prioritaires sont désormais :
-
-1. diagramme BDD limité à 4 entités alors que Prisma en contient 8 ;
-2. spécifications de juin annonçant encore admin et purge comme futurs ;
-3. ~~`README.md` et `docs/DESIGN.md` encore au statut « squelette »~~ —
-   réglé le 2026-07-10 (README réécrit, DESIGN classé en historique) ;
-4. liste des compétences absente ;
-5. aucune preuve W3C ;
-6. responsive et accessibilité non vérifiés sur navigateur ;
-7. veille sécurité et veille technique anglophone non formalisées.
+- Dossier consolidé, deck 35 minutes, démo 11 minutes, 26 Q/R et deux veilles
+  livrés ; focus technique : **signature électronique du contrat**.
+- Audit : **30 validés / 3 à renforcer / 0 manquant**. Les trois restes sont
+  le découpage fonctionnel et la charte (facultatifs) et l'environnement de
+  production démontré.
+- Modèle BDD v2 à 8 entités et procédures SQLite/PostgreSQL de
+  création/migration/sauvegarde/restauration documentés.
+- Suite actuelle : **15 fichiers, 448 assertions**.
+- Correction mobile livrée et **prouvée le 2026-07-11** : burger accessible
+  (contrôle interactif vert sur six pages à 320/375), composition une colonne,
+  tableaux contenus, chaînes longues sécables ; 45 captures aux largeurs
+  exactes (15 × 320, 15 × 375, 15 × 768, zéro doublon binaire) ; W3C 0/0,
+  axe 0 violation et débordement 0/60 rejoués sur la version finale.
+- Les sources de juin restent des v1 intactes sous `docs/historique/2026-06/` ;
+  les captures de cours tierces restent isolées sous
+  `docs/_a_retirer_du_projet/` en attente de suppression par l'utilisateur.
 
 ## Prochaine action recommandée
 
-**Les trois chantiers de préparation sont livrés** — l'audit est à
-29 validés / 4 à renforcer / 0 manquant. Il ne reste que des actions côté
-utilisateur :
+Toutes les preuves automatisables sont fraîches ; il ne reste que des actions
+côté utilisateur :
 
 1. **Répéter** en chronométrant : ouvrir
    [`soutenance/soutenance.html`](soutenance/soutenance.html) (touche N =
@@ -91,9 +78,8 @@ utilisateur :
 3. avant chaque répétition : démarrer le serveur PUIS `npm run seed:demo` ;
 4. décider du **`git push`** (main local est très en avance sur origin).
 
-Pour un agent : plus aucun chantier documentaire jury planifié. Les restes
-hors jury (sauvegarde/restauration, hébergement production, migration
-Prisma 7, Argon2id) sont listés dans l'audit et les veilles.
+Les restes hors jury (hébergement PostgreSQL réel, migration Prisma 7,
+Argon2id) sont listés dans l'audit et les veilles.
 
 ## Vérifications à lancer dès que l'environnement le permet
 
@@ -134,7 +120,39 @@ Puis vérifier dans un navigateur :
 - le premier travail restant, formulé sans ambiguïté ;
 - les décisions de l'utilisateur encore attendues.
 
-### Dernier checkpoint
+### Checkpoint final — preuves responsive régénérées (2026-07-11, Claude)
+
+- Action terminée : **chantier « responsive mobile et présentation » LIVRÉ en
+  entier** (les deux plans du 2026-07-10 — corrections d'audit et responsive —
+  sont entièrement cochés).
+- Comportement du burger vérifié en CDP sur six pages (accueil, annonces,
+  suivi, dashboard, contrat, admin) à 320 et 375 px : bouton visible, menu
+  fermé par défaut, ouverture au clic avec `aria-expanded`/`aria-label`
+  synchronisés, fermeture à Échap avec retour du focus au bouton, fermeture au
+  clic extérieur, aucun débordement menu ouvert — **12/12 vert**.
+- Captures : 45 PNG régénérés le 2026-07-11 — largeurs binaires exactes
+  (15 × 320, 15 × 375, 15 × 768), zéro doublon binaire entre `r320` et `r375`,
+  12 captures clés contrôlées visuellement (marque centrée, burger à droite,
+  une colonne, boutons pleine largeur, rien de coupé).
+- Conformité rejouée dans `docs/jury/conformite/` : **W3C 0 erreur /
+  0 avertissement sur 15 pages, axe 0 violation, débordement 0/60** avec
+  `viewportWidth` enregistré (`resume.json` daté du 2026-07-11).
+- Tests : `npm test` — 15 suites, **448 assertions**, sortie 0 (aucun code
+  produit modifié ce jour ; uniquement documents et preuves régénérées).
+- Fichiers modifiés ce jour : `docs/jury/captures/r{320,375,768}/*.png`,
+  `docs/jury/conformite/*.json`, `docs/jury/audit-certification-dwwm.md`
+  (critère responsive → VALIDÉ, synthèse 30/3/0), `docs/jury/conformite.md`,
+  `docs/jury/README.md`, `docs/jury/soutenance/soutenance.html` (diapo
+  qualité : 0/60, date du 11 juillet), `soutenance/questions-reponses.md`,
+  `AGENTS.md`, et les deux plans cochés sous `docs/superpowers/plans/`.
+- Serveur 4071 arrêté en fin de session. Aucun commit ni staging. Les trois
+  fichiers personnels non suivis sont préservés et ignorés explicitement.
+- Seuls restes, tous côté utilisateur : répétitions chronométrées (deck, démo,
+  Q/R), checklist clavier complète de `conformite.md` (section 5), décision du
+  `git push` (main très en avance sur origin) et suppression des fichiers
+  tiers sous `docs/_a_retirer_du_projet/`.
+
+### Dernier checkpoint livre
 
 - Action terminée (2026-07-10, Claude) : **chantier « script de soutenance »
   LIVRÉ en entier** sur la branche `jury-script-soutenance` (plan

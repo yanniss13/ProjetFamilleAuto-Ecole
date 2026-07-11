@@ -70,7 +70,8 @@ autocomplétion débouncée, vérification SIRET en direct.
 
 **Réalisation** : schéma Prisma de 8 modèles, contraintes d'intégrité (clés
 étrangères, unicités simples et composées, relation 1-1, cascades), évolution
-par migrations, bascule SQLite → PostgreSQL sans changement de code.
+par migrations. Le code Prisma est portable vers PostgreSQL, avec un historique
+de migrations PostgreSQL distinct à préparer et tester.
 
 | Preuve | Où |
 |---|---|
@@ -134,7 +135,7 @@ existe et le plan, sans survendre.
 
 ## Synthèse pour la soutenance
 
-Les compétences 1 à 7 s'appuient sur du code livré et testé (438 assertions) ;
+Les compétences 1 à 7 s'appuient sur du code livré et testé (448 assertions) ;
 la compétence 8 s'appuie sur une documentation partielle et un plan explicite.
 Le déroulé de présentation qui couvre ces compétences minute par minute est
 dans l'[audit, section 4](audit-certification-dwwm.md).

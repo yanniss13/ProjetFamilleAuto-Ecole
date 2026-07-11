@@ -21,11 +21,10 @@ Sur les 33 critères relevés dans la checklist (après les trois chantiers du
 2026-07-10 : « consolidation du dossier », « conformité visible » et
 « script de soutenance ») :
 
-- **29 sont validés** par le code, les tests ou les documents présents ;
-- **4 sont à renforcer** — deux critères facultatifs (découpage fonctionnel
-  destiné au jury, charte graphique formalisée) et deux compléments de
-  production (sauvegarde/restauration de la base, environnement de
-  production démontré) ;
+- **30 sont validés** par le code, les tests ou les documents présents ;
+- **3 sont à renforcer** — deux critères facultatifs (découpage fonctionnel
+  destiné au jury, charte graphique formalisée) et l'environnement de
+  production démontré ;
 - **0 manquant.**
 
 Au 2026-07-10 au soir, le dossier a rattrapé le produit : les preuves
@@ -40,7 +39,11 @@ expliqués, diagramme BDD v2, résumé, besoin v2, matrice de compétences ;
 preuves W3C/responsive/accessibilité ([`conformite.md`](conformite.md)) ;
 deck 35 min, démo 11 min, 26 Q/R ([`soutenance/`](soutenance/)), veilles
 sécurité et technique anglophone, README réécrit, DESIGN classé, micro-fix
-Mailpit.
+Mailpit. Un audit ultérieur a découvert que le contrôle responsive historique
+comparait `scrollWidth` à un `innerWidth` élargi par Chromium : le code de
+contrôle et l'interface mobile ont été corrigés, puis les preuves ont été
+régénérées le 2026-07-11 sur la version finale — W3C 0/0, axe 0 violation,
+débordement 0/60 avec `viewportWidth` exact, 45 captures aux largeurs exactes.
 
 Priorités restantes (côté utilisateur, avant la soutenance) :
 
@@ -49,8 +52,9 @@ Priorités restantes (côté utilisateur, avant la soutenance) :
 2. dérouler la checklist clavier manuelle de [`conformite.md`](conformite.md) ;
 3. relancer `npm run seed:demo` avant chaque répétition (après le démarrage
    du serveur) ;
-4. facultatif hors jury : documenter sauvegarde/restauration de la base
-   (dernier gros reste avec l'hébergement de production).
+4. effectuer un exercice réel de restauration de la base quand les outils
+   seront disponibles (les contrôles W3C/axe/responsive ont été rejoués le
+   2026-07-11 sur la version finale).
 
 L'inventaire et les écarts des sources de juin sont détaillés dans
 [`inventaire-documents-historiques.md`](inventaire-documents-historiques.md).
@@ -65,7 +69,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | À RENFORCER | Découpage fonctionnel avec descriptions (facultatif) | Les lots et l'architecture `routes → contrôleurs → services → vues` donnent un découpage réel, mais pas une vue fonctionnelle destinée au jury. | Ajouter un schéma simple des trois parcours : candidat, auto-école et administrateur. |
 | VALIDÉ | Maquette (obligatoire) | `docs/historique/2026-06/wireframes/` contient 11 écrans HTML navigables, un sommaire, 11 exports PNG associés et une planche SVG datés du 23 juin. Ils constituent une vraie maquette basse fidélité du MVP initial. | Ne pas écraser ces originaux. Les présenter comme v1 et documenter les écarts avec les lots livrés ensuite. |
 | À RENFORCER | Charte graphique (facultative) | Les couleurs, espacements et composants sont centralisés dans `public/css/style.css`, sans document de charte. | Extraire une page de charte : palette, typographie, boutons, cartes, badges, messages et règles d'accessibilité. |
-| À RENFORCER | Description de la BDD, création, restauration et comparaison | `prisma/schema.prisma`, 13 migrations, `.env.example` et les commandes Prisma prouvent la création et l'évolution. Il n'existe pas de procédure de sauvegarde/restauration ni de comparaison argumentée SQLite/PostgreSQL. | Documenter création, migration, seed, sauvegarde et restauration ; justifier SQLite en développement et PostgreSQL en production. |
+| VALIDÉ | Description de la BDD, création, restauration et comparaison | [`base-de-donnees.md`](base-de-donnees.md) décrit le modèle, les 13 migrations SQLite, la création/seed, la nécessité d'un historique PostgreSQL dédié et les procédures `sqlite3 .backup/.restore` et `pg_dump/pg_restore`. | Réaliser un exercice de restauration daté dès qu'un environnement PostgreSQL est disponible ; ne pas présenter ce drill comme déjà exécuté. |
 | VALIDÉ | Diagramme de base de données | [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg) + PNG (8 modèles, colonnes réelles, cardinalités, cascades) et lecture guidée dans [`base-de-donnees.md`](base-de-donnees.md) ; le MCD/MLD v1 reste la preuve initiale. | Montrer v1 puis v2 côte à côte pour illustrer l'évolution 4 → 8. |
 | VALIDÉ | Choix des technologies | Justifications et alternatives rejetées explicitées : diapositive « Technologies et pourquoi » du [deck](soutenance/soutenance.html), Q/R « Choix technologiques » ([`soutenance/questions-reponses.md`](soutenance/questions-reponses.md)) et [`veille-technique.md`](veille-technique.md). | Répéter les justifications à l'oral (framework front, JWT, SQLite). |
 | À RENFORCER | Description des environnements | `.env.example` distingue développement et production ; `src/app.js` adapte proxy et cookie sécurisé. Aucun environnement de préproduction/production n'est démontré. | Décrire poste de développement, environnement de test et cible de production, variables, secrets, HTTPS, stockage et SMTP. |
@@ -92,7 +96,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | VALIDÉ | Contrôle de saisie des formulaires | Six validateurs serveur contrôlent présence, format, listes autorisées et longueurs. Les uploads vérifient taille, mimetype et magic bytes. | Montrer une saisie invalide puis le validateur correspondant. |
 | VALIDÉ | Mécanisme d'authentification | Comptes auto-écoles et admins, bcrypt, vérification email, reset à jeton haché, régénération de session et sessions persistantes Prisma. | Expliquer pourquoi les sessions HTTP conviennent mieux ici qu'un JWT. |
 | VALIDÉ | Politique de droits d'accès | Visiteur/candidat, école et admin ont des espaces distincts. `requireAuth`, `requireAdmin`, `loadSchool`, `loadAdmin` et le scoping `schoolId` protègent les données. | Montrer le test où une école reçoit 404 sur les documents d'une autre école. |
-| VALIDÉ | Interfaces responsives | Contrôlé le 2026-07-10 sur rendu réel : **0 débordement horizontal sur 15 pages × 4 largeurs** (320/375/768/1440), 45 captures archivées sous `captures/r{320,375,768}/` — voir [`conformite.md`](conformite.md). | Montrer 2-3 captures mobiles au jury ; re-jouer les contrôles avant la soutenance pour des preuves fraîches. |
+| VALIDÉ | Interfaces responsives | Le contrôle historique utilisait `innerWidth`, élargi à environ 485 px sous l'émulation mobile : il ne prouvait pas réellement 320/375. Après correction (viewport visuel exact, burger accessible, tableaux contenus), le passage du 2026-07-11 donne **0 débordement sur 60 combinaisons** et les **45 captures exactes** (15 × 320, 15 × 375, 15 × 768) sont régénérées sous [`captures/`](captures/) ; contrôle interactif du burger vérifié sur six pages à 320 et 375 px. | Montrer une capture 320 px et le JSON `debordement-*.json` correspondant si la question vient. |
 | VALIDÉ | Cohérence entre maquette initiale et application finale | [`comparaison-maquettes.md`](comparaison-maquettes.md) : 11 écrans v1 comparés à leurs captures 1440 px ([`captures/`](captures/)), 4 écrans nés des lots E–L, 7 écarts justifiés. | Réutiliser `scripts/captures-jury.js --largeur=` pour les captures responsive du chantier « conformité visible ». |
 | VALIDÉ | Cohérence entre spécifications et application finale | Les 30 spécifications/plans par lot correspondent au code et aux tests ; `README.md` réécrit sur l'état réel, `DESIGN.md` classé en v1 ; matrice exigence → test dans [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md) (critères d'acceptation). | Montrer un exemple spec → plan → test → code si le jury creuse la méthode. |
 | VALIDÉ | Validation W3C | Validateur Nu officiel le 2026-07-10 sur les 15 pages rendues : 3 erreurs corrigées puis **0 erreur et 0 avertissement partout** — méthode, dates et résultats dans [`conformite.md`](conformite.md), JSON bruts sous `conformite/`. | Citer la correction la plus parlante (label sur canvas) si la question vient. |
@@ -160,14 +164,14 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 - [x] créer le résumé, le cahier des charges actuel et la liste des compétences ;
 - [x] identifier et contrôler les maquettes initiales obligatoires ;
 - [x] produire la version actuelle du diagramme de base de données ;
-- [ ] documenter création, migration, sauvegarde et restauration de la base
-  (création/migration/seed couvertes par `base-de-donnees.md` ; reste
-  sauvegarde/restauration).
+- [x] documenter création, migration, sauvegarde et restauration de la base
+  (`base-de-donnees.md` ; le drill réel reste une action de production).
 
 ### Priorité 1 — preuves de conformité
 
 - [x] valider les pages principales avec W3C ;
-- [x] contrôler le responsive à 320, 375, 768 et 1440 px ;
+- [x] revalider le responsive final à 320, 375, 768 et 1440 px avec le viewport
+  visuel exact et régénérer les captures (2026-07-11 : 0/60, 45 PNG exacts) ;
 - [x] effectuer un audit accessibilité automatisé (le contrôle clavier manuel
   reste à dérouler avant la soutenance, checklist dans `conformite.md`) ;
 - [x] produire le tableau de comparaison maquettes v1 / application finale ;
@@ -190,16 +194,18 @@ dans des états intéressants sans effectuer chaque saisie en direct.
 
 ## 6. Limites de cet audit
 
-- Le terminal de cette session n'exposait pas Node/npm : la suite `npm test` n'a pas
-  été relancée. Le dépôt contient **15 fichiers de test et environ 438 assertions**, et
-  `AGENTS.md` indique que la suite était validée lors de la dernière passation.
-- Aucun navigateur contrôlable n'était disponible : le responsive et l'accessibilité
-  ont été évalués sur le HTML/CSS, pas sur un rendu réel.
-- Le validateur W3C et un validateur d'accessibilité n'ont pas été exécutés.
+- `npm test` a été relancé après le burger mobile : **15 suites et 448
+  assertions**, sortie 0.
+- Le navigateur intégré n'était pas disponible pendant la correction mobile ;
+  le contrôle CDP corrigé avait démontré le faux positif. Le 2026-07-11, les
+  preuves finales ont été régénérées avec Edge headless : débordement 0/60,
+  45 captures aux largeurs exactes et contrôle interactif du burger vert.
+- W3C 0 erreur/0 avertissement et axe 0 violation ont été rejoués le
+  2026-07-11 sur les 15 pages de la version finale (JSON sous `conformite/`).
 - Les fichiers personnels non suivis présents à la racine n'ont pas été ouverts ni
   modifiés.
 - Les PDF historiques ont été contrôlés par extraction de texte et via leurs exports
   PNG/SVG équivalents. Poppler n'était pas disponible pour rendre directement les PDF.
 
-Ces limites deviennent les premières vérifications à exécuter dans une session disposant
-de Node et d'un navigateur.
+Toutes les preuves automatisables sont désormais fraîches ; il ne reste que les
+contrôles humains (checklist clavier, répétitions) avant la soutenance.
