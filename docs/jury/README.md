@@ -78,8 +78,8 @@ l'utilisateur.
   exactes (15 × 320, 15 × 375, 15 × 768, zéro doublon binaire) ; W3C 0/0,
   axe 0 violation et débordement 0/60 rejoués sur la version finale.
 - Les sources de juin restent des v1 intactes sous `docs/historique/2026-06/` ;
-  les captures de cours tierces restent isolées sous
-  `docs/_a_retirer_du_projet/` en attente de suppression par l'utilisateur.
+  les captures de cours tierces (`docs/_a_retirer_du_projet/`) ont été
+  supprimées par l'utilisateur le 2026-07-12.
 
 ## Prochaine action recommandée
 
@@ -181,9 +181,9 @@ Puis vérifier dans un navigateur :
 - Serveur 4071 arrêté en fin de session. Aucun commit ni staging. Les trois
   fichiers personnels non suivis sont préservés et ignorés explicitement.
 - Seuls restes, tous côté utilisateur : répétitions chronométrées (deck, démo,
-  Q/R), checklist clavier complète de `conformite.md` (section 5), décision du
-  `git push` (main très en avance sur origin) et suppression des fichiers
-  tiers sous `docs/_a_retirer_du_projet/`.
+  Q/R), checklist clavier complète de `conformite.md` (section 5) et décision
+  du `git push` (main très en avance sur origin). Les fichiers tiers de
+  `docs/_a_retirer_du_projet/` ont été supprimés le 2026-07-12.
 
 ### Dernier checkpoint livre
 

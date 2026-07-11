@@ -13,9 +13,10 @@
   agents ;
 - `historique/2026-06/` : cahier des charges, spécifications, maquettes et diagrammes
   initiaux à conserver comme version 1 ;
-- `superpowers/` : spécifications et plans détaillés des lots livrés ;
-- `_a_retirer_du_projet/` : fichiers isolés pour examen et suppression manuelle par
-  l'utilisateur.
+- `superpowers/` : spécifications et plans détaillés des lots livrés.
+
+Les fichiers tiers isolés sous `_a_retirer_du_projet/` (captures d'un cours
+UML) ont été examinés puis supprimés le 2026-07-12.
 
 L'ancienne spécification de cadrage (`DESIGN.md`) est classée avec la
 conception initiale : [`historique/2026-06/DESIGN.md`](historique/2026-06/DESIGN.md).
