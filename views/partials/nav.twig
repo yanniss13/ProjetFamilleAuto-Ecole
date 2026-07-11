@@ -1,6 +1,13 @@
 <header class="navbar">
   <a class="navbar-brand" href="{% if adminSessionActive %}/admin{% else %}/{% endif %}">MoniteurConnect</a>
-  <nav class="navbar-links">
+  <button class="navbar-toggle" id="navigation-toggle" type="button"
+          aria-expanded="false" aria-controls="navigation-principale"
+          aria-label="Ouvrir le menu" hidden>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </button>
+  <nav class="navbar-links" id="navigation-principale">
     {% if not currentSchool and not currentAdmin %}
       <a href="/annonces">Annonces</a>
       <a href="/alertes">Alertes</a>

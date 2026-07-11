@@ -9,41 +9,43 @@
   {% if listings|length == 0 %}
     <p class="muted">Vous n'avez pas encore publié d'annonce.</p>
   {% else %}
-    <table class="data-table">
-      <thead>
-        <tr><th>Titre</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr>
-      </thead>
-      <tbody>
-        {% for l in listings %}
-          <tr>
-            <td>{{ l.title }}</td>
-            <td>{{ l.city }} ({{ l.department }})</td>
-            <td>
-              {% if l.status == 'open' %}
-                <span class="badge badge-available">Ouverte</span>
-              {% else %}
-                <span class="badge badge-assigned">Clôturée</span>
-              {% endif %}
-            </td>
-            <td class="actions">
-              <a href="/mes-annonces/{{ l.id }}/candidatures" class="btn btn-small">Candidatures</a>
-              <a href="/mes-annonces/{{ l.id }}/modifier" class="btn btn-small">Modifier</a>
-              {% if l.status == 'open' %}
-                <form action="/mes-annonces/{{ l.id }}/cloturer" method="post" class="inline-form">
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr><th>Titre</th><th>Lieu</th><th>Statut</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for l in listings %}
+            <tr>
+              <td>{{ l.title }}</td>
+              <td>{{ l.city }} ({{ l.department }})</td>
+              <td>
+                {% if l.status == 'open' %}
+                  <span class="badge badge-available">Ouverte</span>
+                {% else %}
+                  <span class="badge badge-assigned">Clôturée</span>
+                {% endif %}
+              </td>
+              <td class="actions">
+                <a href="/mes-annonces/{{ l.id }}/candidatures" class="btn btn-small">Candidatures</a>
+                <a href="/mes-annonces/{{ l.id }}/modifier" class="btn btn-small">Modifier</a>
+                {% if l.status == 'open' %}
+                  <form action="/mes-annonces/{{ l.id }}/cloturer" method="post" class="inline-form">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                    <button type="submit" class="btn btn-small">Clôturer</button>
+                  </form>
+                {% endif %}
+                <form action="/mes-annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
+                      data-confirm="Supprimer cette annonce et ses candidatures ?">
                   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                  <button type="submit" class="btn btn-small">Clôturer</button>
+                  <button type="submit" class="btn btn-small btn-danger">Supprimer</button>
                 </form>
-              {% endif %}
-              <form action="/mes-annonces/{{ l.id }}/supprimer" method="post" class="inline-form"
-                    data-confirm="Supprimer cette annonce et ses candidatures ?">
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                <button type="submit" class="btn btn-small btn-danger">Supprimer</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     {% include 'partials/pagination.twig' %}
   {% endif %}
 {% endblock %}

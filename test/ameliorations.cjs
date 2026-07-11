@@ -21,6 +21,7 @@ const { validateListing } = require('../src/validators/listingValidator');
 const { validateApplication } = require('../src/validators/applicationValidator');
 const { validateRegister, validateProfile } = require('../src/validators/schoolValidator');
 const { STORAGE_DIR } = require('../src/config/storage');
+const { configureViewport } = require('../scripts/captures-jury');
 
 const PORT = 4060;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -65,6 +66,63 @@ async function main() {
   const server = app.listen(PORT);
   await new Promise((r) => server.once('listening', r));
   try {
+    const pageNavigationMobile = await req(makeJar(), 'GET', '/');
+    ok(pageNavigationMobile.status === 200
+      && pageNavigationMobile.text.includes('id="navigation-toggle"')
+      && pageNavigationMobile.text.includes('aria-expanded="false"')
+      && pageNavigationMobile.text.includes('aria-controls="navigation-principale"')
+      && pageNavigationMobile.text.includes('id="navigation-principale"')
+      && pageNavigationMobile.text.includes('src="/js/mobile-nav.js"'),
+    'navigation mobile : contrat HTML accessible et script charge');
+
+    const mobileNavPath = path.join(__dirname, '..', 'public', 'js', 'mobile-nav.js');
+    ok(fs.existsSync(mobileNavPath), 'navigation mobile : script statique present');
+    const { setMenuState } = require(mobileNavPath);
+    const classesNavigation = new Set();
+    const fauxHeader = {
+      classList: {
+        toggle: (nom, actif) => (actif ? classesNavigation.add(nom) : classesNavigation.delete(nom)),
+        contains: (nom) => classesNavigation.has(nom),
+      },
+    };
+    const attributsNavigation = {};
+    const fauxBoutonNavigation = {
+      setAttribute: (nom, valeur) => { attributsNavigation[nom] = valeur; },
+      getAttribute: (nom) => attributsNavigation[nom],
+    };
+    setMenuState(fauxHeader, fauxBoutonNavigation, true);
+    ok(classesNavigation.has('navbar-mobile-open')
+      && attributsNavigation['aria-expanded'] === 'true'
+      && attributsNavigation['aria-label'] === 'Fermer le menu',
+    'navigation mobile : ouverture synchronise classe et attributs ARIA');
+    setMenuState(fauxHeader, fauxBoutonNavigation, false);
+    ok(!classesNavigation.has('navbar-mobile-open')
+      && attributsNavigation['aria-expanded'] === 'false'
+      && attributsNavigation['aria-label'] === 'Ouvrir le menu',
+    'navigation mobile : fermeture synchronise classe et attributs ARIA');
+
+    // --- Captures jury : le viewport CDP ne depend pas de la fenetre Edge ---
+    {
+      const appels = [];
+      const fauxCdp = {
+        cmd: async (methode, parametres) => appels.push({ methode, parametres }),
+      };
+      await configureViewport(fauxCdp, 320, 1000);
+      ok(appels[0].methode === 'Emulation.setDeviceMetricsOverride'
+        && appels[0].parametres.width === 320
+        && appels[0].parametres.height === 1000
+        && appels[0].parametres.deviceScaleFactor === 1
+        && appels[0].parametres.mobile === true
+        && appels[1]
+        && appels[1].methode === 'Emulation.setScrollbarsHidden'
+        && appels[1].parametres.hidden === true,
+      'captures jury : viewport mobile fixe exactement a 320 px');
+
+      await configureViewport(fauxCdp, 768, 1000);
+      ok(appels[2].parametres.width === 768 && appels[2].parametres.mobile === false,
+        'captures jury : 768 px utilise le viewport desktop exact');
+    }
+
     // ------------------- 5. Sessions persistées en base (Prisma) -------------------
     const PrismaSessionStore = require('../src/config/sessionStore');
     const store = new PrismaSessionStore(prisma);
