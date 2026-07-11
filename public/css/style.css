@@ -27,6 +27,7 @@ body {
 
 /* --- Navigation --- */
 .navbar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,6 +39,26 @@ body {
 .navbar-links { display: flex; align-items: center; gap: 1rem; }
 .navbar-links a { color: var(--color-text); text-decoration: none; }
 .navbar-links a:hover { color: var(--color-primary); }
+.navbar-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.navbar-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 4px auto;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
 
 /* --- Conteneur principal --- */
 .container { max-width: 960px; margin: 2rem auto; padding: 0 1.5rem; }
@@ -204,6 +225,7 @@ body {
 .data-table th { background: #f9fafb; font-weight: 600; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table .actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.table-scroll { max-width: 100%; overflow-x: auto; }
 
 /* --- Badges de statut --- */
 .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
@@ -277,7 +299,138 @@ body {
 }
 .skip-link:focus { top: 0.5rem; }
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .skip-link,
+  .navbar-toggle span { transition: none; }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 0;
+    padding: 0.5rem 1rem;
+  }
+  .navbar-brand {
+    grid-column: 2;
+    justify-self: center;
+    text-align: center;
+  }
+  .navbar-toggle:not([hidden]) {
+    display: block;
+    grid-column: 3;
+  }
+  .navbar-links {
+    position: relative;
+    grid-column: 1 / -1;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem 0 0.25rem 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .navbar-links::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    bottom: 0.25rem;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--color-primary);
+  }
+  .nav-enhanced .navbar-links { display: none; }
+  .nav-enhanced.navbar-mobile-open .navbar-links { display: flex; }
+  .navbar-links a,
+  .navbar-links .link-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius);
+    text-align: center;
+  }
+  .navbar-links a:hover,
+  .navbar-links .link-button:hover { background: #eff6ff; }
+  .navbar-links .inline-form { display: block; width: 100%; }
+  .navbar-mobile-open .navbar-toggle span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .navbar-mobile-open .navbar-toggle span:nth-child(2) { opacity: 0; }
+  .navbar-mobile-open .navbar-toggle span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 1.25rem auto;
+    padding: 0 1rem;
+  }
+  h1 { font-size: clamp(1.6rem, 8vw, 2.1rem); }
+  .hero,
+  .form-card,
+  .listing-card,
+  .application-card,
+  .map-section,
+  .chart-card,
+  .purge-card { width: 100%; padding: 1.25rem; }
+  .hero,
+  .form-card h1,
+  .form-card h2,
+  .page-header { text-align: center; }
+  .page-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .dashboard-actions,
+  .view-toggle,
+  .signature-actions,
+  .application-actions {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .page-header .btn,
+  .dashboard-actions .btn,
+  .view-toggle .btn,
+  .signature-actions .btn,
+  .application-actions .btn,
+  .form-card .btn-primary {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+  .dashboard-actions .inline-form,
+  .application-actions .inline-form { width: 100%; max-width: 320px; }
+  .filter-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .filter-bar input,
+  .filter-bar select,
+  .filter-bar .btn { width: 100%; min-width: 0; }
+  .stats-grid,
+  .charts-grid { grid-template-columns: minmax(0, 1fr); }
+  .listing-card-header,
+  .application-head {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .listing-card-header > div:first-child { flex-basis: auto; }
+  .listing-card-badges { justify-content: center; }
+  #map,
+  #listings-map { height: 360px; }
+  .pagination { flex-wrap: wrap; }
+  .footer { padding: 1.5rem 1rem; }
+}
 
 /* --- Pagination --- */
 .pagination { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin: 1.5rem 0; }
@@ -285,7 +438,7 @@ body {
 .btn-disabled { opacity: 0.5; pointer-events: none; }
 
 .label-note { font-weight: 400; font-size: 0.9rem; }
-.fine-print { font-size: 0.8rem; }
+.fine-print { font-size: 0.8rem; overflow-wrap: anywhere; }
 
 /* ---------- Lot E : vue carte des annonces & rayon ---------- */
 #listings-map {
@@ -341,3 +494,9 @@ body {
   flex-wrap: wrap;
 }
 .signature-import-input { display: none; }
+
+/* Le bloc Lot E est declare apres les regles responsive principales : cette
+   surcharge finale conserve la hauteur mobile choisie pour la grande carte. */
+@media (max-width: 600px) {
+  #listings-map { height: 360px; }
+}

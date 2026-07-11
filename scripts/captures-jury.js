@@ -11,10 +11,26 @@ const path = require('path');
 const { lanceEdge, navigue, connecte } = require('./lib/cdp');
 const { BASE, ECOLE, ADMIN, donneesDemo, pagesJury } = require('./lib/pages-jury');
 
+const HAUTEUR_VIEWPORT = 1000;
+
 function argument(nom, defaut) {
   const prefixe = `--${nom}=`;
   const trouve = process.argv.find((a) => a.startsWith(prefixe));
   return trouve ? trouve.slice(prefixe.length) : defaut;
+}
+
+// --window-size regle la fenetre exterieure et Chromium lui impose une largeur
+// minimale. L'emulation CDP garantit ici un viewport egal a la largeur demandee.
+async function configureViewport(cdp, largeur, hauteur = HAUTEUR_VIEWPORT) {
+  await cdp.cmd('Emulation.setDeviceMetricsOverride', {
+    width: largeur,
+    height: hauteur,
+    deviceScaleFactor: 1,
+    mobile: largeur < 768,
+  });
+  // Les scrollbars classiques retirent 15 px aux captures desktop. Les masquer
+  // conserve un PNG pleine page exactement large comme le viewport demande.
+  await cdp.cmd('Emulation.setScrollbarsHidden', { hidden: true });
 }
 
 async function capture(cdp, dossierSortie, nom) {
@@ -31,7 +47,8 @@ async function main() {
   fs.mkdirSync(dossierSortie, { recursive: true });
 
   const pages = pagesJury(await donneesDemo());
-  const { cdp, fermer } = await lanceEdge({ largeur });
+  const { cdp, fermer } = await lanceEdge({ largeur, hauteur: HAUTEUR_VIEWPORT });
+  await configureViewport(cdp, largeur);
 
   const echecs = [];
   try {
@@ -73,3 +90,5 @@ if (require.main === module) {
     process.exitCode = 1;
   });
 }
+
+module.exports = { configureViewport };

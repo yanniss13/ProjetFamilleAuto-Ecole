@@ -77,11 +77,17 @@ async function controleDebordement(cdp) {
     await pause(400);
     const r = await cdp.cmd('Runtime.evaluate', {
       expression: `JSON.stringify((() => {
-        const deborde = document.documentElement.scrollWidth > window.innerWidth;
+        // En emulation mobile, innerWidth peut s'elargir au contenu alors que le
+        // viewport visible reste a 320/375 px. Comparer au viewport visuel evite
+        // de valider a tort une page qui necessite un defilement horizontal.
+        const viewportWidth = window.visualViewport
+          ? window.visualViewport.width : document.documentElement.clientWidth;
+        const deborde = document.documentElement.scrollWidth > viewportWidth + 1;
         const coupables = [];
         if (deborde) {
           for (const el of document.querySelectorAll('body *')) {
-            if (el.getBoundingClientRect().right > window.innerWidth + 1) {
+            const rect = el.getBoundingClientRect();
+            if (rect.right > viewportWidth + 1 || rect.left < -1) {
               const cls = (el.className && typeof el.className === 'string')
                 ? '.' + el.className.trim().split(/\\s+/).join('.') : '';
               coupables.push(el.tagName.toLowerCase() + (el.id ? '#' + el.id : cls));
@@ -90,7 +96,7 @@ async function controleDebordement(cdp) {
           }
         }
         return { deborde, scrollWidth: document.documentElement.scrollWidth,
-                 innerWidth: window.innerWidth, coupables };
+                 viewportWidth, innerWidth: window.innerWidth, coupables };
       })())`,
       returnByValue: true,
     });
