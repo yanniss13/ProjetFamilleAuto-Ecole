@@ -95,8 +95,9 @@ côté utilisateur :
 3. avant chaque répétition : démarrer le serveur PUIS `npm run seed:demo` ;
 4. décider du **`git push`** (main local est très en avance sur origin).
 
-Les restes hors jury (hébergement PostgreSQL réel, migration Prisma 7,
-Argon2id) sont listés dans l'audit et les veilles.
+Les restes hors jury (hébergement PostgreSQL réel, Argon2id) sont listés
+dans l'audit et les veilles ; la migration Prisma 7 a été réalisée le
+2026-07-12 (suite complète rejouée).
 
 ## Vérifications à lancer dès que l'environnement le permet
 
@@ -209,7 +210,7 @@ Puis vérifier dans un navigateur :
 - Premier travail restant : **côté utilisateur uniquement** — répétitions
   chronométrées, checklist clavier de `conformite.md`, décision du
   `git push`. Pour un agent : plus aucun chantier jury planifié ; les restes
-  hors jury (sauvegarde/restauration, hébergement production, Prisma 7,
+  hors jury (sauvegarde/restauration, hébergement production,
   Argon2id) sont listés dans l'audit et les veilles.
 - Chantiers précédents tous fusionnés dans `main` le 2026-07-10 (rangement
   Codex, Lot L, consolidation du dossier, conformité visible).

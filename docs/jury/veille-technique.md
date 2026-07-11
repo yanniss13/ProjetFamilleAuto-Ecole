@@ -48,11 +48,12 @@ faits relevés datent de cette consultation.
 - **Relevé du 2026-07-10** : dernière version **7.8.0** (22 avril 2026) —
   exemples de notes : option `queryPlanCacheMaxSize`, correctif d'un panic
   sur les filtres JSON PostgreSQL.
-- **Implication** : le projet est en **Prisma 6.19.3** ; la majeure 7 est
-  disponible et `npx prisma` l'affiche à chaque commande. La migration 6 → 7
-  est **notée pour le chantier production** (lire le guide de mise à niveau
-  majeure, re-passer les 15 suites) — pas pendant la préparation du jury :
-  on ne monte pas de version majeure la veille d'une démonstration.
+- **Implication** : cette veille a débouché sur une action datée — la
+  **migration 6 → 7 a été réalisée le 2026-07-12** (guide officiel suivi :
+  générateur `prisma-client` sans moteur Rust, adaptateur de driver
+  `better-sqlite3`, `prisma.config.ts`, client généré chargé par le
+  type-stripping natif de Node ≥ 22.18), validée par les 15 suites
+  (448 assertions) rejouées après migration.
 
 ### MDN Web Docs — https://developer.mozilla.org/en-US/ (anglais)
 
@@ -78,6 +79,7 @@ compréhension écrite de l'anglais technique attendue par le référentiel
 
 Quatre sources officielles anglophones, chacune reliée à une décision réelle
 du projet : rester sur une LTS Node (22), Express 5 déjà adopté et ses
-breaking changes absorbés, migration Prisma 7 planifiée pour la production,
-MDN comme référence de conformité front. La veille n'est pas une liste de
-liens : chaque relevé a une conséquence datée dans le dépôt.
+breaking changes absorbés, **migration Prisma 7 réalisée le 2026-07-12**
+(guide de mise à niveau suivi, suite complète rejouée), MDN comme référence
+de conformité front. La veille n'est pas une liste de liens : chaque relevé
+a une conséquence datée dans le dépôt.
