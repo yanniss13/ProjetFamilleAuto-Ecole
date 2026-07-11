@@ -46,18 +46,20 @@ de signature. Aucun écran ne redéfinit ces composants localement.
 5. Alertes email — abonnement (`GET /alertes`).
 6. Alertes — confirmation du double opt-in (`GET /alertes/confirmer/:token`).
 7. Alertes — confirmation de désabonnement (`GET /alertes/desabonner/:token`).
-8. Connexion auto-école (`GET /connexion`).
-9. Inscription avec SIRET et adresse (`GET /inscription`).
-10. Mot de passe oublié (`GET /mot-de-passe-oublie`).
-11. Réinitialisation du mot de passe (`GET /reinitialiser/:token`).
+8. Alertes — confirmation après suppression (`POST /alertes/desabonner/:token`).
+9. Connexion auto-école (`GET /connexion`).
+10. Inscription avec SIRET et adresse (`GET /inscription`).
+11. Vérification de l'email (`GET /verifier-email/:token`).
+12. Mot de passe oublié (`GET /mot-de-passe-oublie`).
+13. Réinitialisation du mot de passe (`GET /reinitialiser/:token`).
 
 ### Espace candidat par jeton
 
-12. Suivi en attente.
-13. Suivi refusé.
-14. Suivi accepté, contrat à signer.
-15. Signature candidat avec pad, import et consentement (`GET /suivi/:token/signer`).
-16. Suivi signé avec téléchargement et empreinte SHA-256.
+14. Suivi en attente.
+15. Suivi refusé.
+16. Suivi accepté, contrat à signer.
+17. Signature candidat avec pad, import et consentement (`GET /suivi/:token/signer`).
+18. Suivi signé avec téléchargement et empreinte SHA-256.
 
 Les cinq états de suivi utilisent la même structure partagée, mais restent des
 écrans distincts dans le dossier et le PDF : ils portent des décisions et des
@@ -65,15 +67,15 @@ actions différentes.
 
 ### Espace auto-école
 
-17. Tableau de bord statistique (`GET /tableau-de-bord`).
-18. Mes annonces avec états ouverte/clôturée (`GET /mes-annonces`).
-19. Création d'annonce (`GET /mes-annonces/nouvelle`).
-20. Modification d'annonce (`GET /mes-annonces/:id/modifier`).
-21. Candidatures d'une annonce : attente, refus, contrat envoyé et signé
+19. Tableau de bord statistique (`GET /tableau-de-bord`).
+20. Mes annonces avec états ouverte/clôturée (`GET /mes-annonces`).
+21. Création d'annonce (`GET /mes-annonces/nouvelle`).
+22. Modification d'annonce (`GET /mes-annonces/:id/modifier`).
+23. Candidatures d'une annonce : attente, refus, contrat envoyé et signé
     (`GET /mes-annonces/:id/candidatures`).
-22. Acceptation, termes et signature école
+24. Acceptation, termes et signature école
     (`GET /mes-annonces/:id/candidatures/:appId/accepter`).
-23. Mon compte avec autocomplétion d'adresse (`GET /mon-compte`).
+25. Mon compte avec autocomplétion d'adresse (`GET /mon-compte`).
 
 La maquette n'affiche jamais de réouverture d'annonce, de filtre de candidature
 par statut ou de changement de mot de passe depuis Mon compte, car ces fonctions
@@ -81,16 +83,16 @@ n'existent pas dans le produit.
 
 ### Administration
 
-24. Connexion admin (`GET /admin/connexion`).
-25. Dashboard plateforme et purge RGPD (`GET /admin`).
-26. Modération des écoles, suspension et réactivation (`GET /admin/ecoles`).
-27. Modération et retrait des annonces (`GET /admin/annonces`).
+26. Connexion admin (`GET /admin/connexion`).
+27. Dashboard plateforme et purge RGPD (`GET /admin`).
+28. Modération des écoles, suspension et réactivation (`GET /admin/ecoles`).
+29. Modération et retrait des annonces (`GET /admin/annonces`).
 
 L'administration ne supprime pas une école et n'agit jamais au nom d'une école.
 
 ### États système
 
-28. Planche des états transversaux : succès, erreur de validation, limite 429,
+30. Planche des états transversaux : succès, erreur de validation, limite 429,
     CSRF expiré, 403, 404 et 500. Les états sont regroupés, car ils ne constituent
     pas des parcours autonomes.
 
@@ -120,7 +122,7 @@ La conformité ne repose pas sur une appréciation visuelle seule. Pour chaque
 
 Un contrôle automatisé vérifie les liens HTML, l'existence de chaque route et
 vue citées, l'absence des formulations historiques périmées et la présence des
-28 entrées dans la matrice. Le contrôle visuel compare ensuite chaque PNG au
+30 entrées dans la matrice. Le contrôle visuel compare ensuite chaque PNG au
 site réel, en se concentrant sur la hiérarchie et les fonctions plutôt que sur
 les couleurs de production.
 
