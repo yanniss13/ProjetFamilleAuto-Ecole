@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 860" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="fleche" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b5b8c"/>
+    </marker>
+  </defs>
+  <style>
+    .titre{fill:#1a4d8f;font-size:22px;font-weight:700}.legende{fill:#5b6470;font-size:12.5px}
+    .couloir{fill:#1a4d8f;font-size:16px;font-weight:700}.boite{fill:#fff;stroke:#3b5b8c;stroke-width:1.8;rx:8}
+    .texte{fill:#1f2933;font-size:13px}.petit{fill:#1f2933;font-size:11.5px}.lien{stroke:#3b5b8c;stroke-width:1.8;fill:none;marker-end:url(#fleche)}
+    .derivee{fill:#f4f6f8;stroke:#3b5b8c;stroke-width:1.8;stroke-dasharray:6 4;rx:8}
+  </style>
+  <rect width="1900" height="860" fill="#fff"/>
+  <text x="40" y="42" class="titre">MoniteurConnect — découpage fonctionnel des trois parcours</text>
+  <text x="40" y="70" class="legende">Lecture de gauche à droite · les boîtes en pointillé représentent des fonctions accessibles en dérivation du parcours principal.</text>
+
+  <text x="40" y="122" class="couloir">Candidat /</text><text x="40" y="141" class="couloir">moniteur</text><text x="40" y="160" class="legende">sans compte</text>
+  <path d="M350 135H370 M555 135H575 M760 135H780 M965 135H985 M1170 135H1190 M1375 135H1395 M1580 135H1600" class="lien"/>
+  <g class="texte" text-anchor="middle">
+    <rect x="165" y="105" width="185" height="60" class="boite"/><text x="257" y="140">Accueil /</text>
+    <rect x="370" y="95" width="185" height="80" class="boite"/><text x="462" y="119"><tspan x="462">Annonces /annonces</tspan><tspan x="462" dy="17" class="petit">mots-clés, département,</tspan><tspan x="462" dy="15" class="petit">ville + rayon, vue carte</tspan></text>
+    <rect x="575" y="105" width="185" height="60" class="boite"/><text x="667" y="140">Détail /annonces/:id</text>
+    <rect x="780" y="95" width="185" height="80" class="boite"/><text x="872" y="118"><tspan x="872">Candidature</tspan><tspan x="872" dy="17" class="petit">CV + pièces, magic bytes,</tspan><tspan x="872" dy="15" class="petit">CSRF</tspan></text>
+    <rect x="985" y="105" width="185" height="60" class="boite"/><text x="1077" y="132"><tspan x="1077">Email avec lien de</tspan><tspan x="1077" dy="17">suivi opaque</tspan></text>
+    <rect x="1190" y="105" width="185" height="60" class="boite"/><text x="1282" y="140">Suivi /suivi/:token</text>
+    <rect x="1395" y="95" width="185" height="80" class="boite"/><text x="1487" y="128"><tspan x="1487">Signature du contrat</tspan><tspan x="1487" dy="17" class="petit">pad ou import PNG</tspan></text>
+    <rect x="1600" y="95" width="250" height="80" class="boite"/><text x="1725" y="128"><tspan x="1725">PDF signé + empreinte</tspan><tspan x="1725" dy="17">SHA-256</tspan></text>
+    <path d="M462 175V205" class="lien"/><rect x="350" y="210" width="225" height="65" class="derivee"/><text x="462" y="234"><tspan x="462">Alertes email /alertes</tspan><tspan x="462" dy="16" class="petit">double opt-in,</tspan><tspan x="462" dy="14" class="petit">désabonnement RGPD</tspan></text>
+  </g>
+
+  <text x="40" y="365" class="couloir">Auto-école</text><text x="40" y="385" class="legende">compte requis</text>
+  <path d="M350 370H370 M555 370H575 M760 370H780 M965 370H985 M1170 370H1190 M1375 370H1395 M1580 370H1600" class="lien"/>
+  <g class="texte" text-anchor="middle">
+    <rect x="165" y="325" width="185" height="90" class="boite"/><text x="257" y="348"><tspan x="257">Inscription /inscription</tspan><tspan x="257" dy="16" class="petit">SIRET Sirene, géocodage,</tspan><tspan x="257" dy="14" class="petit">vérification email</tspan></text>
+    <rect x="370" y="340" width="185" height="60" class="boite"/><text x="462" y="375">Connexion /connexion</text>
+    <rect x="575" y="325" width="185" height="90" class="boite"/><text x="667" y="354"><tspan x="667">Tableau de bord</tspan><tspan x="667" dy="17">/tableau-de-bord</tspan><tspan x="667" dy="15" class="petit">statistiques</tspan></text>
+    <rect x="780" y="330" width="185" height="80" class="boite"/><text x="872" y="359"><tspan x="872">Mes annonces</tspan><tspan x="872" dy="17" class="petit">création, édition, clôture</tspan></text>
+    <rect x="985" y="330" width="185" height="80" class="boite"/><text x="1077" y="359"><tspan x="1077">Candidatures</tspan><tspan x="1077" dy="17" class="petit">pièces téléchargeables</tspan></text>
+    <rect x="1190" y="325" width="185" height="90" class="boite"/><text x="1282" y="349"><tspan x="1282">Acceptation + contrat</tspan><tspan x="1282" dy="16" class="petit">identité, termes,</tspan><tspan x="1282" dy="14" class="petit">signature école</tspan></text>
+    <rect x="1395" y="340" width="185" height="60" class="boite"/><text x="1487" y="375">Envoi au candidat</text>
+    <rect x="1600" y="325" width="250" height="90" class="boite"/><text x="1725" y="354"><tspan x="1725">Contrat contresigné</tspan><tspan x="1725" dy="17" class="petit">PDF final aux deux parties</tspan></text>
+    <path d="M667 415V445" class="lien"/><rect x="545" y="450" width="245" height="65" class="derivee"/><text x="667" y="474"><tspan x="667">Mon compte /mon-compte</tspan><tspan x="667" dy="17" class="petit">profil, adresse autocomplétée</tspan></text>
+  </g>
+
+  <text x="40" y="610" class="couloir">Administrateur</text><text x="40" y="630" class="legende">espace cloisonné</text>
+  <path d="M520 615H570 M920 615H970 M1320 615H1370" class="lien"/>
+  <g class="texte" text-anchor="middle">
+    <rect x="165" y="570" width="355" height="90" class="boite"/><text x="342" y="600"><tspan x="342">Connexion /admin/connexion</tspan><tspan x="342" dy="18" class="petit">session régénérée</tspan></text>
+    <rect x="570" y="570" width="350" height="90" class="boite"/><text x="745" y="599"><tspan x="745">Dashboard /admin</tspan><tspan x="745" dy="17" class="petit">statistiques plateforme, purge RGPD</tspan></text>
+    <rect x="970" y="570" width="350" height="90" class="boite"/><text x="1145" y="600"><tspan x="1145">Écoles</tspan><tspan x="1145" dy="18" class="petit">suspension / réactivation</tspan></text>
+    <rect x="1370" y="570" width="350" height="90" class="boite"/><text x="1545" y="600"><tspan x="1545">Annonces</tspan><tspan x="1545" dy="18" class="petit">modération, retrait</tspan></text>
+  </g>
+
+  <rect x="165" y="735" width="1685" height="58" class="derivee"/>
+  <text x="1007" y="770" text-anchor="middle" class="legende">Garde-fous transversaux : CSRF sur tout POST, scoping schoolId, CSP stricte, rate-limit, sessions Prisma.</text>
+</svg>
