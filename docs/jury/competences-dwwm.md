@@ -1,4 +1,4 @@
-# Compétences DWWM couvertes par MoniteurConnect
+﻿# Compétences DWWM couvertes par MoniteurConnect
 
 Titre professionnel **Développeur web et web mobile** (niveau 5), référentiel
 **REAC RNCP37674**. Libellés des blocs et compétences vérifiés le 2026-07-10
@@ -21,7 +21,7 @@ migrations de schéma versionnées, méthode de travail documentée.
 | Modèle d'environnement (dev/prod distingués) | `.env.example` |
 | Fail-fast sur `SESSION_SECRET` au démarrage | `src/server.js` |
 | Scripts outillés : dev, test, seed, purge, admin | `package.json` |
-| 13 migrations Prisma versionnées | `prisma/migrations/` |
+| 13 migrations Prisma versionnées | `prisma/schema/migrations/` |
 | Méthode TDD et conventions du dépôt | [`../../AGENTS.md`](../../AGENTS.md) |
 
 ### 2. Maquetter des interfaces utilisateur web ou web mobile
@@ -75,9 +75,9 @@ de migrations PostgreSQL distinct à préparer et tester.
 
 | Preuve | Où |
 |---|---|
-| Schéma commenté (8 modèles) | `prisma/schema.prisma` |
+| Schéma commenté (8 modèles) | `prisma/schema/` |
 | Diagramme v2 + lecture guidée | [`base-de-donnees.md`](base-de-donnees.md) |
-| Évolution versionnée | `prisma/migrations/` (13 migrations) |
+| Évolution versionnée | `prisma/schema/migrations/` (13 migrations) |
 | Contraintes vérifiées par tests | `test/correctifs.cjs` (P2002), `test/lot-g.cjs` (1-1), `test/smoke.cjs` (cascades) |
 
 ### 6. Développer des composants d'accès aux données SQL et NoSQL
@@ -131,7 +131,7 @@ existe et le plan, sans survendre.
 |---|---|
 | Variables et secrets documentés | `.env.example`, `README.md` |
 | Comportements spécifiques production | `src/app.js` (proxy, cookies `secure`) |
-| Bascule base de données | `prisma/schema.prisma` (commentaire datasource), [`base-de-donnees.md`](base-de-donnees.md) |
+| Bascule base de données | `prisma/schema/` (commentaire datasource), [`base-de-donnees.md`](base-de-donnees.md) |
 
 ## Synthèse pour la soutenance
 

@@ -4,6 +4,9 @@
   "private": true,
   "description": "Plateforme d'annonces reliant auto-écoles et moniteurs indépendants.",
   "type": "commonjs",
+  "prisma": {
+    "schema": "prisma/schema"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",

@@ -1,0 +1,9 @@
+// Journal des purges RGPD (Lot J) : une ligne par exécution, avec les compteurs
+// par catégorie — trace de conformité affichée sur le dashboard admin.
+model PurgeRun {
+  id                   Int      @id @default(autoincrement())
+  ranAt                DateTime @default(now())
+  unconfirmedAlerts    Int
+  rejectedApplications Int
+  expiredTokens        Int
+}

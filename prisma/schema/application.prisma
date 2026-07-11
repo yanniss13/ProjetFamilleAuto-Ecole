@@ -1,0 +1,30 @@
+// Candidature d'un moniteur indépendant à une annonce (déposée sans compte).
+model Application {
+  id             Int     @id @default(autoincrement())
+  applicantName  String
+  applicantEmail String
+  applicantPhone String?
+  message        String
+  cvPath           String? // chemin relatif du CV (PDF) sous storage/
+  idCardPath       String? // chemin relatif de la pièce d'identité (PDF/JPG/PNG) sous storage/
+  licensePath      String? // chemin relatif du permis de conduire (PDF/JPG/PNG) sous storage/
+  teachingCardPath String? // chemin relatif de la carte/autorisation d'enseigner sous storage/
+  status           String  @default("pending") // "pending" | "accepted" | "rejected"
+
+  // Date du refus (Lot J) : point de départ du délai de purge RGPD des candidatures
+  // refusées. Null pour les lignes refusées avant ce lot (repli sur createdAt).
+  rejectedAt DateTime?
+
+  // Jeton opaque (256 bits, en clair) servant de clé à la page de suivi publique du
+  // candidat. Voir docs/superpowers/specs/2026-06-29-lot-b-notifications-suivi-design.md.
+  trackingToken String? @unique
+
+  listingId Int
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  contract Contract?
+
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+}

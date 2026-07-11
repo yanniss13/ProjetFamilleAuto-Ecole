@@ -1,4 +1,4 @@
-# Préparation des 45 minutes de questions
+﻿# Préparation des 45 minutes de questions
 
 Date : 2026-07-10. Réponses volontairement courtes (2-4 phrases), honnêtes
 sur les limites, chacune avec une preuve à montrer si le jury creuse.
@@ -35,14 +35,14 @@ PostgreSQL, mais le provider, l'URL et surtout l'historique de migrations doiven
 être préparés et validés dans un environnement PostgreSQL dédié. Les pièges de
 portabilité du code sont traités : recherche par colonnes `*Lower`
 maintenues à l'écriture, agrégations hebdomadaires en JavaScript.
-*Preuve :* `prisma/schema.prisma` (commentaire datasource),
+*Preuve :* `prisma/schema/` (commentaire datasource),
 `docs/jury/base-de-donnees.md`.
 
 **Pourquoi Prisma plutôt que du SQL brut ou un autre ORM ?**
 Schéma déclaratif versionné, migrations générées, client typé, requêtes
 paramétrées par défaut (anti-injection). Le coût (dépendance lourde) est
 accepté pour la sécurité et la traçabilité des 13 migrations.
-*Preuve :* `prisma/migrations/`.
+*Preuve :* `prisma/schema/migrations/`.
 
 ## Base de données
 

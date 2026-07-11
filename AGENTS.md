@@ -14,7 +14,9 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   documentaire (aucun code ni test modifié), le `npm test` d'avant-commit peut
   être sauté si l'environnement ne permet vraiment pas de l'exécuter.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
-  `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
+  `SESSION_SECRET` et `DATABASE_URL="file:../dev.db"` (fail-fast sinon — le
+  chemin SQLite est relatif à `prisma/schema/main.prisma`, qui porte le
+  datasource du schéma multi-fichiers).
 - `npm test` — suite complète (15 fichiers `.cjs`, 448 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
@@ -123,9 +125,11 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 
 - **Migrations Prisma** : `prisma migrate dev` échoue en shell non interactif dès
   qu'une confirmation est demandée (contraintes uniques...). Recette fiable :
-  1) éditer `prisma/schema.prisma` ; 2) `npx prisma migrate diff --from-migrations
-  ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --script` ;
-  3) écrire le SQL dans `prisma/migrations/<YYYYMMDDHHMMSS>_<nom>/migration.sql` ;
+  1) éditer le fichier concerné sous `prisma/schema/` (schéma multi-fichiers :
+  un modèle par fichier, `datasource` dans `main.prisma`) ;
+  2) `npx prisma migrate diff --from-migrations ./prisma/schema/migrations
+  --to-schema-datamodel ./prisma/schema --script` ;
+  3) écrire le SQL dans `prisma/schema/migrations/<YYYYMMDDHHMMSS>_<nom>/migration.sql` ;
   4) `npx prisma migrate deploy` ; 5) `npx prisma generate`.
 - **CSP stricte** (helmet, `script-src 'self'`) : aucun JS/CSS inline dans les vues ;
   JS dans `public/js/`, données éventuelles via `data-*` ou bloc

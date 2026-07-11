@@ -1,0 +1,47 @@
+// Contrat généré quand une auto-école accepte une candidature (relation 1‑1).
+model Contract {
+  id   Int    @id @default(autoincrement())
+  type String // "freelance" | "cdi" | "cdd" | "apprentissage" | "generic"
+
+  // Termes saisis par l'école au moment de l'acceptation.
+  startDate        DateTime
+  endDate          DateTime? // CDD
+  motif            String? // motif de recours (CDD)
+  grossSalary      String // texte libre : "2200€ brut/mois", "25€/h"…
+  weeklyHours      Int?
+  trialPeriodWeeks Int?
+  workplace        String
+  providerSiret    String? // SIRET du prestataire (freelance)
+  schoolAddress    String?
+  applicantAddress String?
+  extraClauses     String?
+
+  // Identité du candidat nécessaire au contrat (saisie par l'école à l'acceptation).
+  birthDate              DateTime?
+  birthPlace             String?
+  nationality            String?
+  teachingAuthNumber     String? // n° d'autorisation d'enseigner / carte d'enseignant
+  teachingAuthValidUntil DateTime?
+  licenseNumber          String? // n° de permis de conduire
+  licenseCategories      String? // catégories détenues (ex. "B, A2")
+
+  pdfPath           String // chemin relatif du PDF sous storage/contracts/
+  sentToApplicantAt DateTime?
+
+  // Signature électronique (Lot G) : images PNG des signatures sous storage/signatures/,
+  // horodatages, et empreintes SHA-256 (preuve d'intégrité entre la signature de l'école
+  // et le contreseing du candidat). État dérivé : signé <=> applicantSignedAt non nul.
+  schoolSignaturePath    String?
+  schoolSignedAt         DateTime?
+  applicantSignaturePath String?
+  applicantSignedAt      DateTime?
+  proposedPdfHash        String? // SHA-256 hex du PDF proposé (signé école seulement)
+  signedPdfPath          String? // PDF final contresigné, sous storage/contracts/
+  signedPdfHash          String? // SHA-256 hex du PDF final
+
+  applicationId Int         @unique
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
