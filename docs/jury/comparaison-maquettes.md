@@ -7,26 +7,36 @@ sont comparées aux écrans réellement livrés, capturés à 1440 px sur le jeu
 démonstration (`npm run seed:demo`, script
 [`scripts/captures-jury.js`](../../scripts/captures-jury.js)).
 
+Depuis le 2026-07-11, la chaîne complète est : **v1** (maquettes de juin,
+intactes) → **v2** (30 wireframes filaires conformes à l'application livrée,
+sous [`wireframes-v2/`](wireframes-v2/index.html), traçabilité dans
+[`wireframes-v2/matrice-couverture.md`](wireframes-v2/matrice-couverture.md))
+→ **final** (captures réelles sous [`captures/`](captures/)). La colonne
+« Wireframe v2 » ci-dessous relie chaque écran maquetté en v1 à son état v2.
+
 ## 1. Écrans maquettés en v1
 
-| Écran | Maquette v1 | Application finale | Écarts et justification |
-|---|---|---|---|
-| Accueil | [wf-accueil](../historique/2026-06/spec-assets/wf-accueil.png) | [capture](captures/accueil.png) | Fidèle : promesse, deux appels à l'action. La navigation gagne l'entrée « Alertes » (lot I). |
-| Liste des annonces | [wf-annonces](../historique/2026-06/spec-assets/wf-annonces.png) | [capture](captures/annonces.png) | Enrichie : recherche par ville + rayon avec distance affichée (lot E), badge « École vérifiée » (lot F), bascule vers la vue carte, lien « Créer une alerte » pré-rempli (lot I), pagination (lot A). |
-| Détail d'annonce | [wf-annonce-detail](../historique/2026-06/spec-assets/wf-annonce-detail.png) | [capture](captures/annonce-detail.png) | Fidèle : contenu, carte de localisation, formulaire de candidature à 4 pièces. S'ajoutent le badge de vérification (lot F) et le compteur de vues côté gestion (lot H). |
-| Formulaire d'annonce | [wf-annonce-form](../historique/2026-06/spec-assets/wf-annonce-form.png) | [capture](captures/annonce-form.png) | Fidèle aux champs prévus (titre, description, type, lieu, conditions). |
-| Candidatures reçues | [wf-candidatures](../historique/2026-06/spec-assets/wf-candidatures.png) | [capture](captures/candidatures.png) | Les 4 pièces sont téléchargeables comme prévu ; s'ajoutent les états de signature du contrat (lot G) et la pagination (lot A). Le filtre par statut prévu en v1 n'a pas été retenu (voir section 3). |
-| Mon compte | [wf-compte](../historique/2026-06/spec-assets/wf-compte.png) | [capture](captures/compte.png) | Téléphone et adresse modifiables, avec autocomplétion d'adresse (lot L). Le changement de mot de passe passe par le flux « oublié » (voir section 3). |
-| Connexion | [wf-connexion](../historique/2026-06/spec-assets/wf-connexion.png) | [capture](captures/connexion.png) | Fidèle (email + mot de passe, lien mot de passe oublié). |
-| Contrat (acceptation) | [wf-contrat](../historique/2026-06/spec-assets/wf-contrat.png) | [capture](captures/contrat.png) | Champs contractuels prévus + identité du candidat, et surtout le **pad de signature de l'école** (dessin ou import) apparu au lot G — visible en bas de la capture pleine page. |
-| Tableau de bord | [wf-dashboard](../historique/2026-06/spec-assets/wf-dashboard.png) | [capture](captures/dashboard.png) | Transformé par le lot H : 5 tuiles, candidatures par semaine, entonnoir de recrutement, top annonces — le v1 ne prévoyait que des compteurs simples. |
-| Inscription | [wf-inscription](../historique/2026-06/spec-assets/wf-inscription.png) | [capture](captures/inscription.png) | Champs prévus + vérification SIRET en direct (lot F) et autocomplétion d'adresse (lot L). |
-| Mes annonces | [wf-mes-annonces](../historique/2026-06/spec-assets/wf-mes-annonces.png) | [capture](captures/mes-annonces.png) | Fidèle : liste, statuts, actions (modifier, clôturer, supprimer), badge « contrat signé » en plus (lot G). |
+| Écran | Maquette v1 | Wireframe v2 | Application finale | Écarts et justification |
+|---|---|---|---|---|
+| Accueil | [wf-accueil](../historique/2026-06/spec-assets/wf-accueil.png) | [wf-v2-01](wireframes-v2/wf-v2-01-accueil.html) | [capture](captures/accueil.png) | Fidèle : promesse, deux appels à l'action. La navigation gagne l'entrée « Alertes » (lot I). |
+| Liste des annonces | [wf-annonces](../historique/2026-06/spec-assets/wf-annonces.png) | [wf-v2-02](wireframes-v2/wf-v2-02-annonces.html) | [capture](captures/annonces.png) | Enrichie : recherche par ville + rayon avec distance affichée (lot E), badge « École vérifiée » (lot F), bascule vers la vue carte, lien « Créer une alerte » pré-rempli (lot I), pagination (lot A). |
+| Détail d'annonce | [wf-annonce-detail](../historique/2026-06/spec-assets/wf-annonce-detail.png) | [wf-v2-04](wireframes-v2/wf-v2-04-annonce-detail.html) | [capture](captures/annonce-detail.png) | Fidèle : contenu, carte de localisation, formulaire de candidature à 4 pièces. S'ajoutent le badge de vérification (lot F) et le compteur de vues côté gestion (lot H). |
+| Formulaire d'annonce | [wf-annonce-form](../historique/2026-06/spec-assets/wf-annonce-form.png) | [wf-v2-21](wireframes-v2/wf-v2-21-annonce-creation.html) | [capture](captures/annonce-form.png) | Fidèle aux champs prévus (titre, description, type, lieu, conditions). |
+| Candidatures reçues | [wf-candidatures](../historique/2026-06/spec-assets/wf-candidatures.png) | [wf-v2-23](wireframes-v2/wf-v2-23-candidatures.html) | [capture](captures/candidatures.png) | Les 4 pièces sont téléchargeables comme prévu ; s'ajoutent les états de signature du contrat (lot G) et la pagination (lot A). Le filtre par statut prévu en v1 n'a pas été retenu (voir section 3). |
+| Mon compte | [wf-compte](../historique/2026-06/spec-assets/wf-compte.png) | [wf-v2-25](wireframes-v2/wf-v2-25-mon-compte.html) | [capture](captures/compte.png) | Téléphone et adresse modifiables, avec autocomplétion d'adresse (lot L). Le changement de mot de passe passe par le flux « oublié » (voir section 3). |
+| Connexion | [wf-connexion](../historique/2026-06/spec-assets/wf-connexion.png) | [wf-v2-09](wireframes-v2/wf-v2-09-connexion.html) | [capture](captures/connexion.png) | Fidèle (email + mot de passe, lien mot de passe oublié). |
+| Contrat (acceptation) | [wf-contrat](../historique/2026-06/spec-assets/wf-contrat.png) | [wf-v2-24](wireframes-v2/wf-v2-24-contrat-ecole.html) | [capture](captures/contrat.png) | Champs contractuels prévus + identité du candidat, et surtout le **pad de signature de l'école** (dessin ou import) apparu au lot G — visible en bas de la capture pleine page. |
+| Tableau de bord | [wf-dashboard](../historique/2026-06/spec-assets/wf-dashboard.png) | [wf-v2-19](wireframes-v2/wf-v2-19-dashboard-ecole.html) | [capture](captures/dashboard.png) | Transformé par le lot H : 5 tuiles, candidatures par semaine, entonnoir de recrutement, top annonces — le v1 ne prévoyait que des compteurs simples. |
+| Inscription | [wf-inscription](../historique/2026-06/spec-assets/wf-inscription.png) | [wf-v2-10](wireframes-v2/wf-v2-10-inscription.html) | [capture](captures/inscription.png) | Champs prévus + vérification SIRET en direct (lot F) et autocomplétion d'adresse (lot L). |
+| Mes annonces | [wf-mes-annonces](../historique/2026-06/spec-assets/wf-mes-annonces.png) | [wf-v2-20](wireframes-v2/wf-v2-20-mes-annonces.html) | [capture](captures/mes-annonces.png) | Fidèle : liste, statuts, actions (modifier, clôturer, supprimer), badge « contrat signé » en plus (lot G). |
 
 ## 2. Écrans nés après les maquettes
 
 Ces écrans n'existaient pas en v1 : ils sont issus de la feuille de route
-validée E→L, chacun avec sa spécification et ses tests.
+validée E→L, chacun avec sa spécification et ses tests. Tous sont désormais
+maquettés en v2 (carte : wf-v2-03 ; suivi et signature : wf-v2-14 à 18 ;
+alertes : wf-v2-05 à 08 ; administration : wf-v2-26 à 29 — voir le
+[sommaire v2](wireframes-v2/index.html)).
 
 | Écran | Capture | Origine et rôle |
 |---|---|---|
