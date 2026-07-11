@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1000" font-family="Segoe UI, Arial, sans-serif">
+  <defs><marker id="open" markerWidth="14" markerHeight="14" refX="11" refY="6" orient="auto"><path d="M2,1 L11,6 L2,11" fill="none" stroke="#3b5b8c" stroke-width="1.7"/></marker></defs>
+  <style>
+    .titre{fill:#1a4d8f;font-size:22px;font-weight:700}.legende{fill:#5b6470;font-size:12.5px}.sys{fill:none;stroke:#3b5b8c;stroke-width:2}
+    .bande{fill:#f8fafc;stroke:#e5e7eb}.uc ellipse{fill:#fff;stroke:#3b5b8c;stroke-width:1.7}.uc text{fill:#1f2933;font-size:13px}
+    .acteur circle,.acteur line{stroke:#1f2933;stroke-width:2.2;fill:none}.acteur text{fill:#1a4d8f;font-size:15px;font-weight:700}
+    .assoc{stroke:#9aa5b1;stroke-width:1.2}.include{stroke:#3b5b8c;stroke-width:1.6;stroke-dasharray:6 4;marker-end:url(#open)}.inclabel{fill:#5b6470;font-size:12px;font-style:italic}
+  </style>
+  <rect width="1900" height="1000" fill="#fff"/><text x="35" y="40" class="titre">MoniteurConnect — cas d'utilisation v2 (2026-07-11)</text>
+  <text x="35" y="68" class="legende">Trois acteurs · associations pleines · relations « include » pointillées uniquement lorsque le sous-processus est obligatoire.</text>
+  <rect x="235" y="85" width="1630" height="875" rx="8" class="sys"/><text x="260" y="118" class="titre">Système MoniteurConnect</text>
+  <rect x="250" y="135" width="1600" height="270" rx="8" class="bande"/><rect x="250" y="420" width="1600" height="310" rx="8" class="bande"/><rect x="250" y="745" width="1600" height="190" rx="8" class="bande"/>
+
+  <g class="acteur"><circle cx="100" cy="235" r="16"/><line x1="100" y1="251" x2="100" y2="305"/><line x1="70" y1="277" x2="130" y2="277"/><line x1="100" y1="305" x2="76" y2="345"/><line x1="100" y1="305" x2="124" y2="345"/><text x="100" y="372" text-anchor="middle"><tspan x="100">Moniteur / candidat</tspan><tspan x="100" dy="18" class="legende">sans compte</tspan></text></g>
+  <g class="acteur"><circle cx="100" cy="525" r="16"/><line x1="100" y1="541" x2="100" y2="595"/><line x1="70" y1="567" x2="130" y2="567"/><line x1="100" y1="595" x2="76" y2="635"/><line x1="100" y1="595" x2="124" y2="635"/><text x="100" y="662" text-anchor="middle"><tspan x="100">Auto-école</tspan><tspan x="100" dy="18" class="legende">authentifiée</tspan></text></g>
+  <g class="acteur"><circle cx="100" cy="790" r="16"/><line x1="100" y1="806" x2="100" y2="860"/><line x1="70" y1="832" x2="130" y2="832"/><line x1="100" y1="860" x2="76" y2="900"/><line x1="100" y1="860" x2="124" y2="900"/><text x="100" y="927" text-anchor="middle">Administrateur</text></g>
+
+  <path d="M130 277H250 M130 567H250 M130 832H250" class="assoc"/>
+  <g class="uc" text-anchor="middle">
+    <ellipse cx="420" cy="185" rx="145" ry="38"/><text x="420" y="181"><tspan x="420">Consulter et filtrer les annonces</tspan><tspan x="420" dy="16">mots-clés, département, ville + rayon</tspan></text>
+    <ellipse cx="725" cy="185" rx="130" ry="38"/><text x="725" y="190">Basculer en vue carte</text>
+    <ellipse cx="1015" cy="185" rx="135" ry="38"/><text x="1015" y="190">Voir le détail d'une annonce</text>
+    <ellipse cx="1310" cy="185" rx="135" ry="38"/><text x="1310" y="181"><tspan x="1310">Postuler avec</tspan><tspan x="1310" dy="16">pièces jointes</tspan></text>
+    <ellipse cx="1605" cy="185" rx="135" ry="38"/><text x="1605" y="181"><tspan x="1605">Suivre sa candidature</tspan><tspan x="1605" dy="16">par jeton</tspan></text>
+    <ellipse cx="420" cy="310" rx="135" ry="38"/><text x="420" y="315">Signer le contrat en ligne</text>
+    <ellipse cx="725" cy="310" rx="135" ry="38"/><text x="725" y="315">Télécharger le PDF signé</text>
+    <ellipse cx="1015" cy="310" rx="145" ry="38"/><text x="1015" y="306"><tspan x="1015">S'abonner aux alertes email</tspan><tspan x="1015" dy="16">double opt-in</tspan></text>
+    <ellipse cx="1310" cy="310" rx="145" ry="38"/><text x="1310" y="306"><tspan x="1310">Se désabonner</tspan><tspan x="1310" dy="16">suppression RGPD</tspan></text>
+    <ellipse cx="1605" cy="310" rx="145" ry="38"/><text x="1605" y="306"><tspan x="1605">Contrôle des pièces</tspan><tspan x="1605" dy="16">magic bytes</tspan></text>
+
+    <ellipse cx="410" cy="475" rx="145" ry="38"/><text x="410" y="471"><tspan x="410">S'inscrire</tspan><tspan x="410" dy="16">vérification SIRET + email</tspan></text>
+    <ellipse cx="715" cy="475" rx="145" ry="38"/><text x="715" y="471"><tspan x="715">Se connecter / réinitialiser</tspan><tspan x="715" dy="16">son mot de passe</tspan></text>
+    <ellipse cx="1020" cy="475" rx="135" ry="38"/><text x="1020" y="480">Gérer son profil</text>
+    <ellipse cx="1325" cy="475" rx="155" ry="38"/><text x="1325" y="471"><tspan x="1325">Créer, modifier, clôturer ou</tspan><tspan x="1325" dy="16">supprimer une annonce</tspan></text>
+    <ellipse cx="1650" cy="475" rx="155" ry="38"/><text x="1650" y="471"><tspan x="1650">Consulter les candidatures et</tspan><tspan x="1650" dy="16">télécharger les pièces</tspan></text>
+    <ellipse cx="410" cy="585" rx="150" ry="38"/><text x="410" y="581"><tspan x="410">Accepter une candidature</tspan><tspan x="410" dy="16">contrat + signature</tspan></text>
+    <ellipse cx="715" cy="585" rx="135" ry="38"/><text x="715" y="590">Refuser une candidature</text>
+    <ellipse cx="1020" cy="585" rx="140" ry="38"/><text x="1020" y="590">Envoyer le contrat au candidat</text>
+    <ellipse cx="1325" cy="585" rx="150" ry="38"/><text x="1325" y="590">Télécharger le contrat contresigné</text>
+    <ellipse cx="1650" cy="585" rx="135" ry="38"/><text x="1650" y="590">Consulter ses statistiques</text>
+    <ellipse cx="410" cy="680" rx="145" ry="34"/><text x="410" y="685">Générer le contrat PDF</text>
+
+    <ellipse cx="410" cy="790" rx="145" ry="38"/><text x="410" y="795">Se connecter à l'administration</text>
+    <ellipse cx="715" cy="790" rx="145" ry="38"/><text x="715" y="786"><tspan x="715">Consulter les statistiques</tspan><tspan x="715" dy="16">plateforme</tspan></text>
+    <ellipse cx="1020" cy="790" rx="150" ry="38"/><text x="1020" y="786"><tspan x="1020">Suspendre ou réactiver</tspan><tspan x="1020" dy="16">une auto-école</tspan></text>
+    <ellipse cx="1325" cy="790" rx="135" ry="38"/><text x="1325" y="795">Retirer une annonce</text>
+    <ellipse cx="1630" cy="790" rx="135" ry="38"/><text x="1630" y="795">Lancer la purge RGPD</text>
+  </g>
+  <path d="M1445 205L1530 275" class="include"/><text x="1475" y="245" class="inclabel">« include »</text>
+  <path d="M410 623V642" class="include"/><text x="425" y="642" class="inclabel">« include »</text>
+  <text x="260" y="952" class="legende">Les associations acteur → cas sont regroupées par bande pour éviter un faisceau de traits sans valeur métier.</text>
+</svg>
