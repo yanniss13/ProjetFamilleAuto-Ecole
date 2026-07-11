@@ -23,6 +23,9 @@ l'utilisateur.
     (captures 1440 px sous [`captures/`](captures/))
   - Base de données v2 : [`base-de-donnees.md`](base-de-donnees.md)
     (diagramme [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg))
+  - Découpage fonctionnel : [`decoupage-fonctionnel.md`](decoupage-fonctionnel.md)
+    (diagramme [`diagrammes/parcours-fonctionnels.svg`](diagrammes/parcours-fonctionnels.svg))
+  - Charte graphique : [`charte-graphique.md`](charte-graphique.md)
 - **Conformité (rejouée le 2026-07-11)** : [`conformite.md`](conformite.md) —
   passage final sur la version mobile livrée : W3C 0/0, axe 0 violation,
   débordement 0/60 avec viewport exact ; faux positif responsive documenté.
@@ -49,9 +52,8 @@ l'utilisateur.
 
 - Dossier consolidé, deck 35 minutes, démo 11 minutes, 26 Q/R et deux veilles
   livrés ; focus technique : **signature électronique du contrat**.
-- Audit : **30 validés / 3 à renforcer / 0 manquant**. Les trois restes sont
-  le découpage fonctionnel et la charte (facultatifs) et l'environnement de
-  production démontré.
+- Audit : **32 validés / 1 à renforcer / 0 manquant**. Le seul critère à
+  renforcer est l'environnement de production démontré.
 - Modèle BDD v2 à 8 entités et procédures SQLite/PostgreSQL de
   création/migration/sauvegarde/restauration documentés.
 - Suite actuelle : **15 fichiers, 448 assertions**.
@@ -122,6 +124,10 @@ Puis vérifier dans un navigateur :
 
 ### Checkpoint final — preuves responsive régénérées (2026-07-11, Claude)
 
+- Action terminée le 2026-07-11 : découpage fonctionnel et charte graphique
+  livrés (`decoupage-fonctionnel.md`, diagrammes SVG/PNG et
+  `charte-graphique.md`) ; audit porté à **32 validés / 1 à renforcer /
+  0 manquant**.
 - Action terminée : **chantier « responsive mobile et présentation » LIVRÉ en
   entier** (les deux plans du 2026-07-10 — corrections d'audit et responsive —
   sont entièrement cochés).

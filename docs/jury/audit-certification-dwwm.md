@@ -21,10 +21,9 @@ Sur les 33 critères relevés dans la checklist (après les trois chantiers du
 2026-07-10 : « consolidation du dossier », « conformité visible » et
 « script de soutenance ») :
 
-- **30 sont validés** par le code, les tests ou les documents présents ;
-- **3 sont à renforcer** — deux critères facultatifs (découpage fonctionnel
-  destiné au jury, charte graphique formalisée) et l'environnement de
-  production démontré ;
+- **32 sont validés** par le code, les tests ou les documents présents ;
+- **1 est à renforcer** — l'environnement de production démontré (déploiement
+  PostgreSQL réel et exercice de restauration) ;
 - **0 manquant.**
 
 Au 2026-07-10 au soir, le dossier a rattrapé le produit : les preuves
@@ -66,9 +65,9 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 | VALIDÉ | Résumé du projet en français | [`resume-projet.md`](resume-projet.md) (2026-07-10) : problème, acteurs, solution, valeur, périmètre livré lot par lot, stack. `README.md` réécrit et `DESIGN.md` classé en historique le même jour. | Le relire avant la soutenance. |
 | VALIDÉ | Cahier des charges / expression du besoin | [`expression-du-besoin-v2.md`](expression-du-besoin-v2.md) : besoin, objectifs, contraintes, critères d'acceptation adossés aux tests, hors-périmètre, chronologie v1 → v2. | Présenter la chronologie (v1 intacte, v2 datée) comme preuve de méthode. |
 | VALIDÉ | Liste des compétences | [`competences-dwwm.md`](competences-dwwm.md) : matrice des 8 compétences REAC RNCP37674 (libellés vérifiés) avec réalisations et preuves. | Assumer à l'oral les couvertures partielles (NoSQL, déploiement) telles que documentées. |
-| À RENFORCER | Découpage fonctionnel avec descriptions (facultatif) | Les lots et l'architecture `routes → contrôleurs → services → vues` donnent un découpage réel, mais pas une vue fonctionnelle destinée au jury. | Ajouter un schéma simple des trois parcours : candidat, auto-école et administrateur. |
+| VALIDÉ | Découpage fonctionnel avec descriptions (facultatif) | [`decoupage-fonctionnel.md`](decoupage-fonctionnel.md) (2026-07-11) : diagramme des trois parcours (candidat, auto-école, administrateur) avec routes réelles et lecture guidée contrôleur par contrôleur. | Dérouler le diagramme en 60 secondes pendant la partie conception. |
 | VALIDÉ | Maquette (obligatoire) | `docs/historique/2026-06/wireframes/` contient 11 écrans HTML navigables, un sommaire, 11 exports PNG associés et une planche SVG datés du 23 juin. Ils constituent une vraie maquette basse fidélité du MVP initial. | Ne pas écraser ces originaux. Les présenter comme v1 et documenter les écarts avec les lots livrés ensuite. |
-| À RENFORCER | Charte graphique (facultative) | Les couleurs, espacements et composants sont centralisés dans `public/css/style.css`, sans document de charte. | Extraire une page de charte : palette, typographie, boutons, cartes, badges, messages et règles d'accessibilité. |
+| VALIDÉ | Charte graphique (facultative) | [`charte-graphique.md`](charte-graphique.md) (2026-07-11) : palette avec ratios WCAG, typographie système, composants et règles d'accessibilité extraits de `public/css/style.css`. | Citer la règle des 4,5:1 si la question du choix des couleurs vient. |
 | VALIDÉ | Description de la BDD, création, restauration et comparaison | [`base-de-donnees.md`](base-de-donnees.md) décrit le modèle, les 13 migrations SQLite, la création/seed, la nécessité d'un historique PostgreSQL dédié et les procédures `sqlite3 .backup/.restore` et `pg_dump/pg_restore`. | Réaliser un exercice de restauration daté dès qu'un environnement PostgreSQL est disponible ; ne pas présenter ce drill comme déjà exécuté. |
 | VALIDÉ | Diagramme de base de données | [`diagrammes/bdd-v2.svg`](diagrammes/bdd-v2.svg) + PNG (8 modèles, colonnes réelles, cardinalités, cascades) et lecture guidée dans [`base-de-donnees.md`](base-de-donnees.md) ; le MCD/MLD v1 reste la preuve initiale. | Montrer v1 puis v2 côte à côte pour illustrer l'évolution 4 → 8. |
 | VALIDÉ | Choix des technologies | Justifications et alternatives rejetées explicitées : diapositive « Technologies et pourquoi » du [deck](soutenance/soutenance.html), Q/R « Choix technologiques » ([`soutenance/questions-reponses.md`](soutenance/questions-reponses.md)) et [`veille-technique.md`](veille-technique.md). | Répéter les justifications à l'oral (framework front, JWT, SQLite). |
