@@ -1,0 +1,33 @@
+// Annonce publiée par une auto-école (offre / besoin de moniteur).
+model Listing {
+  id           Int     @id @default(autoincrement())
+  title        String
+  description  String
+  contractType String? // "cdi" | "cdd" | "freelance" | "apprentissage" (validé applicativement)
+  city         String
+  department   String  // code département, ex. "13", "75", "2A"
+  hoursPerWeek Int?
+  compensation String? // texte libre (ex. "à négocier", "2200€ brut/mois")
+  status       String  @default("open") // "open" | "closed"
+
+  // Nombre d'affichages de la page détail publique (Lot H). Compteur brut, incrémenté
+  // en fire-and-forget — jamais bloquant pour l'affichage, pas de dé-duplication.
+  viewsCount Int @default(0)
+
+  // Copies en minuscules pour une recherche insensible à la casse, identique sous
+  // SQLite (dev) et PostgreSQL (prod). Maintenues par le service à la création/édition.
+  titleLower       String?
+  descriptionLower String?
+  cityLower        String?
+
+  schoolId Int
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([department])
+  @@index([status])
+}

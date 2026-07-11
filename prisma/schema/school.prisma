@@ -1,0 +1,38 @@
+// Compte auto-école (le seul type d'utilisateur authentifié).
+model School {
+  id           Int     @id @default(autoincrement())
+  email        String  @unique
+  passwordHash String
+  businessName String
+  siret        String  @unique
+  phone        String?
+
+  // Suspension par un administrateur : bloque la connexion et masque les annonces du public.
+  suspended Boolean @default(false)
+
+  // Localisation (optionnelle) : adresse saisie par l'école + coordonnées géocodées
+  // (Nominatim) pour la carte affichée sur la page détail d'une annonce.
+  address   String?
+  latitude  Float?
+  longitude Float?
+
+  // Vérification d'email + réinitialisation de mot de passe (on stocke des HASH
+  // de jetons, jamais les jetons en clair).
+  emailVerified     Boolean   @default(false)
+  verifyTokenHash   String?   @unique
+  verifyTokenExpiry DateTime?
+  resetTokenHash    String?   @unique
+  resetTokenExpiry  DateTime?
+
+  // Vérification Sirene (Lot F) : statut du SIRET au répertoire, nom officiel et date
+  // du dernier contrôle. Jamais bloquant : « unverified » par défaut (comptes existants
+  // inclus) ; une panne de l'API est stockée comme « unverified ».
+  siretStatus       String    @default("unverified") // "verified" | "not_found" | "closed" | "unverified"
+  siretVerifiedName String?
+  siretCheckedAt    DateTime?
+
+  listings Listing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

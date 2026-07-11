@@ -1,4 +1,4 @@
-# Audit de préparation à la certification DWWM
+﻿# Audit de préparation à la certification DWWM
 
 - Date de l'audit : 2026-07-10 (mis à jour après intégration des documents
   historiques, puis après la livraison du chantier « consolidation du dossier »)
@@ -85,7 +85,7 @@ L'inventaire et les écarts des sources de juin sont détaillés dans
 |---|---|---|---|
 | VALIDÉ | Front et back, API facultative | Front SSR Twig + JavaScript dédié ; back Express structuré ; relais JSON `/api/siret/:siret` et `/api/adresse`. | Montrer un flux navigateur → route → contrôleur → service → Prisma/API externe. |
 | VALIDÉ | POO (facultatif) | Choix architectural assumé et argumenté : modules fonctionnels à responsabilité unique, héritage réel là où il s'impose (`PrismaSessionStore extends Store`). Réponse préparée dans [`soutenance/questions-reponses.md`](soutenance/questions-reponses.md). | Ne pas survendre : dire « majoritairement non, et voici pourquoi ». |
-| VALIDÉ | Contraintes d'intégrité de la base | Clés primaires, étrangères, unicités, index, relations 1-N/1-1 et cascades sont définis dans `prisma/schema.prisma` et les migrations. | Illustrer trois contraintes : SIRET unique, contrat unique par candidature et suppression en cascade. |
+| VALIDÉ | Contraintes d'intégrité de la base | Clés primaires, étrangères, unicités, index, relations 1-N/1-1 et cascades sont définis dans `prisma/schema/` et les migrations. | Illustrer trois contraintes : SIRET unique, contrat unique par candidature et suppression en cascade. |
 | VALIDÉ | Code source documenté | Les modules sensibles expliquent le pourquoi : CSRF multipart, uploads, sessions, services externes et purge. | Choisir quelques commentaires utiles plutôt qu'afficher de longs fichiers. |
 | VALIDÉ | Noms de variables et fonctions explicites | Les noms comme `findOwnedById`, `verifyAfterUpload`, `notifyNewListing` et `destroyForSchool` décrivent leur responsabilité. | Citer deux exemples pendant le focus code. |
 | VALIDÉ | Nommage uniforme | Modèles et code technique en anglais, messages et vues en français, modules rangés par rôle. | Expliquer cette convention dans le dossier. |

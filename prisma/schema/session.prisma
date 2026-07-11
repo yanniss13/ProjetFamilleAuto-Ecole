@@ -1,0 +1,9 @@
+// Session HTTP persistée (express-session via PrismaSessionStore) : survit aux
+// redémarrages, partageable entre processus, identique en SQLite (dev) et PostgreSQL (prod).
+model Session {
+  sid       String   @id
+  data      String // JSON de la session express-session
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

@@ -1,0 +1,18 @@
+// Schéma de données — MoniteurConnect (schéma multi-fichiers : un modèle par
+// fichier dans ce dossier, Prisma les fusionne — clé "prisma.schema" de
+// package.json). Plateforme d'annonces : les auto-écoles (School) publient des
+// annonces (Listing), les moniteurs indépendants postulent (Application) SANS
+// créer de compte.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // SQLite en développement (zéro install). En production : passer le provider à
+  // "postgresql" et fournir une DATABASE_URL Postgres — aucun changement de code.
+  // ⚠️ L'URL SQLite relative se résout depuis CE fichier : la base prisma/dev.db
+  // s'écrit "file:../dev.db" dans .env.
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}

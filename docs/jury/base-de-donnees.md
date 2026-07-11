@@ -1,7 +1,9 @@
 # Base de données — modèle v2
 
-Date : 2026-07-10. Source de vérité : [`prisma/schema.prisma`](../../prisma/schema.prisma)
-(commenté) et les 13 migrations de [`prisma/migrations/`](../../prisma/migrations/).
+Date : 2026-07-10 (schéma éclaté en multi-fichiers le 2026-07-12). Source de
+vérité : [`prisma/schema/`](../../prisma/schema/) — un modèle par fichier
+commenté, `datasource` et `generator` dans `main.prisma` — et les 13 migrations
+de [`prisma/schema/migrations/`](../../prisma/schema/migrations/).
 Le MCD/MLD initial (4 entités, juin 2026) est conservé sous
 [`../historique/2026-06/diagrammes/`](../historique/2026-06/diagrammes/).
 
@@ -81,9 +83,9 @@ npx prisma generate
 npm run seed:demo       # démonstration uniquement, jamais en production
 ```
 
-`prisma/migrations/` reste l'historique SQLite de développement. Chaque
-modification commence dans `prisma/schema.prisma`, reçoit une migration
-versionnée, puis passe `npx prisma validate` et `npm test`.
+`prisma/schema/migrations/` reste l'historique SQLite de développement. Chaque
+modification commence dans le fichier concerné de `prisma/schema/`, reçoit une
+migration versionnée, puis passe `npx prisma validate` et `npm test`.
 
 ### Préparation de PostgreSQL
 
@@ -91,7 +93,7 @@ La première mise en production doit être répétée sur une base PostgreSQL vi
 
 1. créer une configuration Prisma dédiée dont le datasource utilise
    `provider = "postgresql"`, sans mélanger ses migrations avec celles de
-   `prisma/migrations/` ;
+   `prisma/schema/migrations/` ;
 2. générer une migration de référence PostgreSQL à partir du schéma actuel
    avec `prisma migrate diff --from-empty --to-schema-datamodel ... --script` ;
 3. relire le SQL produit (types, index, cascades et contraintes uniques), puis

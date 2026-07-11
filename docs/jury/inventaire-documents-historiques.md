@@ -1,4 +1,4 @@
-# Inventaire des documents historiques
+﻿# Inventaire des documents historiques
 
 Date de la revue : 2026-07-10
 
@@ -28,7 +28,7 @@ ensuite. Pour la soutenance :
 | `docs/historique/2026-06/spec-assets/wf-*.png` et `docs/historique/2026-06/wireframes/moniteur-connect-wireframe.svg` | 23/06 | Exports des maquettes | 11 PNG lisibles et une planche SVG globale. | Utiliser les PNG dans le dossier et le diaporama ; conserver le HTML comme source. |
 | `docs/historique/2026-06/diagrammes/diagramme-fonctionnel.{md,pdf}` | 24/06 | Flux global, processus, données, architecture et cas d'utilisation | Le fond initial est exploitable, mais les diagrammes s'arrêtent avant les lots récents. | Mettre à jour le Markdown ou créer une version 2 ; régénérer ensuite le PDF. **Fait le 2026-07-11 :** v2 dans [`docs/jury/diagramme-fonctionnel-v2.md`](diagramme-fonctionnel-v2.md). |
 | `docs/historique/2026-06/diagrammes/diagramme-cas-utilisation-*.pdf` et `docs/historique/2026-06/spec-assets/cas-utilisation-*.{svg,png}` | 24/06 | Cas d'utilisation moniteur et auto-école | Diagrammes lisibles. Ils ne couvrent pas l'administrateur ni les alertes, le suivi et la signature. | Conserver comme v1 et créer un addendum ou une v2 complète. **Fait le 2026-07-11 :** v2 dans [`docs/jury/diagrammes/cas-utilisation-v2.svg`](diagrammes/cas-utilisation-v2.svg). |
-| `docs/historique/2026-06/diagrammes/{mcd.pdf,mld.pdf,mcd-looping.sql}` et `docs/historique/2026-06/spec-assets/{mcd,mld}.{svg,png}` | 24–25/06 | MCD/MLD historique | Seulement 4 entités : école, annonce, candidature, contrat. Le schéma Prisma actuel en possède 8. Les noms français du SQL ne correspondent pas aux modèles Prisma anglais. | Actualiser à partir de `prisma/schema.prisma` ; ne pas utiliser tel quel devant le jury. |
+| `docs/historique/2026-06/diagrammes/{mcd.pdf,mld.pdf,mcd-looping.sql}` et `docs/historique/2026-06/spec-assets/{mcd,mld}.{svg,png}` | 24–25/06 | MCD/MLD historique | Seulement 4 entités : école, annonce, candidature, contrat. Le schéma Prisma actuel en possède 8. Les noms français du SQL ne correspondent pas aux modèles Prisma anglais. | Actualiser à partir de `prisma/schema/` ; ne pas utiliser tel quel devant le jury. |
 | `docs/historique/2026-06/spec-assets/{architecture.png,modele-donnees.png}` | 23–24/06 | Architecture et modèle simplifié | Très lisibles, mais antérieurs aux sessions Prisma, à l'admin, aux alertes, à la purge et aux API SIRET/Adresse. | Réutiliser le style graphique pour une version 2 actuelle. |
 | `docs/_a_retirer_du_projet/captures-cours-uml/image1.png` à `image8.png` | 24/06 | Captures d'un cours École R17 sur les diagrammes UML | Supports pédagogiques tiers, non spécifiques à MoniteurConnect. | Examiner puis retirer ce dossier du projet ; ne pas présenter ces images comme des livrables. **Fait le 2026-07-12 :** dossier supprimé. |
 

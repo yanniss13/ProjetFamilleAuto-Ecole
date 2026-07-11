@@ -1,0 +1,8 @@
+// Administrateur de la plateforme (modération). Créé par script CLI, pas en self-service.
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
