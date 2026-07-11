@@ -4,13 +4,11 @@
   "private": true,
   "description": "Plateforme d'annonces reliant auto-écoles et moniteurs indépendants.",
   "type": "commonjs",
-  "prisma": {
-    "schema": "prisma/schema"
-  },
   "scripts": {
+    "postinstall": "node scripts/generate-client.js",
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "prisma:generate": "prisma generate",
+    "prisma:generate": "node scripts/generate-client.js",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "admin:create": "node scripts/create-admin.js",
@@ -19,8 +17,10 @@
     "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-b.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/ameliorations-v2.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs && node test/lot-k.cjs && node test/lot-l.cjs"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.3",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.11.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
@@ -34,6 +34,6 @@
   "devDependencies": {
     "axe-core": "^4.12.1",
     "leaflet": "^1.9.4",
-    "prisma": "^6.0.0"
+    "prisma": "^7.8.0"
   }
 }

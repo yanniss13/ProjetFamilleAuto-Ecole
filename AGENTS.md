@@ -5,8 +5,18 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 
 ## Stack & commandes
 
-- Node.js (CommonJS), Express 5, Twig (autoescape), Prisma (SQLite en dev, prévu
-  PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
+- Node.js (CommonJS, **>= 22.18 requis** : le client Prisma généré est du
+  TypeScript ESM chargé par `require()` grâce au type-stripping natif),
+  Express 5, Twig (autoescape), **Prisma 7** (générateur `prisma-client`,
+  adaptateur `better-sqlite3` en dev, `@prisma/adapter-pg` prévu en prod),
+  sessions en base (table `Session`), Leaflet auto-hébergé.
+- Le client Prisma généré vit sous `src/generated/prisma/` (non versionné) :
+  `npm run prisma:generate` le reconstruit (aussi en postinstall) et pose le
+  marqueur ESM `{"type":"module"}` indispensable. La connexion passe par
+  l'adaptateur dans `src/config/prisma.js` (qui charge aussi dotenv — les
+  scripts et tests n'ont rien à faire) ; le CLI lit l'URL dans
+  `prisma.config.ts`. `DATABASE_URL` est relative à la racine :
+  `file:./prisma/dev.db`.
 - ⚠️ Node est installé via **nvm-windows**, HORS des emplacements standards :
   `C:\nvm4w\nodejs\node.exe` et `C:\nvm4w\nodejs\npm.cmd`. Si le PATH de la
   session ne les expose pas (sandbox Codex notamment), utiliser ces chemins
@@ -14,9 +24,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   documentaire (aucun code ni test modifié), le `npm test` d'avant-commit peut
   être sauté si l'environnement ne permet vraiment pas de l'exécuter.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
-  `SESSION_SECRET` et `DATABASE_URL="file:../dev.db"` (fail-fast sinon — le
-  chemin SQLite est relatif à `prisma/schema/main.prisma`, qui porte le
-  datasource du schéma multi-fichiers).
+  `SESSION_SECRET` et `DATABASE_URL="file:./prisma/dev.db"` (fail-fast sinon).
 - `npm test` — suite complète (15 fichiers `.cjs`, 448 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.

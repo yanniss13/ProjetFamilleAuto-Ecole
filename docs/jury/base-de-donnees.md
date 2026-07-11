@@ -92,8 +92,10 @@ migration versionnée, puis passe `npx prisma validate` et `npm test`.
 La première mise en production doit être répétée sur une base PostgreSQL vide :
 
 1. créer une configuration Prisma dédiée dont le datasource utilise
-   `provider = "postgresql"`, sans mélanger ses migrations avec celles de
-   `prisma/schema/migrations/` ;
+   `provider = "postgresql"` avec l'adaptateur `@prisma/adapter-pg`
+   (le projet est en Prisma 7 depuis le 2026-07-12 : la connexion passe par
+   un adaptateur de driver — `better-sqlite3` en développement), sans
+   mélanger ses migrations avec celles de `prisma/schema/migrations/` ;
 2. générer une migration de référence PostgreSQL à partir du schéma actuel
    avec `prisma migrate diff --from-empty --to-schema-datamodel ... --script` ;
 3. relire le SQL produit (types, index, cascades et contraintes uniques), puis

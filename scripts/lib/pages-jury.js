@@ -2,16 +2,16 @@
 // Source de vérité unique pour les captures d'écran et les contrôles de
 // conformité. LECTURE SEULE : la base n'est interrogée que pour retrouver les
 // identifiants de démo, rien n'est écrit.
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../src/config/prisma');
 
 const BASE = process.env.CAPTURE_BASE_URL || 'http://127.0.0.1:4071';
 const DEMO_SUFFIX = '@demo.moniteur-connect.example';
 const ECOLE = { email: `ecole.vitrine${DEMO_SUFFIX}`, password: 'demo1234' };
 const ADMIN = { email: `admin${DEMO_SUFFIX}`, password: 'admin1234' };
 
-// IDs du jeu de démo, en lecture seule (aucune écriture, $disconnect garanti).
+// IDs du jeu de démo, en lecture seule (aucune écriture, $disconnect garanti —
+// le client partagé de src/config/prisma porte l'adaptateur SQLite Prisma 7).
 async function donneesDemo() {
-  const prisma = new PrismaClient();
   try {
     const vitrine = await prisma.school.findUnique({ where: { email: ECOLE.email } });
     if (!vitrine) throw new Error(`École vitrine absente — lancer \`npm run seed:demo\` d'abord.`);
