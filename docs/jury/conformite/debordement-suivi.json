@@ -1,25 +1,29 @@
 {
   "320": {
     "deborde": false,
-    "scrollWidth": 485,
-    "innerWidth": 485,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "innerWidth": 320,
     "coupables": []
   },
   "375": {
     "deborde": false,
-    "scrollWidth": 486,
-    "innerWidth": 486,
+    "scrollWidth": 375,
+    "viewportWidth": 375,
+    "innerWidth": 375,
     "coupables": []
   },
   "768": {
     "deborde": false,
     "scrollWidth": 768,
+    "viewportWidth": 768,
     "innerWidth": 768,
     "coupables": []
   },
   "1440": {
     "deborde": false,
     "scrollWidth": 1440,
+    "viewportWidth": 1440,
     "innerWidth": 1440,
     "coupables": []
   }
