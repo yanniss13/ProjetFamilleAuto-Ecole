@@ -63,6 +63,29 @@ Vue d'ensemble : [`decoupage-fonctionnel.md`](decoupage-fonctionnel.md) et
 | Retirer une annonce | La modération supprime une annonce désignée ; seule une absence Prisma `P2025` devient une 404. | `POST /admin/annonces/:id/supprimer` | `lot-c.cjs`, `correctifs.cjs` |
 | Lancer la purge RGPD | La purge manuelle applique les mêmes règles que la tâche planifiée et journalise un `PurgeRun`. | `POST /admin/purge` | `lot-j.cjs` |
 
+### Matrice des rôles et permissions
+
+Qui peut faire quoi, et **quel code l'impose** (reprend le §1.7 de la v1,
+aligné sur les gardes réellement montées dans `src/routes/index.js`) :
+
+| Zone (routes) | Visiteur / candidat | École authentifiée | Admin | Garde dans le code |
+|---|---|---|---|---|
+| Consultation publique (`/`, `/annonces`, détail, carte) | Oui | Oui | Oui | Aucune — pages publiques ; les annonces d'écoles suspendues sont masquées |
+| Déposer une candidature (`POST /annonces/:id/postuler`) | Oui | **Non** | **Non** | `rejectBackOfficeApplication` : toute session back-office est refusée avant le limiteur anti-spam |
+| Alertes email (`/alertes`, confirmation, désabonnement) | Oui | Oui (entrée de menu masquée) | Oui (entrée masquée) | Jetons hachés ; suppression réelle au désabonnement |
+| Suivi et signature candidat (`/suivi/:token`, `/signer`) | **Sur jeton uniquement** | Idem (le lien fait foi) | Idem | Jeton opaque 64 hex ; signer depuis le suivi neutralise la session école du navigateur |
+| Inscription / connexion / réinitialisation | Oui | Redirigée (déjà connectée) | — | `redirectIfAuth` ; connexion et reset régénèrent la session |
+| Espace école (`/tableau-de-bord`, `/mes-annonces`, `/mon-compte`) | Redirection connexion | Oui, **ses données seulement** | **Non** | `requireAuth` + `loadSchool` ; toute requête de gestion scopée `schoolId` |
+| Pièces et contrats d'une **autre** école | — | **404** | — | Scoping `schoolId` dans chaque service (prouvé par `test/smoke.cjs`) |
+| Espace admin (`/admin`, écoles, annonces, purge) | Redirection login admin | **Non** | Oui | `requireAdmin` + `loadAdmin` ; la connexion admin régénère la session et ferme l'espace école |
+| APIs relais (`/api/siret/:siret`, `/api/adresse`) | Oui | Oui | Oui | Rate-limit par IP (30/15 min et 30/min), réponses d'erreur non bloquantes |
+
+Transversal à toutes les écritures : jeton CSRF obligatoire (y compris
+formulaires multipart) et CSP stricte sans inline. Cloisonnement
+école/admin prouvé par `test/lot-c.cjs` et `test/ameliorations-v2.cjs`
+(« session admin ne peut pas atteindre /tableau-de-bord », « session école
+ne peut pas atteindre /admin »).
+
 ### Maquettes v2
 
 Les 30 écrans et états ci-dessus sont maquettés en filaire sous
