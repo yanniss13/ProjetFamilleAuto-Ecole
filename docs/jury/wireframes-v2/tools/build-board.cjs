@@ -1,7 +1,9 @@
 // Génère la planche SVG de couverture des 30 wireframes v2 : miniatures
-// référencées (pas embarquées) groupées par acteur, avec légende. Les
-// miniatures montrent le haut de chaque page ; les PNG complets restent
-// sous png/. Usage : node docs/jury/wireframes-v2/tools/build-board.cjs
+// EMBARQUÉES en data URI (un SVG à liens relatifs s'affiche avec des carrés
+// vides dès qu'il est rendu « comme une image » — aperçu Windows, <img>,
+// GitHub — car les ressources externes y sont bloquées). Les miniatures
+// montrent le haut de chaque page ; les PNG complets restent sous png/.
+// Usage : node docs/jury/wireframes-v2/tools/build-board.cjs
 const fs = require('fs');
 const path = require('path');
 const screens = require(path.join(__dirname, '..', 'screens.cjs'));
@@ -23,10 +25,11 @@ for (const groupe of groupes) {
   liste.forEach((s, i) => {
     const col = i % COLONNES, ligne = Math.floor(i / COLONNES);
     const x = MARGE + col * CELL_L, cy = y + ligne * CELL_H;
-    const png = `png/${s.filename.replace('.html', '.png')}`;
+    const png = path.join(RACINE, 'png', s.filename.replace('.html', '.png'));
+    const dataUri = `data:image/png;base64,${fs.readFileSync(png).toString('base64')}`;
     blocs.push(
       `<g><rect class="cadre" x="${x}" y="${cy}" width="${IMG_L}" height="${IMG_H}"/>`
-      + `<image href="${png}" x="${x}" y="${cy}" width="${IMG_L}" height="${IMG_H}" preserveAspectRatio="xMidYMin slice"/>`
+      + `<image href="${dataUri}" x="${x}" y="${cy}" width="${IMG_L}" height="${IMG_H}" preserveAspectRatio="xMidYMin slice"/>`
       + `<rect class="bord" x="${x}" y="${cy}" width="${IMG_L}" height="${IMG_H}"/>`
       + `<text class="nom" x="${x}" y="${cy + IMG_H + 20}">${esc(s.title)}</text>`
       + `<text class="route" x="${x}" y="${cy + IMG_H + 38}">${esc(s.route)}</text></g>`,
