@@ -37,6 +37,10 @@ l'utilisateur.
     matrice [`wireframes-v2/matrice-couverture.md`](wireframes-v2/matrice-couverture.md),
     planche [`wireframes-v2/wireframes-v2-planche.svg`](wireframes-v2/wireframes-v2-planche.svg),
     PDF 32 pages [`wireframes-v2/wireframes-v2.pdf`](wireframes-v2/wireframes-v2.pdf)
+- **Dossier final PDF** : chaque Markdown du dossier jury a son équivalent
+  sous [`pdf/`](pdf/) (18 fichiers, arborescence miroir, liens internes
+  pointant vers les PDF). Régénération : `python scripts/pdf-jury.py`
+  (après toute modification d'un `.md`).
 - **Conformité (rejouée le 2026-07-11)** : [`conformite.md`](conformite.md) —
   passage final sur la version mobile livrée : W3C 0/0, axe 0 violation,
   débordement 0/60 avec viewport exact ; faux positif responsive documenté.
