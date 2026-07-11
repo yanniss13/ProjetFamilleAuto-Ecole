@@ -7,6 +7,12 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
 
 - Node.js (CommonJS), Express 5, Twig (autoescape), Prisma (SQLite en dev, prévu
   PostgreSQL en prod), sessions en base (table `Session`), Leaflet auto-hébergé.
+- ⚠️ Node est installé via **nvm-windows**, HORS des emplacements standards :
+  `C:\nvm4w\nodejs\node.exe` et `C:\nvm4w\nodejs\npm.cmd`. Si le PATH de la
+  session ne les expose pas (sandbox Codex notamment), utiliser ces chemins
+  absolus, ex. `& "C:\nvm4w\nodejs\npm.cmd" test`. Pour un chantier purement
+  documentaire (aucun code ni test modifié), le `npm test` d'avant-commit peut
+  être sauté si l'environnement ne permet vraiment pas de l'exécuter.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./dev.db"` (fail-fast sinon).
 - `npm test` — suite complète (15 fichiers `.cjs`, 448 assertions). TOUJOURS la lancer
