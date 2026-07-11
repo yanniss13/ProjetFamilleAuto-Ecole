@@ -342,7 +342,12 @@ node scripts/captures-jury.js --largeur=768 --sortie=docs/jury/captures/r768
 ```
 
 Attendu : `15/15` à chaque fois (45 PNG, chacun > 5 Ko).
-- [x] **Step 2:** Contrôle visuel par échantillon (outil Read) : `r320/annonces.png`, `r320/dashboard.png`, `r375/contrat.png`, `r768/admin.png` — noter tout débordement ou chevauchement visible (à recouper avec `debordement-*.json` de la Task 2 pour la Task 6). **Constat : aucun débordement ni chevauchement sur les 4 échantillons ; cohérent avec les JSON (0 débordement partout).**
+- [x] **Step 2 — historique invalidé le 2026-07-10 :** le contrôle visuel a
+  bien été effectué, mais les captures demandées à 320/375 mesuraient en réalité
+  environ 481–496 px à cause de la largeur minimale de la fenêtre Chromium. Le
+  constat « aucun débordement à 320/375 » ne constitue donc pas une preuve. Les
+  captures exactes et le contrôle du burger doivent être refaits selon le plan
+  `2026-07-10-responsive-mobile-presentation.md`.
 - [x] **Step 3:** `npm test`. Cocher la Task 3, checkpoint README jury, puis :
 
 ```powershell
@@ -395,8 +400,15 @@ git commit -m "Jury: corrections accessibilite - 0 violation axe critical/seriou
 **Interfaces:**
 - Consumes: `docs/jury/conformite/debordement-*.json` + observations Task 3 ; `node scripts/conformite-jury.js --controle=debordement`.
 
-- [x] **Step 1 (SANS OBJET):** aucun `deborde: true` au constat initial ni au re-run final — aucune correction nécessaire. Pour chaque `deborde: true`, identifier le coupable (`coupables[]`) et corriger — remèdes types : tableau large (l'envelopper d'un conteneur `overflow-x: auto` via une classe CSS existante ou nouvelle dans `style.css`), image/carte à largeur fixe (`max-width: 100%`), grille sans `minmax(0, ...)`, texte insécable long (`overflow-wrap`). Pas de `!important`.
-- [x] **Step 2:** Re-vérifié via un run complet final `--controle=tout` après les corrections des Tasks 4-5 : **0 erreur W3C, 0 violation axe, 0 débordement sur les 45 contrôles** (`resume.json` final). Aucune capture à regénérer (aucune page corrigée pour du responsive).
+- [x] **Step 1 — historique invalidé le 2026-07-10 :** le script comparait
+  `scrollWidth` à `window.innerWidth`, lui aussi élargi à environ 485 px sous
+  émulation mobile. L'absence de `deborde: true` ne prouvait donc pas 320/375.
+  Le script corrigé utilise désormais `visualViewport.width` ; les tableaux,
+  chaînes longues et la navigation mobile ont depuis été corrigés.
+- [x] **Step 2 — résultat historique partiel :** les résultats W3C et axe
+  décrivent la version antérieure au burger. Le « 0 débordement » de ce run est
+  invalidé par le faux positif ci-dessus. Rejouer `--controle=tout` sur la
+  version mobile finale avant toute affirmation de conformité.
 - [x] **Step 3:** `npm test`. Cocher la Task 6, checkpoint README jury, puis (fusionné avec le commit de la Task 5 — aucune correction responsive) :
 
 ```powershell
@@ -433,7 +445,7 @@ git commit -m "Jury: rapport de conformite date (W3C, responsive, accessibilite)
 - Modify: `AGENTS.md`
 - Modify: `docs/superpowers/plans/2026-07-10-conformite-visible.md` (tout coché)
 
-- [x] **Step 1:** Audit : « Validation W3C » MANQUANT → VALIDÉ, « Interfaces responsives » et « Validateur d'accessibilité » À RENFORCER → VALIDÉ (constats sourcés vers [`conformite.md`](../jury/conformite.md)) ; synthèse recomptée : **22 validés / 10 à renforcer / 1 manquant** (le manquant : veille technique anglophone) ; cases P1 cochées ; priorités restantes réordonnées (script de soutenance en tête).
+- [x] **Step 1:** Audit : « Validation W3C » MANQUANT → VALIDÉ, « Interfaces responsives » et « Validateur d'accessibilité » À RENFORCER → VALIDÉ (constats sourcés vers [`conformite.md`](../../jury/conformite.md)) ; synthèse recomptée : **22 validés / 10 à renforcer / 1 manquant** (le manquant : veille technique anglophone) ; cases P1 cochées ; priorités restantes réordonnées (script de soutenance en tête).
 - [x] **Step 2:** `docs/jury/README.md` : `conformite.md` ajouté aux documents de référence ; « Prochaine action recommandée » → script de soutenance ; checkpoint final réécrit (chantier livré, vérifications, premier travail restant). `AGENTS.md` : « Prochain travail » → script de soutenance (+ mention que les contrôles se relancent via `conformite-jury.js`).
 - [x] **Step 3:** Contrôle global des liens sur tous les `.md` touchés (0 cassé attendu) ; `git status` (aucun fichier personnel) ; `npm test` + `npx prisma validate` ; cocher tout ce plan. Commit final :
 

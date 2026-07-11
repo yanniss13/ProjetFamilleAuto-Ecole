@@ -58,9 +58,13 @@ La rangée du bas regroupe les entités **autonomes** (aucune clé étrangère) 
 
 ## SQLite en développement, PostgreSQL en production
 
-Le provider est déclaré dans le datasource Prisma ; la bascule se fait en
-changeant `provider = "sqlite"` en `"postgresql"` et la `DATABASE_URL` —
-**aucun changement de code**. Les choix qui rendent cette bascule sûre :
+Le code applicatif utilisant Prisma est conçu pour rester portable, mais les
+**migrations ne le sont pas** : l'historique SQL actuel cible SQLite et ne peut
+pas être rejoué tel quel sur PostgreSQL. Le passage en production demande donc
+un provider et une `DATABASE_URL` PostgreSQL, mais aussi une chaîne de migrations
+PostgreSQL dédiée et testée.
+
+Les choix qui limitent les écarts de code entre les deux moteurs sont :
 
 - recherche insensible à la casse par colonnes `*Lower` maintenues à
   l'écriture (le `LOWER()` SQL se comporte différemment selon les moteurs) ;
@@ -68,8 +72,79 @@ changeant `provider = "sqlite"` en `"postgresql"` et la `DATABASE_URL` —
   du dialecte (lot H) ;
 - sessions et jetons stockés en colonnes portables (chaînes, dates).
 
-Commandes : `npx prisma validate` (schéma), `npx prisma migrate deploy`
-(application des migrations), `npm run seed:demo` (jeu de démonstration).
-La procédure complète de sauvegarde/restauration fait partie du prochain
-chantier documentaire (voir la feuille de route de
-l'[audit](audit-certification-dwwm.md)).
+### Création et migration en développement
+
+```powershell
+copy .env.example .env
+npx prisma migrate deploy
+npx prisma generate
+npm run seed:demo       # démonstration uniquement, jamais en production
+```
+
+`prisma/migrations/` reste l'historique SQLite de développement. Chaque
+modification commence dans `prisma/schema.prisma`, reçoit une migration
+versionnée, puis passe `npx prisma validate` et `npm test`.
+
+### Préparation de PostgreSQL
+
+La première mise en production doit être répétée sur une base PostgreSQL vide :
+
+1. créer une configuration Prisma dédiée dont le datasource utilise
+   `provider = "postgresql"`, sans mélanger ses migrations avec celles de
+   `prisma/migrations/` ;
+2. générer une migration de référence PostgreSQL à partir du schéma actuel
+   avec `prisma migrate diff --from-empty --to-schema-datamodel ... --script` ;
+3. relire le SQL produit (types, index, cascades et contraintes uniques), puis
+   le versionner dans l'historique PostgreSQL dédié ;
+4. appliquer cet historique sur une base de préproduction avec
+   `npx prisma migrate deploy --schema <schema-postgresql>` ;
+5. générer le client, exécuter les 15 suites de tests et contrôler les parcours
+   inscription → annonce → candidature → contrat signé ;
+6. seulement après cette répétition, appliquer la même version en production.
+
+Il n'existe encore aucun déploiement PostgreSQL réel dans le dépôt : cette
+partie reste une trajectoire documentée, pas une réalisation à survendre au
+jury.
+
+## Sauvegarde et restauration
+
+Toujours arrêter les écritures applicatives (mode maintenance ou serveur
+arrêté), dater le fichier de sauvegarde et restaurer d'abord vers une **base
+séparée**. Une sauvegarde non restaurée au moins une fois n'est pas une preuve de
+reprise.
+
+### SQLite local
+
+La commande `.backup` produit une copie cohérente même avec le journal SQLite :
+
+```powershell
+New-Item -ItemType Directory -Force backups
+sqlite3 prisma/dev.db ".backup 'backups/moniteur-connect-20260710.sqlite'"
+
+# Restauration de contrôle dans un autre fichier
+sqlite3 prisma/restauration-controle.db ".restore 'backups/moniteur-connect-20260710.sqlite'"
+sqlite3 prisma/restauration-controle.db "PRAGMA integrity_check;"
+```
+
+Le dernier résultat doit être `ok`. Pointer temporairement `DATABASE_URL` vers
+`restauration-controle.db`, démarrer l'application et vérifier les volumes et un
+parcours métier avant de considérer la sauvegarde comme exploitable. Ne jamais
+écraser `dev.db` pendant un exercice.
+
+### PostgreSQL cible
+
+Les outils natifs conservent le schéma et les données. Les identifiants doivent
+venir du gestionnaire de secrets ou de `.pgpass`, jamais d'un fichier versionné :
+
+```powershell
+pg_dump --format=custom --no-owner --file=backups/moniteur-connect-20260710.dump $env:DATABASE_URL
+
+# RESTORE_DATABASE_URL pointe vers une base vide de contrôle
+pg_restore --clean --if-exists --no-owner --dbname=$env:RESTORE_DATABASE_URL backups/moniteur-connect-20260710.dump
+```
+
+Après restauration : exécuter une requête de comptage sur les entités clés,
+`npx prisma migrate status --schema <schema-postgresql>`, puis les tests et un
+smoke test applicatif. La durée, le résultat et la personne ayant réalisé
+l'exercice doivent être consignés ; ce test de restauration reste à effectuer
+lorsqu'un environnement PostgreSQL sera disponible.

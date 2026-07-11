@@ -30,9 +30,10 @@ du contrat express-session).
 *Preuve :* `src/config/sessionStore.js`.
 
 **Pourquoi SQLite en développement ?**
-Zéro installation pour développer et tester, et Prisma rend la bascule vers
-PostgreSQL déclarative (provider + `DATABASE_URL`, aucun changement de code).
-Les pièges de portabilité sont traités : recherche par colonnes `*Lower`
+Zéro installation pour développer et tester. Le code Prisma est portable vers
+PostgreSQL, mais le provider, l'URL et surtout l'historique de migrations doivent
+être préparés et validés dans un environnement PostgreSQL dédié. Les pièges de
+portabilité du code sont traités : recherche par colonnes `*Lower`
 maintenues à l'écriture, agrégations hebdomadaires en JavaScript.
 *Preuve :* `prisma/schema.prisma` (commentaire datasource),
 `docs/jury/base-de-donnees.md`.
@@ -59,11 +60,11 @@ journal de purge. L'évolution est documentée lot par lot.
 *Preuve :* `docs/jury/base-de-donnees.md` (tableau 4 → 8).
 
 **Comment passeriez-vous en production côté base ?**
-Provider PostgreSQL + `DATABASE_URL`, `npx prisma migrate deploy` pour
-rejouer les 13 migrations, puis la suite de tests. La procédure de
-sauvegarde/restauration est le chantier documentaire restant, identifié dans
-l'audit.
-*Preuve :* `docs/jury/audit-certification-dwwm.md` (feuille de route).
+Créer une chaîne de migrations PostgreSQL dédiée sur une base vide, la valider
+en préproduction, puis utiliser `npx prisma migrate deploy` et la suite de tests.
+Avant le déploiement, sauvegarder avec `pg_dump` et tester la restauration avec
+`pg_restore` sur une base séparée.
+*Preuve :* `docs/jury/base-de-donnees.md`.
 
 ## Sécurité
 
@@ -138,7 +139,7 @@ qui de reprendre le travail — la préparation du jury elle-même a suivi ce
 cycle.
 *Preuve :* `docs/superpowers/{specs,plans}/`, historique Git.
 
-**442 assertions sans framework de test — pourquoi ?**
+**448 assertions sans framework de test — pourquoi ?**
 Un runner Node maison suffit : serveur dédié par fichier sur un port unique,
 assertions nommées, données suffixées par horodatage, nettoyage en `finally`.
 Zéro dépendance de test, et la suite EST la documentation des comportements.
@@ -161,13 +162,15 @@ la souris/au doigt — l'alternative accessible est l'import d'un fichier.
 *Preuve :* `docs/jury/conformite.md`.
 
 **Et la validité W3C / le responsive ?**
-Validateur Nu officiel : 0 erreur et 0 avertissement sur les 15 pages ;
-0 débordement horizontal sur 4 largeurs (320/375/768/1440), 45 captures
-archivées. Les contrôles sont re-jouables en deux commandes.
-*Preuve :* `docs/jury/conformite.md`, `docs/jury/captures/r320/`.
+Passage final du 2026-07-11 : validateur Nu à 0 erreur et 0 avertissement sur
+les 15 pages, et 0 débordement sur 60 combinaisons (4 largeurs). Un faux
+positif responsive avait été découvert — Chromium élargissait `innerWidth` à
+environ 485 px pour une demande à 320 px — le contrôle utilise depuis le
+viewport visuel exact et l'interface possède un burger accessible.
+*Preuve :* `docs/jury/conformite.md`, `scripts/conformite-jury.js`.
 
 **Pourquoi pas d'application mobile ?**
-Hors périmètre du besoin : le site est responsive (vérifié à 320 px) et le
+Hors périmètre du besoin : le site web cible explicitement 320/375 px et le
 parcours moniteur tient en une page sans compte. Une app native n'apporterait
 que du coût de maintenance à ce stade.
 *Preuve :* `docs/jury/expression-du-besoin-v2.md` (hors-périmètre).

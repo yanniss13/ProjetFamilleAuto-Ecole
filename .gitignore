@@ -14,3 +14,11 @@ storage/**
 
 npm-debug.log*
 .vscode/
+
+# Fichiers et caches locaux des agents, jamais destines au depot
+.claude/settings.local.json
+.agents/
+.superpowers/
+tmp/
+contexte.md
+Suivi_candidatures_stage_1_1_mails_plus_naturels_v3.xlsx

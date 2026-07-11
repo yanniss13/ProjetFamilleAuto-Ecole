@@ -1,6 +1,7 @@
 # Conformité W3C, responsive et accessibilité — rapport daté
 
-Date des contrôles : 2026-07-10. Ce rapport archive les preuves demandées par
+Date des contrôles : 2026-07-10, rejoués intégralement le **2026-07-11** sur la
+version mobile finale (burger accessible). Ce rapport archive les preuves demandées par
 la checklist DWWM (page, méthode, résultat) pour les critères « Validation
 W3C », « Interfaces responsives » et « Validateur d'accessibilité ».
 
@@ -27,8 +28,9 @@ Outils et versions : Microsoft Edge headless piloté en CDP
 (`scripts/lib/cdp.js`), validateur **Nu du W3C** (https://validator.w3.org/nu/,
 appelé le 2026-07-10, HTML posté en séquence avec 2 s de pause), **axe-core**
 (devDependency, version exacte dans `package-lock.json`) injecté dans les
-pages rendues, détection de débordement par comparaison
-`scrollWidth`/`innerWidth` à 320, 375, 768 et 1440 px.
+pages rendues. La détection de débordement compare désormais `scrollWidth` au
+**viewport visuel** à 320, 375, 768 et 1440 px ; `innerWidth` n'est pas fiable
+sous l'émulation mobile lorsque Chromium élargit le viewport de mise en page.
 
 Limites documentées : le HTML validé est celui **sérialisé par le DOM** de la
 page chargée (doctype rajouté), pas l'octet-à-octet servi par Express — des
@@ -71,20 +73,33 @@ Résultat après corrections (re-validation Nu du 2026-07-10) :
 
 ## 3. Responsive (320 / 375 / 768 / 1440 px)
 
-Détection automatique de débordement horizontal
-(`scrollWidth > innerWidth`) : **aucun débordement sur les 60 combinaisons**
-(15 pages × 4 largeurs), dès le premier constat — aucune correction
-nécessaire. JSON par page : `conformite/debordement-<page>.json`.
+### Correction du faux positif
 
-Preuves visuelles : captures pleine page des 15 écrans à chaque largeur —
-[`captures/r320/`](captures/r320/), [`captures/r375/`](captures/r375/),
-[`captures/r768/`](captures/r768/), référence 1440 px sous
-[`captures/`](captures/). Contrôle visuel par échantillon (annonces et
-dashboard à 320, contrat à 375, admin à 768) : empilement propre, aucun
-chevauchement, navigation et tableaux contenus.
+Le contrôle initial concluait à 0/60 en comparant `scrollWidth` à
+`window.innerWidth`. À une largeur demandée de 320 px, Chromium produisait par
+exemple `visualViewport.width = 320`, mais `innerWidth = scrollWidth = 485` :
+la page débordait pour l'utilisateur tout en passant le test. Le script de
+capture utilisait aussi `--window-size`, qui règle la fenêtre extérieure et non
+le viewport ; les dossiers `r320` et `r375` contenaient donc souvent les mêmes
+PNG d'environ 485 px.
 
-Les grilles `auto-fit`/`minmax`, les formulaires fluides et `flex-wrap` de
-`public/css/style.css` expliquent ce résultat.
+Corrections apportées :
+
+- `conformite-jury.js` compare au viewport visuel et archive `viewportWidth` ;
+- `captures-jury.js` impose `Emulation.setDeviceMetricsOverride` et masque les
+  scrollbars pour conserver la largeur PNG demandée ;
+- navigation burger accessible sous 600 px, avec repli progressif ;
+- tableaux larges contenus dans `.table-scroll` ;
+- empreintes SHA-256 sécables avec `overflow-wrap:anywhere` ;
+- cartes, formulaires, filtres, graphiques et actions recomposés pour 320/375.
+
+Passage final du **2026-07-11** sur la version mobile livrée : **0 débordement
+sur les 60 combinaisons** (15 pages × 4 largeurs), chaque JSON archivant le
+`viewportWidth` exact. Les **45 captures** ont été régénérées le même jour :
+15 PNG de 320 px, 15 de 375 px et 15 de 768 px exactement, sans aucun doublon
+binaire entre `r320` et `r375`. Le contrôle interactif du burger (ouverture au
+clic, fermeture à Échap avec retour du focus, fermeture au clic extérieur,
+aucun débordement menu ouvert) est passé sur six pages à 320 et 375 px.
 
 ## 4. Accessibilité (axe-core)
 
@@ -121,18 +136,24 @@ maximisé puis à 375 px :
    candidatures → formulaire d'acceptation.
 4. **Focus visible** à chaque arrêt de tabulation (liseré bleu
    `:focus-visible`), y compris pagination et navigation.
-5. **Aucune souricière** : la tabulation traverse chaque page de bout en bout
+5. **Burger mobile** à 320/375 : bouton annoncé « Ouvrir le menu »,
+   `aria-expanded` passe à `true`, Échap ferme puis rend le focus au bouton ; un
+   clic extérieur ferme également le panneau.
+6. **Aucune souricière** : la tabulation traverse chaque page de bout en bout
    et en revient (Maj+Tab).
-6. **Limite connue et assumée** : le pad de signature se dessine à la souris
+7. **Limite connue et assumée** : le pad de signature se dessine à la souris
    ou au doigt — alternative accessible : le bouton « Importer une
    signature » (fichier PNG/JPEG), atteignable au clavier. À dire au jury si
    la question vient.
 
 ## 6. Synthèse
 
-- W3C : 15/15 pages à 0 erreur, 0 avertissement (après 3 corrections).
-- Responsive : 0 débordement sur 60 combinaisons, 45 captures archivées.
-- Accessibilité : 0 violation axe (tous niveaux) après 2 corrections
-  transverses ; limite du pad de signature documentée.
-- Tout est re-jouable en quelques commandes (section 1) — y compris juste
-  avant la soutenance pour des preuves fraîches.
+- W3C : passage final du 2026-07-11 sur la version mobile livrée — 15/15 pages
+  à **0 erreur, 0 avertissement**.
+- Responsive : faux positif corrigé, passage final du 2026-07-11 à **0
+  débordement sur 60 combinaisons** et 45 captures aux largeurs exactes.
+- Accessibilité : passage axe du 2026-07-11 à **0 violation sur les 15 pages**,
+  burger compris ; la checklist clavier manuelle (section 5) reste à dérouler
+  par l'utilisateur avant la soutenance.
+- Toutes les commandes sont reproductibles en section 1 pour produire des
+  preuves fraîches à tout moment.
