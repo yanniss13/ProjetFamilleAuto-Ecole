@@ -26,6 +26,12 @@ l'utilisateur.
   - Découpage fonctionnel : [`decoupage-fonctionnel.md`](decoupage-fonctionnel.md)
     (diagramme [`diagrammes/parcours-fonctionnels.svg`](diagrammes/parcours-fonctionnels.svg))
   - Charte graphique : [`charte-graphique.md`](charte-graphique.md)
+  - Spécifications fonctionnelles et techniques v2 :
+    [`specifications-v2.md`](specifications-v2.md)
+  - Diagramme fonctionnel v2 :
+    [`diagramme-fonctionnel-v2.md`](diagramme-fonctionnel-v2.md)
+  - Cas d'utilisation v2 :
+    [`diagrammes/cas-utilisation-v2.svg`](diagrammes/cas-utilisation-v2.svg)
 - **Conformité (rejouée le 2026-07-11)** : [`conformite.md`](conformite.md) —
   passage final sur la version mobile livrée : W3C 0/0, axe 0 violation,
   débordement 0/60 avec viewport exact ; faux positif responsive documenté.
@@ -124,6 +130,10 @@ Puis vérifier dans un navigateur :
 
 ### Checkpoint final — preuves responsive régénérées (2026-07-11, Claude)
 
+- Action terminée le 2026-07-11 : spécifications, diagramme fonctionnel et
+  cas d'utilisation livrés en v2 sous `docs/jury/` ; les v1 de juin sont
+  restées intactes et les wireframes n'ont volontairement pas été modifiés,
+  car ils prouvent la maquette initiale.
 - Action terminée le 2026-07-11 : découpage fonctionnel et charte graphique
   livrés (`decoupage-fonctionnel.md`, diagrammes SVG/PNG et
   `charte-graphique.md`) ; audit porté à **32 validés / 1 à renforcer /
