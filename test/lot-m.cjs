@@ -28,6 +28,9 @@ const { resolveStored } = require('../src/config/storage');
 const PORT = 4072;
 const BASE = `http://127.0.0.1:${PORT}`;
 const STAMP = Date.now();
+const PDF_BYTES = Buffer.from('%PDF-1.4\n%%EOF\n');
+const PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+const SIGNATURE_PNG = `data:image/png;base64,${PNG_B64}`;
 
 let passed = 0;
 const createdSchoolIds = [];
@@ -92,6 +95,34 @@ function form(values) {
   return { body: params.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 }
 
+function applicationForm(csrf, suffix) {
+  const data = new FormData();
+  data.append('_csrf', csrf);
+  data.append('applicantName', `Direct M ${suffix}`);
+  data.append('applicantEmail', `direct.m.${STAMP}.${suffix}@example.test`);
+  data.append('applicantPhone', '0611223344');
+  data.append('message', 'Candidature envoyee pendant le test temps reel.');
+  data.append('cv', new Blob([PDF_BYTES], { type: 'application/pdf' }), 'cv.pdf');
+  data.append('idCard', new Blob([PDF_BYTES], { type: 'application/pdf' }), 'identite.pdf');
+  data.append('license', new Blob([PDF_BYTES], { type: 'application/pdf' }), 'permis.pdf');
+  data.append('teachingCard', new Blob([PDF_BYTES], { type: 'application/pdf' }), 'carte.pdf');
+  return data;
+}
+
+function contractValues(csrf) {
+  return {
+    _csrf: csrf,
+    type: 'cdi',
+    startDate: '2026-11-02',
+    grossSalary: '2300 € brut/mois',
+    weeklyHours: '35',
+    workplace: 'Marseille',
+    schoolAddress: '45 avenue du Prado, Marseille',
+    applicantAddress: '18 rue Paradis, Marseille',
+    signatureData: SIGNATURE_PNG,
+  };
+}
+
 function openSse(jar, urlPath) {
   return new Promise((resolve, reject) => {
     const request = http.get(BASE + urlPath, {
@@ -118,6 +149,10 @@ function openSse(jar, urlPath) {
     });
     request.on('error', reject);
   });
+}
+
+async function waitForSse(stream, type) {
+  return eventually(() => stream.body().includes(`"type":"${type}"`), 80, 10);
 }
 
 async function main() {
@@ -459,6 +494,101 @@ async function main() {
       && r.text.includes('Reconnexion en cours')
       && r.text.includes('/js/realtime.js') === false,
     'vues : suivi contient l indicateur mais le script sera branche en Tache 6');
+
+    // --- 5. Publications après les écritures métier ---
+    const schoolEvents = await openSse(schoolJar, `/mes-annonces/${listing.id}/candidatures/temps-reel`);
+    const publicJar = makeJar();
+    r = await req(publicJar, 'GET', `/annonces/${listing.id}`);
+    const beforeCreate = await prisma.application.count({
+      where: { listingId: listing.id, applicantEmail: { contains: `direct.m.${STAMP}` } },
+    });
+    r = await req(publicJar, 'POST', `/annonces/${listing.id}/postuler`, {
+      body: applicationForm(csrfFrom(r.text), 'workflow'),
+    });
+    ok(r.status === 302 && await waitForSse(schoolEvents, 'application-created'),
+      'evenements : depot persiste puis notifie l ecole');
+    const liveApplication = await prisma.application.findFirst({
+      where: { listingId: listing.id, applicantEmail: `direct.m.${STAMP}.workflow@example.test` },
+      include: { contract: true },
+    });
+    ok(beforeCreate === 0 && liveApplication && liveApplication.trackingToken,
+      'evenements : candidature existe avec son jeton avant consommation du signal');
+
+    const liveCandidateJar = makeJar();
+    r = await req(liveCandidateJar, 'GET', `/suivi/${liveApplication.trackingToken}`);
+    const candidateEvents = await openSse(liveCandidateJar, `/suivi/temps-reel/${liveApplication.id}`);
+
+    r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures/${liveApplication.id}/accepter`);
+    r = await req(schoolJar, 'POST', `/mes-annonces/${listing.id}/candidatures/${liveApplication.id}/accepter`,
+      form(contractValues(csrfFrom(r.text))));
+    ok(r.status === 302 && await waitForSse(candidateEvents, 'application-accepted'),
+      'evenements : acceptation et contrat persistes puis candidat notifie');
+    let liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
+    ok(liveContract && liveContract.schoolSignedAt,
+      'evenements : signal accepte correspond a un contrat en base');
+
+    const originalInvitation = mailer.sendSignatureInvitation;
+    mailer.sendSignatureInvitation = async () => true;
+    try {
+      r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+      r = await req(schoolJar, 'POST',
+        `/mes-annonces/${listing.id}/candidatures/${liveApplication.id}/contrat/envoyer`,
+        form({ _csrf: csrfFrom(r.text) }));
+      ok(r.status === 302 && await waitForSse(candidateEvents, 'contract-sent'),
+        'evenements : invitation reussie notifie le candidat');
+      liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
+      ok(liveContract.sentToApplicantAt instanceof Date,
+        'evenements : contract-sent est publie apres markSent');
+
+      const sentEventsBeforeFailure = (candidateEvents.body().match(/"type":"contract-sent"/g) || []).length;
+      mailer.sendSignatureInvitation = async () => false;
+      r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+      r = await req(schoolJar, 'POST',
+        `/mes-annonces/${listing.id}/candidatures/${liveApplication.id}/contrat/envoyer`,
+        form({ _csrf: csrfFrom(r.text) }));
+      await wait(80);
+      const sentEventsAfterFailure = (candidateEvents.body().match(/"type":"contract-sent"/g) || []).length;
+      ok(r.status === 302 && sentEventsAfterFailure === sentEventsBeforeFailure,
+        'evenements : echec email ne publie pas contract-sent');
+    } finally {
+      mailer.sendSignatureInvitation = originalInvitation;
+    }
+
+    r = await req(liveCandidateJar, 'GET', `/suivi/${liveApplication.trackingToken}/signer`);
+    r = await req(liveCandidateJar, 'POST', `/suivi/${liveApplication.trackingToken}/signer`, form({
+      _csrf: csrfFrom(r.text), accept: '1', signatureData: SIGNATURE_PNG,
+    }));
+    ok(r.status === 302 && await waitForSse(schoolEvents, 'contract-signed'),
+      'evenements : contreseing persiste puis notifie l ecole');
+    liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
+    ok(liveContract.applicantSignedAt instanceof Date && Boolean(liveContract.signedPdfPath),
+      'evenements : signal signe correspond au PDF final en base');
+
+    const rejectedApplication = await prisma.application.create({
+      data: {
+        listingId: listing.id,
+        applicantName: 'Refus M',
+        applicantEmail: `refus.m.${STAMP}@example.test`,
+        message: 'Candidature a refuser',
+        trackingToken: `f${String(STAMP).padStart(63, 'f')}`.slice(0, 64),
+      },
+    });
+    const rejectedJar = makeJar();
+    await req(rejectedJar, 'GET', `/suivi/${rejectedApplication.trackingToken}`);
+    const rejectedEvents = await openSse(rejectedJar, `/suivi/temps-reel/${rejectedApplication.id}`);
+    r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    r = await req(schoolJar, 'POST',
+      `/mes-annonces/${listing.id}/candidatures/${rejectedApplication.id}/refuser`,
+      form({ _csrf: csrfFrom(r.text) }));
+    ok(r.status === 302 && await waitForSse(rejectedEvents, 'application-rejected'),
+      'evenements : refus persiste puis notifie le candidat');
+    const rejectedRow = await prisma.application.findUnique({ where: { id: rejectedApplication.id } });
+    ok(rejectedRow.status === 'rejected' && rejectedRow.rejectedAt instanceof Date,
+      'evenements : signal refuse correspond a l etat RGPD en base');
+
+    schoolEvents.request.destroy();
+    candidateEvents.request.destroy();
+    rejectedEvents.request.destroy();
 
     console.log(`\n✅ Lot M tests reussis - ${passed} assertions.`);
   } finally {

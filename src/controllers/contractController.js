@@ -6,6 +6,7 @@ const crypto = require('crypto');
 
 const applicationService = require('../services/applicationService');
 const contractService = require('../services/contractService');
+const realtimeService = require('../services/realtimeService');
 const { validateContract } = require('../validators/contractValidator');
 const { buildContractPdf } = require('../services/contractPdf');
 const signatureImage = require('../services/signatureImage');
@@ -50,6 +51,10 @@ async function reject(req, res, next) {
     }
 
     await applicationService.updateStatus(application.id, 'rejected');
+    realtimeService.publishApplicationUpdate(
+      application,
+      realtimeService.EVENT_TYPES.APPLICATION_REJECTED
+    );
     // Best-effort : informe le candidat du refus (lien de suivi rappelé).
     await mailer.sendApplicationRejected(application.applicantEmail, application.applicantName, application.listing.title, application.trackingToken);
     req.flash('success', 'Candidature refusée.');
@@ -194,6 +199,10 @@ async function accept(req, res, next) {
       signedPdfHash: null,
     });
     await applicationService.updateStatus(application.id, 'accepted');
+    realtimeService.publishApplicationUpdate(
+      application,
+      realtimeService.EVENT_TYPES.APPLICATION_ACCEPTED
+    );
     // Best-effort : informe le candidat de l'acceptation (lien de suivi rappelé).
     await mailer.sendApplicationAccepted(application.applicantEmail, application.applicantName, application.listing.title, application.trackingToken);
 
@@ -254,6 +263,10 @@ async function sendContract(req, res, next) {
 
     if (ok) {
       await contractService.markSent(application.contract.id);
+      realtimeService.publishApplicationUpdate(
+        application,
+        realtimeService.EVENT_TYPES.CONTRACT_SENT
+      );
       req.flash('success', 'Invitation à signer envoyée au candidat.');
     } else {
       req.flash('error', "L'envoi de l'invitation a échoué. Réessayez plus tard.");
