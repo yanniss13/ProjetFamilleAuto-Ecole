@@ -12,6 +12,8 @@ process.env.GEOCODING_DISABLED = '1';
 process.env.SIRET_LOOKUP_DISABLED = '1';
 
 const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
 
 const prisma = require('../src/config/prisma');
 const app = require('../src/app');
@@ -112,6 +114,25 @@ async function main() {
     ok(fs.existsSync(resolveStored(contrat.pdfPath)) && fs.existsSync(resolveStored(contrat.signedPdfPath)),
       'seed : PDF propose et PDF signe presents sur disque');
 
+    ok(Number.isInteger(r2.realtimeApplicationId)
+      && Number.isInteger(r2.realtimeListingId)
+      && typeof r2.realtimeTrackingToken === 'string',
+    'seed : references de la candidature temps reel retournees');
+    const realtimeApplication = await prisma.application.findUnique({
+      where: { id: r2.realtimeApplicationId },
+      include: { listing: true },
+    });
+    ok(Boolean(realtimeApplication)
+      && realtimeApplication.status === 'pending'
+      && realtimeApplication.trackingToken === r2.realtimeTrackingToken
+      && realtimeApplication.listingId === r2.realtimeListingId
+      && realtimeApplication.listing.schoolId === vitrine.id,
+    'seed : candidature vitrine en attente dediee a la scene temps reel');
+
+    const rr = await get(`/suivi/${r2.realtimeTrackingToken}`);
+    ok(rr.status === 200 && rr.text.includes('En attente'),
+      'seed : suivi temps reel pret a ouvrir sur le telephone');
+
     const appAvecCv = await prisma.application.findFirst({
       where: { listing: { schoolId: vitrine.id }, cvPath: { not: null } },
     });
@@ -135,6 +156,21 @@ async function main() {
     const rs = await get(`/suivi/${r2.trackingToken}`);
     ok(rs.status === 200 && rs.text.toLowerCase().includes('contrat'),
       'seed : page de suivi du dossier signe accessible');
+
+    const demoBaseUrl = 'http://192.0.2.10:3000';
+    const cli = spawnSync(process.execPath, ['scripts/seed-demo.js'], {
+      cwd: path.join(__dirname, '..'),
+      env: { ...process.env, DEMO_BASE_URL: `${demoBaseUrl}///` },
+      encoding: 'utf8',
+    });
+    ok(cli.status === 0
+      && cli.stdout.includes(`Carte des annonces : ${demoBaseUrl}/annonces?vue=carte`)
+      && cli.stdout.includes(`Tableau de bord    : ${demoBaseUrl}/tableau-de-bord`)
+      && cli.stdout.includes(`Administration     : ${demoBaseUrl}/admin`)
+      && cli.stdout.includes(`Suivi candidat (temps réel, en attente) : ${demoBaseUrl}/suivi/`)
+      && cli.stdout.includes(`Suivi candidat (contrat signé)          : ${demoBaseUrl}/suivi/`)
+      && cli.stdout.includes(`Alertes email      : ${demoBaseUrl}/alertes`),
+    'seed CLI : DEMO_BASE_URL normalisee pour les URLs de demonstration');
 
     console.log(`\n✅ Lot K tests reussis - ${passed} assertions.`);
   } finally {
