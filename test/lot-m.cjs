@@ -25,6 +25,7 @@ const contractService = require('../src/services/contractService');
 const realtimeService = require('../src/services/realtimeService');
 const passwordUtil = require('../src/utils/password');
 const mailer = require('../src/services/mailer');
+const PrismaSessionStore = require('../src/config/sessionStore');
 const { resolveStored } = require('../src/config/storage');
 
 const PORT = 4072;
@@ -654,6 +655,39 @@ async function main() {
       headers: { accept: 'text/event-stream' },
     });
     ok(r.status === 204, 'candidat : flux sans liaison de session -> 204');
+
+    const degradedJar = makeJar();
+    await req(degradedJar, 'GET', '/');
+    const originalSessionSet = PrismaSessionStore.prototype.set;
+    let failedRealtimeSave = 0;
+    PrismaSessionStore.prototype.set = function failTargetedRealtimeSave(sid, sessionData, callback) {
+      if (failedRealtimeSave === 0
+          && Array.isArray(sessionData.realtimeApplicationIds)
+          && sessionData.realtimeApplicationIds.includes(applications[0].id)) {
+        failedRealtimeSave += 1;
+        return callback(new Error('Panne simulee du save temps reel'));
+      }
+      return originalSessionSet.call(this, sid, sessionData, callback);
+    };
+    let degradedPage;
+    try {
+      degradedPage = await req(
+        degradedJar,
+        'GET',
+        `/suivi/${applications[0].trackingToken}`
+      );
+    } finally {
+      PrismaSessionStore.prototype.set = originalSessionSet;
+    }
+    const degradedStream = await openSse(
+      degradedJar,
+      `/suivi/temps-reel/${applications[0].id}`
+    );
+    ok(failedRealtimeSave === 1 && degradedPage.status === 200,
+      'candidat degrade : echec du save temps reel conserve la page de suivi');
+    ok(degradedStream.response.statusCode === 204,
+      'candidat degrade : rollback deterministe laisse le flux non autorise');
+    degradedStream.request.destroy();
 
     for (const application of applications.slice(1)) {
       r = await req(candidateJar, 'GET', `/suivi/${application.trackingToken}`);
