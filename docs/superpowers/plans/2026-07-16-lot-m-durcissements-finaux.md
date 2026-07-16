@@ -280,7 +280,7 @@ git status --short
 
 Expected: Lot M et les 16 fichiers verts, Prisma valide, aucun diff invalide et worktree propre.
 
-- [ ] **Step 2: Demander une revue ciblée des deux correctifs**
+- [x] **Step 2: Demander une revue ciblée des deux correctifs**
 
 Le relecteur contrôle les courses de gestionnaires BFCache, le rattrapage
 `onopen`, la portée exacte du `catch`, le rollback pour déterminisme et la preuve
