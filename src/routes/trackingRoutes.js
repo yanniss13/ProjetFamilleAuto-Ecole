@@ -4,6 +4,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const trackingController = require('../controllers/trackingController');
 const signatureController = require('../controllers/signatureController');
+const realtimeController = require('../controllers/realtimeController');
 
 const router = express.Router();
 
@@ -33,6 +34,8 @@ const signLimiter = rateLimit({
 
 router.use(detachAuthenticatedSession);
 
+router.get('/temps-reel/:applicationId', realtimeController.candidateStream);
+router.get('/fragment/:applicationId', realtimeController.candidateFragment);
 router.get('/:token', trackingController.show);
 router.get('/:token/contrat', signatureController.downloadContract);
 router.get('/:token/signer', signatureController.showSign);

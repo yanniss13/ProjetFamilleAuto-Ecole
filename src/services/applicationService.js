@@ -69,6 +69,13 @@ function findByTrackingToken(token) {
   });
 }
 
+function findByIdForTracking(applicationId) {
+  return prisma.application.findUnique({
+    where: { id: applicationId },
+    include: { listing: { include: { school: true } }, contract: true },
+  });
+}
+
 module.exports = {
   createForListing,
   findForOwnedListing,
@@ -76,4 +83,5 @@ module.exports = {
   updateStatus,
   ensureTrackingToken,
   findByTrackingToken,
+  findByIdForTracking,
 };
