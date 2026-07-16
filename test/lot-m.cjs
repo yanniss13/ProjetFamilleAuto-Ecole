@@ -20,6 +20,8 @@ const vm = require('vm');
 
 const prisma = require('../src/config/prisma');
 const app = require('../src/app');
+const applicationService = require('../src/services/applicationService');
+const contractService = require('../src/services/contractService');
 const realtimeService = require('../src/services/realtimeService');
 const passwordUtil = require('../src/utils/password');
 const mailer = require('../src/services/mailer');
@@ -155,8 +157,110 @@ async function waitForSse(stream, type) {
   return eventually(() => stream.body().includes(`"type":"${type}"`), 80, 10);
 }
 
+function installTransitionOrderProbe() {
+  const states = new Map();
+  const publications = [];
+  const originals = [];
+
+  function stateFor(applicationId) {
+    let state = states.get(applicationId);
+    if (!state) {
+      state = {};
+      states.set(applicationId, state);
+    }
+    return state;
+  }
+
+  function wrapAfter(object, method, markCompleted) {
+    const original = object[method];
+    originals.push({ object, method, original });
+    object[method] = async function wrappedMutation(...args) {
+      const result = await original.apply(this, args);
+      markCompleted(result);
+      return result;
+    };
+  }
+
+  wrapAfter(applicationService, 'createForListing', (application) => {
+    stateFor(application.id).created = Number.isInteger(application.id)
+      && Number.isInteger(application.listingId)
+      && Boolean(application.trackingToken);
+  });
+  wrapAfter(applicationService, 'updateStatus', (application) => {
+    const state = stateFor(application.id);
+    if (application.status === 'accepted') {
+      state.accepted = application.rejectedAt === null;
+    } else if (application.status === 'rejected') {
+      state.rejected = application.rejectedAt instanceof Date;
+    }
+  });
+  wrapAfter(contractService, 'upsertForApplication', (contract) => {
+    stateFor(contract.applicationId).contractPersisted = Boolean(
+      contract.pdfPath
+      && contract.schoolSignaturePath
+      && contract.schoolSignedAt instanceof Date
+      && contract.proposedPdfHash
+    );
+  });
+  wrapAfter(contractService, 'markSent', (contract) => {
+    stateFor(contract.applicationId).sent = contract.sentToApplicantAt instanceof Date;
+  });
+  wrapAfter(contractService, 'signByApplicant', (contract) => {
+    const signedPdfPath = resolveStored(contract.signedPdfPath);
+    stateFor(contract.applicationId).signed = contract.applicantSignedAt instanceof Date
+      && Boolean(contract.signedPdfHash)
+      && Boolean(signedPdfPath)
+      && fs.existsSync(signedPdfPath);
+  });
+
+  const originalPublish = realtimeService.publishApplicationUpdate;
+  originals.push({
+    object: realtimeService,
+    method: 'publishApplicationUpdate',
+    original: originalPublish,
+  });
+  realtimeService.publishApplicationUpdate = function observedPublish(application, type) {
+    const applicationId = application && application.id;
+    const state = states.get(applicationId);
+    const afterMutation = type === realtimeService.EVENT_TYPES.APPLICATION_CREATED
+      ? Boolean(state && state.created)
+      : type === realtimeService.EVENT_TYPES.APPLICATION_ACCEPTED
+        ? Boolean(state && state.contractPersisted && state.accepted)
+        : type === realtimeService.EVENT_TYPES.APPLICATION_REJECTED
+          ? Boolean(state && state.rejected)
+          : type === realtimeService.EVENT_TYPES.CONTRACT_SENT
+            ? Boolean(state && state.sent)
+            : type === realtimeService.EVENT_TYPES.CONTRACT_SIGNED
+              ? Boolean(state && state.signed)
+              : false;
+    publications.push({ applicationId, type, afterMutation });
+    return originalPublish.call(this, application, type);
+  };
+
+  let active = true;
+  return {
+    wasPublishedAfter(applicationId, type) {
+      const matching = publications.filter((entry) => (
+        entry.applicationId === applicationId && entry.type === type
+      ));
+      return matching.length > 0 && matching.every((entry) => entry.afterMutation);
+    },
+    publicationCount(applicationId, type) {
+      return publications.filter((entry) => (
+        entry.applicationId === applicationId && entry.type === type
+      )).length;
+    },
+    restore() {
+      if (!active) return;
+      active = false;
+      for (const { object, method, original } of originals.reverse()) object[method] = original;
+    },
+  };
+}
+
 async function main() {
   let server;
+  let transitionOrderProbe;
   try {
     realtimeService._resetForTests();
     server = app.listen(PORT);
@@ -496,6 +600,7 @@ async function main() {
     'vues : suivi contient l indicateur mais le script sera branche en Tache 6');
 
     // --- 5. Publications après les écritures métier ---
+    transitionOrderProbe = installTransitionOrderProbe();
     const schoolEvents = await openSse(schoolJar, `/mes-annonces/${listing.id}/candidatures/temps-reel`);
     const publicJar = makeJar();
     r = await req(publicJar, 'GET', `/annonces/${listing.id}`);
@@ -513,6 +618,10 @@ async function main() {
     });
     ok(beforeCreate === 0 && liveApplication && liveApplication.trackingToken,
       'evenements : candidature existe avec son jeton avant consommation du signal');
+    ok(transitionOrderProbe.wasPublishedAfter(
+      liveApplication.id,
+      realtimeService.EVENT_TYPES.APPLICATION_CREATED
+    ), 'ordre : application-created publiee apres la candidature persistee');
 
     const liveCandidateJar = makeJar();
     r = await req(liveCandidateJar, 'GET', `/suivi/${liveApplication.trackingToken}`);
@@ -526,6 +635,10 @@ async function main() {
     let liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
     ok(liveContract && liveContract.schoolSignedAt,
       'evenements : signal accepte correspond a un contrat en base');
+    ok(transitionOrderProbe.wasPublishedAfter(
+      liveApplication.id,
+      realtimeService.EVENT_TYPES.APPLICATION_ACCEPTED
+    ), 'ordre : application-accepted publiee apres contrat et statut persistes');
 
     const originalInvitation = mailer.sendSignatureInvitation;
     mailer.sendSignatureInvitation = async () => true;
@@ -539,8 +652,16 @@ async function main() {
       liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
       ok(liveContract.sentToApplicantAt instanceof Date,
         'evenements : contract-sent est publie apres markSent');
+      ok(transitionOrderProbe.wasPublishedAfter(
+        liveApplication.id,
+        realtimeService.EVENT_TYPES.CONTRACT_SENT
+      ), 'ordre : contract-sent publie apres markSent persiste');
 
       const sentEventsBeforeFailure = (candidateEvents.body().match(/"type":"contract-sent"/g) || []).length;
+      const sentPublicationsBeforeFailure = transitionOrderProbe.publicationCount(
+        liveApplication.id,
+        realtimeService.EVENT_TYPES.CONTRACT_SENT
+      );
       mailer.sendSignatureInvitation = async () => false;
       r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
       r = await req(schoolJar, 'POST',
@@ -548,8 +669,14 @@ async function main() {
         form({ _csrf: csrfFrom(r.text) }));
       await wait(80);
       const sentEventsAfterFailure = (candidateEvents.body().match(/"type":"contract-sent"/g) || []).length;
+      const sentPublicationsAfterFailure = transitionOrderProbe.publicationCount(
+        liveApplication.id,
+        realtimeService.EVENT_TYPES.CONTRACT_SENT
+      );
       ok(r.status === 302 && sentEventsAfterFailure === sentEventsBeforeFailure,
         'evenements : echec email ne publie pas contract-sent');
+      ok(sentPublicationsAfterFailure === sentPublicationsBeforeFailure,
+        'ordre : echec email ne declenche aucun appel de publication contract-sent');
     } finally {
       mailer.sendSignatureInvitation = originalInvitation;
     }
@@ -563,6 +690,10 @@ async function main() {
     liveContract = await prisma.contract.findUnique({ where: { applicationId: liveApplication.id } });
     ok(liveContract.applicantSignedAt instanceof Date && Boolean(liveContract.signedPdfPath),
       'evenements : signal signe correspond au PDF final en base');
+    ok(transitionOrderProbe.wasPublishedAfter(
+      liveApplication.id,
+      realtimeService.EVENT_TYPES.CONTRACT_SIGNED
+    ), 'ordre : contract-signed publie apres signature, PDF final et empreinte persistes');
 
     const rejectedApplication = await prisma.application.create({
       data: {
@@ -585,6 +716,10 @@ async function main() {
     const rejectedRow = await prisma.application.findUnique({ where: { id: rejectedApplication.id } });
     ok(rejectedRow.status === 'rejected' && rejectedRow.rejectedAt instanceof Date,
       'evenements : signal refuse correspond a l etat RGPD en base');
+    ok(transitionOrderProbe.wasPublishedAfter(
+      rejectedApplication.id,
+      realtimeService.EVENT_TYPES.APPLICATION_REJECTED
+    ), 'ordre : application-rejected publiee apres statut et rejectedAt persistes');
 
     schoolEvents.request.destroy();
     candidateEvents.request.destroy();
@@ -592,6 +727,7 @@ async function main() {
 
     console.log(`\n✅ Lot M tests reussis - ${passed} assertions.`);
   } finally {
+    if (transitionOrderProbe) transitionOrderProbe.restore();
     realtimeService._resetForTests();
     for (const request of openSseRequests) request.destroy();
     if (server) await new Promise((resolve) => server.close(resolve));
