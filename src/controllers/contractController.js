@@ -240,11 +240,16 @@ async function sendContract(req, res, next) {
     if (!application) return;
     if (!application.contract) return notFound(res);
 
+    const trackingToken = await applicationService.ensureTrackingToken(
+      application.id,
+      application.trackingToken
+    );
+
     const ok = await mailer.sendSignatureInvitation(
       application.applicantEmail,
       application.applicantName,
       application.listing.title,
-      application.trackingToken
+      trackingToken
     );
 
     if (ok) {

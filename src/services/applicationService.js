@@ -1,6 +1,7 @@
 // Accès aux données de l'entité Application via Prisma.
 const prisma = require('../config/prisma');
 const { paginate } = require('../utils/pagination');
+const { generateOpaqueToken } = require('./tokens');
 
 // Dépose une candidature sur une annonce.
 function createForListing(listingId, data) {
@@ -41,6 +42,24 @@ function updateStatus(applicationId, status) {
   });
 }
 
+// Les candidatures antérieures au suivi public peuvent ne pas avoir de jeton.
+// updateMany rend l'attribution sûre si deux envois concurrents arrivent ensemble :
+// un seul écrit, puis les deux relisent la même valeur persistée.
+async function ensureTrackingToken(applicationId, currentToken) {
+  if (currentToken) return currentToken;
+
+  const generatedToken = generateOpaqueToken();
+  await prisma.application.updateMany({
+    where: { id: applicationId, trackingToken: null },
+    data: { trackingToken: generatedToken },
+  });
+  const application = await prisma.application.findUnique({
+    where: { id: applicationId },
+    select: { trackingToken: true },
+  });
+  return application && application.trackingToken;
+}
+
 // Candidature retrouvée par son jeton de suivi public (page /suivi). Inclut annonce + école
 // (pour l'affichage) et le contrat (pour savoir s'il a été envoyé).
 function findByTrackingToken(token) {
@@ -55,5 +74,6 @@ module.exports = {
   findForOwnedListing,
   findOwnedById,
   updateStatus,
+  ensureTrackingToken,
   findByTrackingToken,
 };

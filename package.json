@@ -26,8 +26,8 @@
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
     "helmet": "^8.2.0",
-    "multer": "^2.0.0",
-    "nodemailer": "^7.0.0",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.3",
     "pdfkit": "^0.19.1",
     "twig": "^3.0.0"
   },
@@ -35,5 +35,8 @@
     "axe-core": "^4.12.1",
     "leaflet": "^1.9.4",
     "prisma": "^7.8.0"
+  },
+  "overrides": {
+    "@hono/node-server": "1.19.13"
   }
 }
