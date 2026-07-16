@@ -53,6 +53,12 @@ async function eventually(fn, tries = 50, delayMs = 10) {
 
 function makeJar() { return { cookie: '' }; }
 
+function sidFromJar(jar) {
+  const encoded = String(jar.cookie || '').split('=')[1] || '';
+  const signed = decodeURIComponent(encoded);
+  return signed.startsWith('s:') ? signed.slice(2).split('.')[0] : null;
+}
+
 function storeCookies(jar, res) {
   const values = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
   for (const value of values) jar.cookie = value.split(';')[0];
@@ -327,6 +333,69 @@ async function main() {
     } finally {
       process.env.REALTIME_MAX_CONNECTION_MS = previousMaxConnection;
     }
+
+    // --- 3. Autorisation candidat liee a la session ---
+    const applications = [];
+    for (let i = 0; i < 6; i += 1) {
+      applications.push(await prisma.application.create({
+        data: {
+          listingId: listing.id,
+          applicantName: `Candidat M ${i}`,
+          applicantEmail: `m.candidat.${STAMP}.${i}@example.test`,
+          message: 'Candidature de test temps reel',
+          trackingToken: `${String(i)}${String(STAMP).padStart(63, 'a')}`.slice(0, 64),
+        },
+      }));
+    }
+
+    const candidateJar = makeJar();
+    r = await req(candidateJar, 'GET', `/suivi/${applications[0].trackingToken}`);
+    ok(r.status === 200
+      && r.text.includes(`/suivi/temps-reel/${applications[0].id}`)
+      && r.text.includes(`/suivi/fragment/${applications[0].id}`)
+      && !r.text.includes(`/suivi/temps-reel/${applications[0].trackingToken}`),
+    'candidat : page lie la session avec des URLs temps reel sans jeton');
+
+    r = await req(candidateJar, 'GET', `/suivi/fragment/${applications[0].id}`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 200 && r.text.includes('En attente'),
+      'candidat : fragment autorise rendu depuis la base');
+
+    r = await req(makeJar(), 'GET', `/suivi/fragment/${applications[0].id}`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 401, 'candidat : fragment sans liaison de session -> 401');
+
+    r = await req(makeJar(), 'GET', `/suivi/temps-reel/${applications[0].id}`, {
+      headers: { accept: 'text/event-stream' },
+    });
+    ok(r.status === 204, 'candidat : flux sans liaison de session -> 204');
+
+    for (const application of applications.slice(1)) {
+      r = await req(candidateJar, 'GET', `/suivi/${application.trackingToken}`);
+      ok(r.status === 200, `candidat : ouverture du suivi ${application.id}`);
+    }
+    r = await req(candidateJar, 'GET', `/suivi/fragment/${applications[0].id}`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 401, 'candidat : la sixieme liaison evince la plus ancienne');
+    r = await req(candidateJar, 'GET', `/suivi/fragment/${applications[5].id}`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 200, 'candidat : la liaison la plus recente reste autorisee');
+
+    const expiredSid = sidFromJar(candidateJar);
+    ok(Boolean(expiredSid), 'candidat : identifiant de session de test extrait');
+    await prisma.session.deleteMany({ where: { sid: expiredSid } });
+    r = await req(candidateJar, 'GET', `/suivi/fragment/${applications[5].id}`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 401, 'candidat : session expiree -> fragment 401');
+    r = await req(candidateJar, 'GET', `/suivi/temps-reel/${applications[5].id}`, {
+      headers: { accept: 'text/event-stream' },
+    });
+    ok(r.status === 204, 'candidat : session expiree -> flux terminal 204');
 
     console.log(`\n✅ Lot M tests reussis - ${passed} assertions.`);
   } finally {

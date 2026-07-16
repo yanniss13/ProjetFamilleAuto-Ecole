@@ -1,6 +1,7 @@
 'use strict';
 
 const listingService = require('../services/listingService');
+const applicationService = require('../services/applicationService');
 const realtimeService = require('../services/realtimeService');
 const { parseId, notFound } = require('../utils/http');
 
@@ -62,4 +63,38 @@ async function schoolStream(req, res, next) {
   }
 }
 
-module.exports = { openStream, schoolStream };
+function candidateIsAuthorized(req, applicationId) {
+  return Boolean(req.session && Array.isArray(req.session.realtimeApplicationIds)
+    && req.session.realtimeApplicationIds.includes(applicationId));
+}
+
+async function candidateStream(req, res, next) {
+  try {
+    const applicationId = parseId(req.params.applicationId);
+    if (!applicationId || !candidateIsAuthorized(req, applicationId)) return res.status(204).end();
+    const application = await applicationService.findByIdForTracking(applicationId);
+    if (!application) return notFound(res);
+    openStream(req, res, realtimeService.applicationChannel(applicationId));
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function candidateFragment(req, res, next) {
+  try {
+    const applicationId = parseId(req.params.applicationId);
+    if (!applicationId || !candidateIsAuthorized(req, applicationId)) return res.status(401).end();
+    const application = await applicationService.findByIdForTracking(applicationId);
+    if (!application) return notFound(res);
+    res.render('tracking/_status', { application });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  openStream,
+  schoolStream,
+  candidateStream,
+  candidateFragment,
+};

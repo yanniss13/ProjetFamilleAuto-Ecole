@@ -1,0 +1,34 @@
+<section data-tracking-status>
+  <p>
+    {% if application.status == 'accepted' %}
+      <span class="badge badge-available">Acceptée</span>
+    {% elseif application.status == 'rejected' %}
+      <span class="badge badge-rejected">Refusée</span>
+    {% else %}
+      <span class="badge badge-pending">En attente</span>
+    {% endif %}
+  </p>
+
+  {% if application.status == 'accepted' %}
+    {% if application.contract and application.contract.applicantSignedAt %}
+      <p><span class="badge badge-available">✍️ Contrat signé le {{ application.contract.applicantSignedAt|date('d/m/Y à H:i') }}</span></p>
+      <p><a class="btn btn-primary" href="/suivi/{{ application.trackingToken }}/contrat">Télécharger le contrat signé (PDF)</a></p>
+      {% if application.contract.signedPdfHash %}
+        <p class="fine-print">Empreinte SHA-256 du document final : {{ application.contract.signedPdfHash }}</p>
+      {% endif %}
+    {% elseif application.contract and application.contract.sentToApplicantAt %}
+      <p>Votre candidature a été acceptée : votre contrat est prêt et n'attend plus que votre signature.</p>
+      <p>
+        <a class="btn" href="/suivi/{{ application.trackingToken }}/contrat">Lire le contrat (PDF)</a>
+        <a class="btn btn-primary" href="/suivi/{{ application.trackingToken }}/signer">Signer le contrat</a>
+      </p>
+      <p class="muted">Contrat transmis le {{ application.contract.sentToApplicantAt|date('d/m/Y à H:i') }}.</p>
+    {% else %}
+      <p>Votre candidature a été acceptée. L'auto-école prépare votre contrat.</p>
+    {% endif %}
+  {% elseif application.status == 'rejected' %}
+    <p>Votre candidature n'a pas été retenue cette fois-ci. Merci de l'intérêt porté à cette auto-école.</p>
+  {% else %}
+    <p>Votre candidature est en cours d'examen par l'auto-école.</p>
+  {% endif %}
+</section>
