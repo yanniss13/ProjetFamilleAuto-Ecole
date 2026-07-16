@@ -85,8 +85,10 @@ l'utilisateur.
 
 ## Prochaine action recommandée
 
-Toutes les preuves automatisables sont fraîches ; il ne reste que des actions
-côté utilisateur :
+Toutes les preuves automatisables sont fraîches. Le contrôle réel du Lot M
+reste à exécuter dès qu'un backend Browser est disponible : deux pages ouvertes
+simultanément, accès LAN, transitions et reconnexion, focus et régions
+accessibles. Les autres actions sont côté utilisateur :
 
 1. **Répéter** en chronométrant : ouvrir
    [`soutenance/soutenance.html`](soutenance/soutenance.html) (touche N =
@@ -116,8 +118,19 @@ dans l'audit et les veilles ; la migration Prisma 7 a été réalisée le
 ```powershell
 npm test
 npx prisma validate
-npm run seed:demo
+```
+
+Puis utiliser deux terminaux, dans cet ordre. Terminal 1 — démarrer le serveur
+et vérifier que http://localhost:3000 répond :
+
+```powershell
 npm run dev
+```
+
+Terminal 2 — seulement après cette vérification :
+
+```powershell
+npm run seed:demo
 ```
 
 Puis vérifier dans un navigateur :
