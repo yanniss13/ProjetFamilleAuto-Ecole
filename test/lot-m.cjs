@@ -360,14 +360,24 @@ function loadRealtimeScript(dom, fetchImpl, { withAbortController = true } = {})
     }
   }
   const module = { exports: {} };
+  const windowListeners = Object.create(null);
   const win = {
-    addEventListener() {},
+    addEventListener(name, callback) {
+      if (!windowListeners[name]) windowListeners[name] = new Set();
+      windowListeners[name].add(callback);
+    },
+    removeEventListener(name, callback) {
+      if (windowListeners[name]) windowListeners[name].delete(callback);
+    },
   };
+  function dispatchWindowEvent(name, event = {}) {
+    for (const callback of Array.from(windowListeners[name] || [])) callback(event);
+  }
   if (withAbortController) win.AbortController = AbortController;
   const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'realtime.js'), 'utf8');
   vm.runInNewContext(script, { module, document: undefined, window: undefined, console });
   module.exports.initRealtime(dom.document, win, fetchImpl, FakeEventSource, FakeDOMParser);
-  return { api: module.exports, sources };
+  return { api: module.exports, sources, dispatchWindowEvent };
 }
 
 function deferred() {
@@ -877,6 +887,33 @@ async function main() {
     }));
     ok(duplicateBrowser.sources.length === 1,
       'js vm : un seul EventSource maximum est cree par page');
+
+    const bfcacheDom = makeRealtimeDom();
+    let bfcacheFetches = 0;
+    const bfcacheBrowser = loadRealtimeScript(bfcacheDom, async () => {
+      bfcacheFetches += 1;
+      return fragmentResponse();
+    });
+    bfcacheBrowser.dispatchWindowEvent('pagehide', { persisted: true });
+    bfcacheBrowser.dispatchWindowEvent('pageshow', { persisted: false });
+    ok(bfcacheBrowser.sources[0].closed && bfcacheBrowser.sources.length === 1,
+      'js vm bfcache : pagehide ferme la source et pageshow ordinaire ne recree rien');
+
+    bfcacheBrowser.dispatchWindowEvent('pageshow', { persisted: true });
+    const restoredBfcacheSource = bfcacheBrowser.sources[1];
+    if (restoredBfcacheSource) restoredBfcacheSource.open();
+    ok(Boolean(restoredBfcacheSource)
+      && await eventually(() => bfcacheFetches === 1)
+      && bfcacheBrowser.sources.length === 2
+      && !restoredBfcacheSource.closed,
+    'js vm bfcache : retour persistant recree une source et rattrape le fragment');
+
+    bfcacheBrowser.dispatchWindowEvent('pagehide', { persisted: true });
+    bfcacheBrowser.dispatchWindowEvent('pageshow', { persisted: true });
+    ok(bfcacheBrowser.sources.length === 3
+      && bfcacheBrowser.sources[1].closed
+      && !bfcacheBrowser.sources[2].closed,
+    'js vm bfcache : cycles successifs gardent une seule nouvelle source');
 
     candidateBrowser.sources[0].open();
     ok(await eventually(() => browserCalls.length === 1)
