@@ -12,12 +12,24 @@ function saveSession(req) {
 }
 
 async function bindRealtimeApplication(req, applicationId) {
+  const hadPreviousIds = Object.prototype.hasOwnProperty.call(
+    req.session,
+    'realtimeApplicationIds'
+  );
+  const previousIds = req.session.realtimeApplicationIds;
   const previous = Array.isArray(req.session.realtimeApplicationIds)
     ? req.session.realtimeApplicationIds.filter((id) => Number.isInteger(id) && id > 0 && id !== applicationId)
     : [];
   previous.push(applicationId);
   req.session.realtimeApplicationIds = previous.slice(-MAX_REALTIME_APPLICATIONS);
-  await saveSession(req);
+  try {
+    await saveSession(req);
+  } catch (err) {
+    // Le rollback rend l'issue déterministe si l'auto-sauvegarde Express réussit ensuite.
+    if (hadPreviousIds) req.session.realtimeApplicationIds = previousIds;
+    else delete req.session.realtimeApplicationIds;
+    throw err;
+  }
 }
 
 async function show(req, res, next) {
@@ -26,7 +38,11 @@ async function show(req, res, next) {
     if (!token) return notFound(res);
     const application = await applicationService.findByTrackingToken(token);
     if (!application) return notFound(res);
-    await bindRealtimeApplication(req, application.id);
+    try {
+      await bindRealtimeApplication(req, application.id);
+    } catch (err) {
+      console.error('Autorisation temps réel candidat non persistée :', err);
+    }
     res.render('tracking/show', { title: 'Suivi de candidature', application });
   } catch (err) {
     next(err);
