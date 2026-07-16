@@ -18,6 +18,7 @@ const { spawnSync } = require('child_process');
 const prisma = require('../src/config/prisma');
 const app = require('../src/app');
 const { resolveStored } = require('../src/config/storage');
+const { sha256Hex } = require('../src/utils/hash');
 
 const PORT = 4067;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -59,12 +60,21 @@ function form(obj) {
   for (const [k, v] of Object.entries(obj)) p.append(k, v);
   return { body: p.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 }
+function trackingUrlFromCli(stdout, label) {
+  const line = String(stdout || '').split(/\r?\n/).find((value) => value.includes(label));
+  if (!line) return null;
+  const match = line.match(/:\s+(https?:\/\/\S+\/suivi\/([a-f0-9]{64}))$/);
+  return match ? { url: match[1], token: match[2] } : null;
+}
 
 let temoinId = null;
+let initialSessionIds = null;
 
 async function main() {
   let server;
   try {
+    initialSessionIds = new Set((await prisma.session.findMany({ select: { sid: true } }))
+      .map((session) => session.sid));
     server = app.listen(PORT);
     await new Promise((r) => server.once('listening', r));
 
@@ -126,6 +136,7 @@ async function main() {
       && realtimeApplication.status === 'pending'
       && realtimeApplication.trackingToken === r2.realtimeTrackingToken
       && realtimeApplication.listingId === r2.realtimeListingId
+      && realtimeApplication.listing.status === 'open'
       && realtimeApplication.listing.schoolId === vitrine.id,
     'seed : candidature vitrine en attente dediee a la scene temps reel');
 
@@ -163,18 +174,74 @@ async function main() {
       env: { ...process.env, DEMO_BASE_URL: `${demoBaseUrl}///` },
       encoding: 'utf8',
     });
+    const cliRealtimeTracking = trackingUrlFromCli(cli.stdout, 'Suivi candidat (temps réel, en attente)');
+    const cliSignedTracking = trackingUrlFromCli(cli.stdout, 'Suivi candidat (contrat signé)');
     ok(cli.status === 0
       && cli.stdout.includes(`Carte des annonces : ${demoBaseUrl}/annonces?vue=carte`)
       && cli.stdout.includes(`Tableau de bord    : ${demoBaseUrl}/tableau-de-bord`)
       && cli.stdout.includes(`Administration     : ${demoBaseUrl}/admin`)
-      && cli.stdout.includes(`Suivi candidat (temps réel, en attente) : ${demoBaseUrl}/suivi/`)
-      && cli.stdout.includes(`Suivi candidat (contrat signé)          : ${demoBaseUrl}/suivi/`)
       && cli.stdout.includes(`Alertes email      : ${demoBaseUrl}/alertes`),
     'seed CLI : DEMO_BASE_URL normalisee pour les URLs de demonstration');
+    ok(Boolean(cliRealtimeTracking) && Boolean(cliSignedTracking)
+      && cliRealtimeTracking.url === `${demoBaseUrl}/suivi/${cliRealtimeTracking.token}`
+      && cliSignedTracking.url === `${demoBaseUrl}/suivi/${cliSignedTracking.token}`
+      && cliRealtimeTracking.token !== cliSignedTracking.token,
+    'seed CLI : deux URLs de suivi completes avec des jetons hexadecimaux distincts');
+
+    const [cliRealtimeApplication, cliSignedApplication] = await Promise.all([
+      prisma.application.findUnique({
+        where: { trackingToken: cliRealtimeTracking.token },
+        include: { listing: { include: { school: true } }, contract: true },
+      }),
+      prisma.application.findUnique({
+        where: { trackingToken: cliSignedTracking.token },
+        include: { listing: { include: { school: true } }, contract: true },
+      }),
+    ]);
+    ok(Boolean(cliRealtimeApplication)
+      && cliRealtimeApplication.status === 'pending'
+      && cliRealtimeApplication.trackingToken === cliRealtimeTracking.token
+      && cliRealtimeApplication.listingId === cliRealtimeApplication.listing.id
+      && cliRealtimeApplication.listing.status === 'open'
+      && cliRealtimeApplication.listing.schoolId === cliRealtimeApplication.listing.school.id
+      && cliRealtimeApplication.listing.school.email === `ecole.vitrine${DEMO_SUFFIX}`,
+    'seed CLI : URL temps reel relue en base sur le dossier pending ouvert de la vitrine');
+
+    const cliSignedContract = cliSignedApplication && cliSignedApplication.contract;
+    ok(Boolean(cliSignedApplication) && Boolean(cliSignedContract)
+      && cliSignedApplication.status === 'accepted'
+      && cliSignedApplication.trackingToken === cliSignedTracking.token
+      && cliSignedApplication.listing.school.email === `ecole.vitrine${DEMO_SUFFIX}`
+      && cliSignedContract.applicationId === cliSignedApplication.id
+      && cliSignedContract.sentToApplicantAt instanceof Date
+      && cliSignedContract.schoolSignedAt instanceof Date
+      && cliSignedContract.applicantSignedAt instanceof Date
+      && [cliSignedContract.pdfPath, cliSignedContract.schoolSignaturePath,
+        cliSignedContract.applicantSignaturePath, cliSignedContract.signedPdfPath]
+        .every((storedPath) => storedPath && fs.existsSync(resolveStored(storedPath)))
+      && /^[a-f0-9]{64}$/.test(cliSignedContract.signedPdfHash)
+      && cliSignedContract.signedPdfHash
+        === sha256Hex(fs.readFileSync(resolveStored(cliSignedContract.signedPdfPath))),
+    'seed CLI : URL signee relue en base avec signatures et PDF final integre');
+
+    const cliRealtimePage = await get(new URL(cliRealtimeTracking.url).pathname);
+    ok(cliRealtimePage.status === 200 && cliRealtimePage.text.includes('En attente'),
+      'seed CLI : URL temps reel imprimee ouvre le suivi en attente sur le serveur');
+    const cliSignedPage = await get(new URL(cliSignedTracking.url).pathname);
+    ok(cliSignedPage.status === 200 && cliSignedPage.text.includes('Contrat signé'),
+      'seed CLI : URL signee imprimee ouvre le suivi du contrat signe sur le serveur');
 
     console.log(`\n✅ Lot K tests reussis - ${passed} assertions.`);
   } finally {
     if (server) await new Promise((r) => server.close(r));
+    if (initialSessionIds) {
+      const currentSessionIds = (await prisma.session.findMany({ select: { sid: true } }))
+        .map((session) => session.sid);
+      const createdSessionIds = currentSessionIds.filter((sid) => !initialSessionIds.has(sid));
+      if (createdSessionIds.length) {
+        await prisma.session.deleteMany({ where: { sid: { in: createdSessionIds } } });
+      }
+    }
     // On ne nettoie QUE le temoin : les donnees demo sont le produit du seed.
     if (temoinId) await prisma.school.deleteMany({ where: { id: temoinId } });
     await prisma.$disconnect();
