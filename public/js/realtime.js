@@ -48,11 +48,21 @@
 
     setState(context, 'connecting');
     var source = new EventSourceCtor(streamUrl);
-    var requestNumber = 0;
-    var controller = null;
+    var queue = [];
+    var pendingByKey = Object.create(null);
+    var running = false;
+    var stopped = false;
+
+    function closeSource() {
+      if (stopped) return;
+      stopped = true;
+      queue.length = 0;
+      pendingByKey = Object.create(null);
+      source.close();
+    }
 
     function stopAsUnavailable() {
-      source.close();
+      closeSource();
       setState(context, 'unavailable');
     }
 
@@ -66,14 +76,9 @@
     }
 
     function fetchNode(url, selector) {
-      requestNumber += 1;
-      var currentRequest = requestNumber;
-      if (controller) controller.abort();
-      controller = win.AbortController ? new win.AbortController() : null;
       return fetchImpl(url, {
         credentials: 'same-origin',
         headers: { Accept: 'text/html', 'X-Realtime-Fragment': '1' },
-        signal: controller ? controller.signal : undefined,
       }).then(function (response) {
         if (response.status === 401 || response.status === 403) {
           var unauthorized = new Error('Session temps reel expiree.');
@@ -83,7 +88,6 @@
         if (!response.ok || response.redirected) throw new Error('Fragment temps reel indisponible.');
         return response.text();
       }).then(function (html) {
-        if (currentRequest !== requestNumber) return null;
         return parsedNode(html, selector);
       });
     }
@@ -99,8 +103,41 @@
     }
 
     function handleFetchError(err) {
-      if (err && err.name === 'AbortError') return;
-      stopAsUnavailable();
+      if (stopped) return;
+      if (err && err.code === 'UNAUTHORIZED') {
+        stopAsUnavailable();
+        return;
+      }
+      setState(context, 'unavailable');
+      showUpdate(context);
+    }
+
+    function drainQueue() {
+      if (running || stopped) return;
+      var task = queue.shift();
+      if (!task) return;
+      delete pendingByKey[task.key];
+      running = true;
+      Promise.resolve().then(function () {
+        if (!stopped) return task.refresh();
+        return null;
+      }).catch(handleFetchError).then(function () {
+        running = false;
+        drainQueue();
+      });
+    }
+
+    function enqueueRefresh(key, refresh) {
+      if (stopped) return;
+      var pending = pendingByKey[key];
+      if (pending) {
+        pending.refresh = refresh;
+        return;
+      }
+      var task = { key: key, refresh: refresh };
+      pendingByKey[key] = task;
+      queue.push(task);
+      drainQueue();
     }
 
     function refreshSnapshot(message) {
@@ -113,15 +150,18 @@
           setState(context, 'live');
           if (message) announce(context, message);
         }
-      }).catch(handleFetchError);
+      });
     }
 
     function refreshSchoolCard(event) {
-      if (!cardTemplate || !event.applicationId) return refreshSnapshot(messageFor(event.type));
-      var url = cardTemplate.replace('__APPLICATION_ID__', String(event.applicationId));
+      var applicationId = event && event.applicationId;
+      if (!cardTemplate || !Number.isInteger(applicationId) || applicationId <= 0) {
+        return refreshSnapshot(messageFor(event && event.type));
+      }
+      var url = cardTemplate.replace('__APPLICATION_ID__', String(applicationId));
       return fetchNode(url, '[data-application-card]').then(function (next) {
         if (!next) return;
-        var current = context.querySelector(`[data-application-card="${event.applicationId}"]`);
+        var current = context.querySelector(`[data-application-card="${applicationId}"]`);
         if (current) {
           if (replaceWithoutStealingFocus(current, next)) announce(context, messageFor(event.type));
           return;
@@ -137,14 +177,16 @@
         announce(context, messageFor(event.type));
       }).then(function () {
         setState(context, 'live');
-      }).catch(handleFetchError);
+      });
     }
 
     source.onopen = function () {
+      if (stopped) return;
       setState(context, 'live');
-      refreshSnapshot('');
+      enqueueRefresh('snapshot', function () { return refreshSnapshot(''); });
     };
     source.onerror = function () {
+      if (stopped) return;
       if (source.readyState === 2) stopAsUnavailable();
       else setState(context, 'connecting');
     };
@@ -155,10 +197,20 @@
       } catch {
         return;
       }
-      if (mode === 'school') refreshSchoolCard(event);
-      else refreshSnapshot(messageFor(event.type));
+      if (stopped) return;
+      if (mode === 'school') {
+        var applicationId = event && event.applicationId;
+        var key = Number.isInteger(applicationId) && applicationId > 0
+          ? `card:${applicationId}`
+          : 'snapshot';
+        enqueueRefresh(key, function () { return refreshSchoolCard(event); });
+      } else {
+        enqueueRefresh('snapshot', function () {
+          return refreshSnapshot(messageFor(event.type));
+        });
+      }
     });
-    win.addEventListener('pagehide', function () { source.close(); });
+    win.addEventListener('pagehide', closeSource);
     return source;
   }
 
@@ -172,7 +224,9 @@
 
   var api = { initRealtime: initRealtime, startRealtime: startRealtime, setState: setState };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  if (typeof document !== 'undefined'
+      && typeof window !== 'undefined'
+      && typeof window.fetch === 'function') {
     initRealtime(document, window, window.fetch.bind(window), window.EventSource, window.DOMParser);
   }
 })();

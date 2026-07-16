@@ -258,7 +258,13 @@ function installTransitionOrderProbe() {
   };
 }
 
-function makeRealtimeDom({ mode = 'candidate', focused = false, page = '1' } = {}) {
+function makeRealtimeDom({
+  mode = 'candidate',
+  focused = false,
+  focusedCardId = null,
+  page = '1',
+  cardIds = [],
+} = {}) {
   const statusText = { textContent: '' };
   const status = {
     hidden: true,
@@ -268,11 +274,22 @@ function makeRealtimeDom({ mode = 'candidate', focused = false, page = '1' } = {
   };
   const announcement = { textContent: '' };
   const update = { hidden: true };
+  const activeElement = focused || focusedCardId !== null ? {} : null;
   const current = {
     replacements: 0,
     contains() { return focused; },
     replaceWith() { this.replacements += 1; },
   };
+  const cards = {};
+  for (const applicationId of cardIds) {
+    cards[String(applicationId)] = {
+      replacements: 0,
+      contains(element) {
+        return String(focusedCardId) === String(applicationId) && element === activeElement;
+      },
+      replaceWith() { this.replacements += 1; },
+    };
+  }
   const list = {
     prepended: 0,
     prepend() { this.prepended += 1; },
@@ -295,19 +312,23 @@ function makeRealtimeDom({ mode = 'candidate', focused = false, page = '1' } = {
       if (selector === '[data-application-region]' && mode === 'school') return current;
       if (selector === '[data-application-list]') return list;
       if (selector === '[data-application-empty]') return empty;
+      const cardMatch = selector.match(/^\[data-application-card="(\d+)"\]$/);
+      if (cardMatch) return cards[cardMatch[1]] || null;
       return null;
     },
   };
   const document = {
-    activeElement: focused ? {} : null,
+    activeElement,
     body: {},
     querySelectorAll(selector) { return selector === '[data-realtime-context]' ? [context] : []; },
     importNode(node) { return node; },
   };
-  return { document, context, status, statusText, announcement, update, current, list, empty };
+  return {
+    document, context, status, statusText, announcement, update, current, cards, list, empty,
+  };
 }
 
-function loadRealtimeScript(dom, fetchImpl) {
+function loadRealtimeScript(dom, fetchImpl, { withAbortController = true } = {}) {
   const sources = [];
   class FakeEventSource {
     constructor(url) {
@@ -315,10 +336,11 @@ function loadRealtimeScript(dom, fetchImpl) {
       this.readyState = 0;
       this.listeners = {};
       this.closed = false;
+      this.closeCalls = 0;
       sources.push(this);
     }
     addEventListener(name, callback) { this.listeners[name] = callback; }
-    close() { this.closed = true; this.readyState = 2; }
+    close() { this.closeCalls += 1; this.closed = true; this.readyState = 2; }
     open() { this.readyState = 1; if (this.onopen) this.onopen(); }
     error(state) { this.readyState = state; if (this.onerror) this.onerror(); }
     invalidate(payload) {
@@ -326,20 +348,48 @@ function loadRealtimeScript(dom, fetchImpl) {
     }
   }
   class FakeDOMParser {
-    parseFromString() {
-      const node = { querySelector() { return null; } };
+    parseFromString(html) {
+      if (html.includes('data-missing-root')) {
+        return { querySelector() { return null; } };
+      }
+      const containsScript = html.includes('data-script-fragment');
+      const node = {
+        querySelector(selector) { return selector === 'script' && containsScript ? {} : null; },
+      };
       return { querySelector() { return node; } };
     }
   }
   const module = { exports: {} };
   const win = {
     addEventListener() {},
-    AbortController,
   };
+  if (withAbortController) win.AbortController = AbortController;
   const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'realtime.js'), 'utf8');
   vm.runInNewContext(script, { module, document: undefined, window: undefined, console });
   module.exports.initRealtime(dom.document, win, fetchImpl, FakeEventSource, FakeDOMParser);
   return { api: module.exports, sources };
+}
+
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
+
+function fragmentResponse(html = '<section></section>') {
+  return { ok: true, status: 200, redirected: false, text: async () => html };
+}
+
+async function resolveDeferredRequests(requests, expectedCount) {
+  for (let index = 0; index < expectedCount; index += 1) {
+    if (!await eventually(() => requests.length > index)) return false;
+    requests[index].resolve(fragmentResponse());
+  }
+  return true;
 }
 
 async function main() {
@@ -874,9 +924,11 @@ async function main() {
       ok: false, status: 500, redirected: false, text: async () => '',
     }));
     failedFragmentBrowser.sources[0].open();
-    ok(await eventually(() => failedFragmentBrowser.sources[0].closed)
+    ok(await eventually(() => failedFragmentDom.statusText.textContent
+      .includes('Temps réel indisponible'))
+      && !failedFragmentBrowser.sources[0].closed
       && failedFragmentDom.statusText.textContent.includes('Temps réel indisponible'),
-    'js vm : echec terminal du fragment ferme la source');
+    'js vm : echec transitoire du fragment conserve la source ouverte');
 
     const focusDom = makeRealtimeDom({ focused: true });
     const focusBrowser = loadRealtimeScript(focusDom, async () => ({
@@ -917,6 +969,189 @@ async function main() {
     r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
     ok(r.text.includes('/js/realtime.js') && !r.text.includes('<script>'),
       'structure : page ecole respecte la CSP sans script inline');
+
+    // --- 7. Revue des courses et des erreurs transitoires du client ---
+    const reviewChecks = [];
+
+    const distinctCardsDom = makeRealtimeDom({ mode: 'school', cardIds: [901, 902] });
+    const distinctCardRequests = [];
+    const distinctCardsBrowser = loadRealtimeScript(distinctCardsDom, () => {
+      const request = deferred();
+      distinctCardRequests.push(request);
+      return request.promise;
+    });
+    distinctCardsBrowser.sources[0].invalidate({
+      type: 'application-accepted', applicationId: 901,
+    });
+    distinctCardsBrowser.sources[0].invalidate({
+      type: 'application-rejected', applicationId: 902,
+    });
+    await resolveDeferredRequests(distinctCardRequests, 2);
+    reviewChecks.push({
+      condition: await eventually(() => (
+        distinctCardsDom.cards['901'].replacements === 1
+        && distinctCardsDom.cards['902'].replacements === 1
+      )),
+      label: 'js vm revue : deux cartes distinctes sont toutes les deux actualisees',
+    });
+
+    const snapshotThenCardDom = makeRealtimeDom({ mode: 'school', cardIds: [903] });
+    const snapshotThenCardRequests = [];
+    const snapshotThenCardBrowser = loadRealtimeScript(snapshotThenCardDom, () => {
+      const request = deferred();
+      snapshotThenCardRequests.push(request);
+      return request.promise;
+    });
+    snapshotThenCardBrowser.sources[0].open();
+    snapshotThenCardBrowser.sources[0].invalidate({
+      type: 'contract-signed', applicationId: 903,
+    });
+    await resolveDeferredRequests(snapshotThenCardRequests, 2);
+    reviewChecks.push({
+      condition: await eventually(() => (
+        snapshotThenCardDom.current.replacements === 1
+        && snapshotThenCardDom.cards['903'].replacements === 1
+      )),
+      label: 'js vm revue : le snapshot open et la carte suivante sont tous deux appliques',
+    });
+
+    const serialDom = makeRealtimeDom();
+    const serialRequests = [];
+    let activeRequests = 0;
+    let maximumActiveRequests = 0;
+    const serialBrowser = loadRealtimeScript(serialDom, () => {
+      const request = deferred();
+      activeRequests += 1;
+      maximumActiveRequests = Math.max(maximumActiveRequests, activeRequests);
+      serialRequests.push(request);
+      return request.promise.finally(() => { activeRequests -= 1; });
+    }, { withAbortController: false });
+    serialBrowser.sources[0].open();
+    serialBrowser.sources[0].invalidate({ type: 'application-accepted', applicationId: 904 });
+    await eventually(() => serialRequests.length >= 1);
+    if (serialRequests.length >= 2) {
+      serialRequests[1].resolve(fragmentResponse());
+      await eventually(() => serialDom.current.replacements === 1);
+      serialRequests[0].reject(new Error('ancienne requete en echec'));
+    } else {
+      serialRequests[0].reject(new Error('premiere requete en echec'));
+      await eventually(() => serialRequests.length >= 2);
+      if (serialRequests[1]) serialRequests[1].resolve(fragmentResponse());
+    }
+    reviewChecks.push({
+      condition: await eventually(() => (
+        maximumActiveRequests === 1
+        && serialDom.current.replacements === 1
+        && serialDom.status.attrs['data-state'] === 'live'
+        && !serialBrowser.sources[0].closed
+      )),
+      label: 'js vm revue : sans AbortController la file evite erreur obsolete et concurrence',
+    });
+
+    async function transientFailureRecovers(firstFetch) {
+      const transientDom = makeRealtimeDom();
+      let calls = 0;
+      const transientBrowser = loadRealtimeScript(transientDom, () => {
+        calls += 1;
+        return calls === 1 ? firstFetch() : Promise.resolve(fragmentResponse());
+      });
+      transientBrowser.sources[0].open();
+      await eventually(() => transientDom.status.attrs['data-state'] === 'unavailable');
+      const stayedOpenWithFallback = !transientBrowser.sources[0].closed
+        && transientDom.update.hidden === false;
+      transientBrowser.sources[0].invalidate({
+        type: 'application-accepted', applicationId: 905,
+      });
+      const recovered = await eventually(() => (
+        calls === 2
+        && transientDom.current.replacements === 1
+        && transientDom.status.attrs['data-state'] === 'live'
+      ));
+      return stayedOpenWithFallback && recovered && !transientBrowser.sources[0].closed;
+    }
+
+    reviewChecks.push({
+      condition: await transientFailureRecovers(() => Promise.resolve({
+        ok: false, status: 500, redirected: false, text: async () => '',
+      })),
+      label: 'js vm revue : un fragment 500 reste transitoire puis recupere',
+    });
+    reviewChecks.push({
+      condition: await transientFailureRecovers(() => Promise.reject(new Error('reseau coupe'))),
+      label: 'js vm revue : un rejet reseau reste transitoire puis recupere',
+    });
+    reviewChecks.push({
+      condition: await transientFailureRecovers(() => Promise.resolve(
+        fragmentResponse('<section data-missing-root></section>')
+      )),
+      label: 'js vm revue : une racine absente reste transitoire puis recupere',
+    });
+    reviewChecks.push({
+      condition: await transientFailureRecovers(() => Promise.resolve(
+        fragmentResponse('<section data-script-fragment><script></script></section>')
+      )),
+      label: 'js vm revue : un fragment avec script est refuse sans fermer le flux',
+    });
+
+    async function terminalAuthorizationClosesOnce(status) {
+      const terminalDom = makeRealtimeDom();
+      const terminalBrowser = loadRealtimeScript(terminalDom, async () => ({
+        ok: false, status, redirected: false, text: async () => '',
+      }));
+      terminalBrowser.sources[0].open();
+      await eventually(() => terminalBrowser.sources[0].closed);
+      terminalBrowser.sources[0].error(2);
+      return terminalBrowser.sources[0].closeCalls === 1
+        && terminalDom.status.attrs['data-state'] === 'unavailable';
+    }
+    reviewChecks.push({
+      condition: await terminalAuthorizationClosesOnce(401),
+      label: 'js vm revue : 401 ferme la source une seule fois',
+    });
+    reviewChecks.push({
+      condition: await terminalAuthorizationClosesOnce(403),
+      label: 'js vm revue : 403 ferme la source une seule fois',
+    });
+
+    const focusedCardDom = makeRealtimeDom({
+      mode: 'school', cardIds: [906], focusedCardId: 906,
+    });
+    const focusedCardBrowser = loadRealtimeScript(focusedCardDom, async () => fragmentResponse());
+    focusedCardBrowser.sources[0].invalidate({
+      type: 'application-accepted', applicationId: 906,
+    });
+    reviewChecks.push({
+      condition: await eventually(() => (
+        focusedCardDom.update.hidden === false
+        && focusedCardDom.cards['906'].replacements === 0
+      )),
+      label: 'js vm revue : une carte focalisee conserve le focus et affiche le bandeau',
+    });
+
+    let fallbackWithoutFetch = true;
+    try {
+      const script = fs.readFileSync(
+        path.join(__dirname, '..', 'public', 'js', 'realtime.js'), 'utf8'
+      );
+      vm.runInNewContext(script, {
+        module: { exports: {} },
+        document: makeRealtimeDom().document,
+        window: {},
+        console,
+      });
+    } catch {
+      fallbackWithoutFetch = false;
+    }
+    reviewChecks.push({
+      condition: fallbackWithoutFetch,
+      label: 'js vm revue : sans window.fetch le HTML de repli reste utilisable',
+    });
+
+    const reviewFailures = reviewChecks.filter((check) => !check.condition);
+    if (reviewFailures.length) {
+      throw new Error(`ECHEC REVUE : ${reviewFailures.map((check) => check.label).join(' ; ')}`);
+    }
+    for (const check of reviewChecks) ok(true, check.label);
 
     schoolEvents.request.destroy();
     candidateEvents.request.destroy();
