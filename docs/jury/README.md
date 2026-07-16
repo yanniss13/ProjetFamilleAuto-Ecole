@@ -73,7 +73,7 @@ l'utilisateur.
   création/migration/sauvegarde/restauration documentés.
 - Lot M livré après la préparation initiale : suivi des candidatures en temps
   réel par SSE, avec rattrapage à la reconnexion et repli sans JavaScript.
-- Suite actuelle rejouée le 2026-07-16 : **16 fichiers, 546 assertions**.
+- Suite actuelle rejouée le 2026-07-16 : **16 fichiers, 551 assertions**.
 - Correction mobile livrée et **prouvée le 2026-07-11** : burger accessible
   (contrôle interactif vert sur six pages à 320/375), composition une colonne,
   tableaux contenus, chaînes longues sécables ; 45 captures aux largeurs
@@ -165,8 +165,9 @@ Puis vérifier dans un navigateur :
 
 ### Checkpoint Lot M — passation du 2026-07-16
 
-- Intégration automatisée vérifiée avant commit : `test/lot-m.cjs` vert avec
-  **89 assertions** ; `npm test` vert avec **16 fichiers et 546 assertions**,
+- Intégration automatisée vérifiée après les durcissements finaux :
+  `test/lot-m.cjs` vert avec **94 assertions** ; `npm test` vert avec
+  **16 fichiers et 551 assertions**,
   dans l'ordre Lot L → Lot M → Lot K ; schéma Prisma valide et
   `git diff --check` sans erreur.
 - Serveur démarré à neuf sur le port 3000, puis seed exécuté avec
