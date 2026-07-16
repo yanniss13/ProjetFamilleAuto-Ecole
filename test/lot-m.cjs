@@ -397,6 +397,69 @@ async function main() {
     });
     ok(r.status === 204, 'candidat : session expiree -> flux terminal 204');
 
+    // --- 4. Partials et contexte ecole ---
+    r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    ok(r.status === 200
+      && r.text.includes('data-realtime-context')
+      && r.text.includes(`data-realtime-stream-url="/mes-annonces/${listing.id}/candidatures/temps-reel"`)
+      && r.text.includes(`data-realtime-snapshot-url="/mes-annonces/${listing.id}/candidatures?page=1"`)
+      && r.text.includes('role="status"')
+      && r.text.includes('aria-live="polite"'),
+    'vues : page ecole expose le contexte et l indicateur accessible');
+
+    const displayedApplication = applications[5];
+    r = await req(schoolJar, 'GET',
+      `/mes-annonces/${listing.id}/candidatures/${displayedApplication.id}/carte`,
+      { headers: { 'x-realtime-fragment': '1' } });
+    ok(r.status === 200
+      && r.text.includes(`data-application-card="${displayedApplication.id}"`)
+      && r.text.includes(displayedApplication.applicantName),
+    'vues : fragment carte rendu pour l ecole proprietaire');
+
+    const otherSchool = await prisma.school.create({
+      data: {
+        email: `m.other.${STAMP}@example.test`,
+        passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: 'M Autre Ecole',
+        siret: `5${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(otherSchool.id);
+    const otherJar = makeJar();
+    r = await req(otherJar, 'GET', '/connexion');
+    r = await req(otherJar, 'POST', '/connexion', form({
+      _csrf: csrfFrom(r.text), email: otherSchool.email, password: 'motdepasse123',
+    }));
+    r = await req(otherJar, 'GET',
+      `/mes-annonces/${listing.id}/candidatures/${displayedApplication.id}/carte`,
+      { headers: { 'x-realtime-fragment': '1' } });
+    ok(r.status === 404, 'vues : fragment carte d une autre ecole -> 404');
+    r = await req(otherJar, 'GET',
+      `/mes-annonces/${listing.id}/candidatures/temps-reel`,
+      { headers: { accept: 'text/event-stream' } });
+    ok(r.status === 404, 'sse : flux d une annonce appartenant a une autre ecole -> 404');
+
+    const secondListing = await prisma.listing.create({
+      data: {
+        title: `Lot M autre annonce ${STAMP}`,
+        description: 'Autre annonce de la meme ecole',
+        city: 'Marseille', department: '13', schoolId: school.id,
+        titleLower: `lot m autre annonce ${STAMP}`,
+        descriptionLower: 'autre annonce de la meme ecole', cityLower: 'marseille',
+      },
+    });
+    r = await req(schoolJar, 'GET',
+      `/mes-annonces/${secondListing.id}/candidatures/${displayedApplication.id}/carte`,
+      { headers: { 'x-realtime-fragment': '1' } });
+    ok(r.status === 404, 'vues : candidature et annonce incoherentes -> 404');
+
+    r = await req(makeJar(), 'GET', `/suivi/${displayedApplication.trackingToken}`);
+    ok(r.text.includes('data-realtime-status')
+      && r.text.includes('Reconnexion en cours')
+      && r.text.includes('/js/realtime.js') === false,
+    'vues : suivi contient l indicateur mais le script sera branche en Tache 6');
+
     console.log(`\n✅ Lot M tests reussis - ${passed} assertions.`);
   } finally {
     realtimeService._resetForTests();

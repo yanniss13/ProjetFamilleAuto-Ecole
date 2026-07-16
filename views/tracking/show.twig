@@ -12,6 +12,9 @@
        data-realtime-mode="candidate"
        data-realtime-stream-url="/suivi/temps-reel/{{ application.id }}"
        data-realtime-snapshot-url="/suivi/fragment/{{ application.id }}">
+    {% include 'partials/realtime-status.twig' with {
+      realtimeReloadUrl: '/suivi/' ~ application.trackingToken
+    } %}
     {% include 'tracking/_status.twig' %}
   </div>
 {% endblock %}
