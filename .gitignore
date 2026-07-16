@@ -19,6 +19,7 @@ npm-debug.log*
 .claude/settings.local.json
 .agents/
 .superpowers/
+worktrees/
 tmp/
 contexte.md
 Suivi_candidatures_stage_1_1_mails_plus_naturels_v3.xlsx
