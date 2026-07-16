@@ -63,7 +63,7 @@ l'utilisateur.
   `C:\Users\yanni\Downloads\Checklist_certification_DWWM.xlsx.zip`
   (le contenu utile est entièrement retranscrit dans l'audit).
 
-## État actuel au 2026-07-11
+## État actuel au 2026-07-16
 
 - Dossier consolidé, deck 35 minutes, démo 11 minutes, 26 Q/R et deux veilles
   livrés ; focus technique : **signature électronique du contrat**.
@@ -71,7 +71,9 @@ l'utilisateur.
   renforcer est l'environnement de production démontré.
 - Modèle BDD v2 à 8 entités et procédures SQLite/PostgreSQL de
   création/migration/sauvegarde/restauration documentés.
-- Suite actuelle : **15 fichiers, 448 assertions**.
+- Lot M livré après la préparation initiale : suivi des candidatures en temps
+  réel par SSE, avec rattrapage à la reconnexion et repli sans JavaScript.
+- Suite actuelle rejouée le 2026-07-16 : **16 fichiers, 546 assertions**.
 - Correction mobile livrée et **prouvée le 2026-07-11** : burger accessible
   (contrôle interactif vert sur six pages à 320/375), composition une colonne,
   tableaux contenus, chaînes longues sécables ; 45 captures aux largeurs
@@ -98,6 +100,16 @@ côté utilisateur :
 Les restes hors jury (hébergement PostgreSQL réel, Argon2id) sont listés
 dans l'audit et les veilles ; la migration Prisma 7 a été réalisée le
 2026-07-12 (suite complète rejouée).
+
+### Limites de production du temps réel
+
+- Temps réel Lot M : adaptateur mémoire mono-processus ; une production
+  multi-instance devra utiliser PostgreSQL `LISTEN/NOTIFY` ou Redis.
+- Sous HTTP/1.1, plusieurs onglets peuvent atteindre la limite de connexions SSE
+  par origine ; HTTP/2 ou une mutualisation inter-onglets est l'évolution prévue.
+- Le reverse proxy de production doit masquer le segment secret des accès
+  initiaux `/suivi/:token` dans ses journaux. Les URLs SSE et fragment ne
+  contiennent pas ce jeton.
 
 ## Vérifications à lancer dès que l'environnement le permet
 
@@ -137,6 +149,27 @@ Puis vérifier dans un navigateur :
 - les commandes de vérification exécutées et leur résultat ;
 - le premier travail restant, formulé sans ambiguïté ;
 - les décisions de l'utilisateur encore attendues.
+
+### Checkpoint Lot M — passation du 2026-07-16
+
+- Intégration automatisée vérifiée avant commit : `test/lot-m.cjs` vert avec
+  **89 assertions** ; `npm test` vert avec **16 fichiers et 546 assertions**,
+  dans l'ordre Lot L → Lot M → Lot K ; schéma Prisma valide et
+  `git diff --check` sans erreur.
+- Serveur démarré à neuf sur le port 3000, puis seed exécuté avec
+  `DEMO_BASE_URL=http://192.168.1.13:3000`. Cette commande a produit l'URL de
+  suivi temps réel attendue ; elle ne constitue pas une preuve d'accès depuis
+  un autre appareil. Le serveur de vérification a ensuite été arrêté et le
+  port 3000 n'était plus en écoute.
+- Contrôle dans un vrai navigateur **non réalisé dans cette session** : la
+  connexion Browser a répondu `No browser is available` et la liste des
+  navigateurs disponibles était vide (`[]`). Aucun autre moteur d'automatisation
+  n'a été substitué à ce contrôle obligatoire.
+- Restent donc à rejouer manuellement : pages école et candidat simultanées,
+  transitions sans rechargement, coupure/reconnexion et rattrapage, session
+  terminale sans rafale, conservation du focus avec bandeau, inspection des
+  régions `aria-live`, scénario de secours à deux onglets et essai sur téléphone
+  via le réseau local. Aucun pare-feu Windows n'a été modifié.
 
 ### Checkpoint final — preuves responsive régénérées (2026-07-11, Claude)
 
@@ -209,7 +242,8 @@ Puis vérifier dans un navigateur :
   30 s après le boot).
 - Premier travail restant : **côté utilisateur uniquement** — répétitions
   chronométrées, checklist clavier de `conformite.md`, décision du
-  `git push`. Pour un agent : plus aucun chantier jury planifié ; les restes
+  `git push`. Pour un agent, la préparation initiale était alors close ; le
+  Lot M a été ajouté le 2026-07-16. Les restes
   hors jury (sauvegarde/restauration, hébergement production,
   Argon2id) sont listés dans l'audit et les veilles.
 - Chantiers précédents tous fusionnés dans `main` le 2026-07-10 (rangement

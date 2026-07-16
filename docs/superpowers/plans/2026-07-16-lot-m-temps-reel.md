@@ -2146,7 +2146,7 @@ git commit -m "M: preparer la candidature temps reel de demonstration"
 - Consumes: suite Lot M verte, seed retournant `realtimeTrackingToken`, serveur redémarré après vues Twig.
 - Produces: Lot M dans `npm test`, scénario école/téléphone reproductible, limites mono-instance et HTTP/1.1 documentées.
 
-- [ ] **Step 1: Ajouter le test au script npm sans altérer les dépendances**
+- [x] **Step 1: Ajouter le test au script npm sans altérer les dépendances**
 
 Dans `package.json`, ajouter `node test/lot-m.cjs` après le Lot L et avant le seed Lot K, afin que le seed persistant reste le dernier test. La fin exacte du script devient :
 
@@ -2156,7 +2156,7 @@ Dans `package.json`, ajouter `node test/lot-m.cjs` après le Lot L et avant le s
 
 Ne pas modifier `package-lock.json` : le Lot M n'ajoute aucune dépendance.
 
-- [ ] **Step 2: Lancer les vérifications automatisées fraîches**
+- [x] **Step 2: Lancer les vérifications automatisées fraîches**
 
 Run:
 
@@ -2174,7 +2174,7 @@ Expected:
 - Prisma : `The schema at prisma\schema is valid` ;
 - `git diff --check` : aucune ligne d'erreur.
 
-- [ ] **Step 3: Mettre à jour la passation sans inventer le total d'assertions**
+- [x] **Step 3: Mettre à jour la passation sans inventer le total d'assertions**
 
 Ajouter dans `AGENTS.md` :
 
@@ -2199,7 +2199,7 @@ Ajouter aussi ces limites de production, sans les présenter comme des défauts 
   contiennent pas ce jeton.
 ```
 
-- [ ] **Step 4: Intégrer la scène sans allonger les 11 minutes**
+- [x] **Step 4: Intégrer la scène sans allonger les 11 minutes**
 
 Dans `docs/jury/soutenance/demo-11-minutes.md` :
 
@@ -2244,13 +2244,13 @@ Contrôler et consigner dans le checkpoint de `docs/jury/README.md` :
 
 Ce contrôle est manuel : ne pas le comptabiliser comme assertion Node. Si le téléphone ne peut pas joindre le PC, vérifier l'écoute réseau et demander l'autorisation avant toute modification du pare-feu Windows.
 
-- [ ] **Step 6: Demander une revue de code séquentielle**
+- [x] **Step 6: Demander une revue de code séquentielle**
 
 Invoquer `superpowers:requesting-code-review` après les sorties vertes. Le relecteur vérifie au minimum : fuite d'abonnés, token dans les URLs SSE/fragment, réponse 204 terminale, publication avant écriture Prisma, remplacement DOM sous focus et modifications utilisateur absorbées par erreur.
 
 Expected: aucun point bloquant. Corriger toute remarque avec `superpowers:receiving-code-review`, une par une, et relancer les commandes concernées.
 
-- [ ] **Step 7: Commit de passation ciblé**
+- [x] **Step 7: Commit de passation ciblé**
 
 Vérifier d'abord le staging :
 
@@ -2265,7 +2265,7 @@ git add -- package.json AGENTS.md docs/jury/README.md docs/jury/soutenance/demo-
 git commit -m "M: integrer le temps reel a la demonstration jury"
 ```
 
-- [ ] **Step 8: Vérification finale post-commit**
+- [x] **Step 8: Vérification finale post-commit**
 
 Run:
 
