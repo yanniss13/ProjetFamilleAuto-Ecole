@@ -25,7 +25,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   être sauté si l'environnement ne permet vraiment pas de l'exécuter.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./prisma/dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (16 fichiers `.cjs`, 546 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (16 fichiers `.cjs`, 551 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 - `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le

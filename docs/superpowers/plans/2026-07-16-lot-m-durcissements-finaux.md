@@ -30,7 +30,7 @@
 - Consumes: `startRealtime(context, doc, win, fetchImpl, EventSourceCtor, ParserCtor)` et son rattrapage existant dans `source.onopen`.
 - Produces: un cycle `pagehide` → `pageshow({ persisted: true })` qui ferme l'ancienne source, retire ses gestionnaires et en crée exactement une nouvelle.
 
-- [ ] **Step 1: Étendre le faux `window` et écrire le test BFCache RED**
+- [x] **Step 1: Étendre le faux `window` et écrire le test BFCache RED**
 
 Dans `loadRealtimeScript`, remplacer le faux `window` sans état par un registre de gestionnaires :
 
@@ -79,7 +79,7 @@ Retourner `dispatchWindowEvent` et ajouter des assertions qui prouvent :
     'js vm bfcache : cycles successifs gardent une seule nouvelle source');
 ```
 
-- [ ] **Step 2: Exécuter le test et constater l'échec attendu**
+- [x] **Step 2: Exécuter le test et constater l'échec attendu**
 
 Run:
 
@@ -89,7 +89,7 @@ Run:
 
 Expected: échec sur la première assertion qui attend une deuxième source après `pageshow` persistant ; le code courant ne possède aucun gestionnaire `pageshow`.
 
-- [ ] **Step 3: Implémenter le remplacement des gestionnaires de cycle**
+- [x] **Step 3: Implémenter le remplacement des gestionnaires de cycle**
 
 À la fin de `startRealtime`, remplacer le seul branchement `pagehide` par :
 
@@ -112,7 +112,7 @@ Expected: échec sur la première assertion qui attend une deuxième source apr�
 La recréation est inconditionnelle pour `persisted === true`. Le nouveau
 `source.onopen` conserve le rattrapage existant sans autre code.
 
-- [ ] **Step 4: Rejouer Lot M et vérifier le passage GREEN**
+- [x] **Step 4: Rejouer Lot M et vérifier le passage GREEN**
 
 Run:
 
@@ -122,7 +122,7 @@ Run:
 
 Expected: sortie 0 ; trois nouvelles assertions BFCache vertes et une seule source créée par cycle.
 
-- [ ] **Step 5: Commit ciblé**
+- [x] **Step 5: Commit ciblé**
 
 ```powershell
 git add -- public/js/realtime.js test/lot-m.cjs
@@ -141,7 +141,7 @@ git commit -m "M: retablir le flux apres un retour bfcache"
 - Consumes: `bindRealtimeApplication(req, applicationId)` et `PrismaSessionStore.prototype.set(sid, session, callback)`.
 - Produces: rollback exact de `req.session.realtimeApplicationIds` sur échec explicite, page de suivi 200 et flux candidat 204.
 
-- [ ] **Step 1: Écrire le scénario HTTP RED avec une panne unique du store**
+- [x] **Step 1: Écrire le scénario HTTP RED avec une panne unique du store**
 
 Importer le store puis intercepter uniquement la première écriture qui contient
 l'identifiant ciblé :
@@ -190,7 +190,7 @@ autorisation, puis exécuter :
 
 Le remplacement du prototype doit toujours être restauré dans `finally`.
 
-- [ ] **Step 2: Exécuter le test et constater l'échec attendu**
+- [x] **Step 2: Exécuter le test et constater l'échec attendu**
 
 Run:
 
@@ -200,7 +200,7 @@ Run:
 
 Expected: la page répond 500, car l'erreur de `bindRealtimeApplication` atteint encore le gestionnaire Express global.
 
-- [ ] **Step 3: Rendre la liaison transactionnelle en mémoire**
+- [x] **Step 3: Rendre la liaison transactionnelle en mémoire**
 
 Dans `bindRealtimeApplication`, conserver la présence et la valeur précédentes,
 puis les restaurer uniquement sur rejet du `save()` :
@@ -222,7 +222,7 @@ puis les restaurer uniquement sur rejet du `save()` :
   }
 ```
 
-- [ ] **Step 4: Limiter le `catch` dégradable à l'appel de liaison**
+- [x] **Step 4: Limiter le `catch` dégradable à l'appel de liaison**
 
 Dans `show`, conserver la recherche et le rendu dans le `try` extérieur, mais
 absorber seulement la liaison :
@@ -238,7 +238,7 @@ absorber seulement la liaison :
 
 Ne déplacer ni `findByTrackingToken`, ni `res.render` dans ce `catch` interne.
 
-- [ ] **Step 5: Rejouer Lot M et les gardes historiques**
+- [x] **Step 5: Rejouer Lot M et les gardes historiques**
 
 Run:
 
@@ -250,7 +250,7 @@ Run:
 
 Expected: trois sorties 0 ; page dégradée 200, flux 204, suivi historique et signature inchangés.
 
-- [ ] **Step 6: Commit ciblé**
+- [x] **Step 6: Commit ciblé**
 
 ```powershell
 git add -- src/controllers/trackingController.js test/lot-m.cjs
@@ -268,7 +268,7 @@ git commit -m "M: degrader proprement la liaison temps reel"
 - Consumes: les deux commits correctifs et la branche propre `lot-m-temps-reel`.
 - Produces: branche `prisma-7` fusionnée et vérifiée, puis worktree et branche de fonctionnalité supprimés.
 
-- [ ] **Step 1: Lancer les preuves fraîches dans le worktree**
+- [x] **Step 1: Lancer les preuves fraîches dans le worktree**
 
 ```powershell
 & "C:\nvm4w\nodejs\node.exe" test/lot-m.cjs
