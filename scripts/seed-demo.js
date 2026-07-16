@@ -313,6 +313,7 @@ async function seedDemo() {
   // Vitrine : pièces réelles sur les 4 premières, un contrat signé sur la 2e.
   const STATUTS_VITRINE = ['pending', 'accepted', 'accepted', 'rejected', 'pending', 'accepted', 'pending', 'rejected', 'pending', 'pending', 'pending', 'rejected', 'pending', 'accepted', 'pending'];
   let candidatureSignee = null;
+  let candidatureTempsReel = null;
   for (let v = 0; v < 15; v += 1) {
     // Jamais l'annonce clôturée (dernier index) ; la candidature signée (v = 1)
     // est forcée sur l'annonce phare : le contrat généré la référence.
@@ -329,6 +330,7 @@ async function seedDemo() {
       }
     }
     const candidature = await creeCandidature(annonce, v, STATUTS_VITRINE[v], (v * 6) % 80, extra);
+    if (v === 0) candidatureTempsReel = candidature; // Julien Martin — en attente
     if (v === 1) candidatureSignee = candidature; // Sophie Bernard — dossier signé
   }
   await creeContratSigne(vitrine, annoncesVitrine[0], candidatureSignee);
@@ -371,6 +373,9 @@ async function seedDemo() {
   return {
     ...compteurs,
     trackingToken: candidatureSignee.trackingToken,
+    realtimeTrackingToken: candidatureTempsReel.trackingToken,
+    realtimeApplicationId: candidatureTempsReel.id,
+    realtimeListingId: candidatureTempsReel.listingId,
     credentials: {
       school: { email: vitrine.email, password: MDP_ECOLE },
       admin: { email: admin.email, password: MDP_ADMIN },
@@ -388,12 +393,14 @@ async function runCli() {
     console.log('\nComptes de démonstration :');
     console.log(`  École vitrine : ${r.credentials.school.email} / ${r.credentials.school.password}`);
     console.log(`  Admin         : ${r.credentials.admin.email} / ${r.credentials.admin.password}`);
+    const baseUrl = String(process.env.DEMO_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '');
     console.log('\nURLs clés :');
-    console.log('  Carte des annonces : http://localhost:3000/annonces?vue=carte');
-    console.log('  Tableau de bord    : http://localhost:3000/tableau-de-bord');
-    console.log('  Administration     : http://localhost:3000/admin');
-    console.log(`  Suivi candidat (contrat signé) : http://localhost:3000/suivi/${r.trackingToken}`);
-    console.log('  Alertes email      : http://localhost:3000/alertes');
+    console.log(`  Carte des annonces : ${baseUrl}/annonces?vue=carte`);
+    console.log(`  Tableau de bord    : ${baseUrl}/tableau-de-bord`);
+    console.log(`  Administration     : ${baseUrl}/admin`);
+    console.log(`  Suivi candidat (temps réel, en attente) : ${baseUrl}/suivi/${r.realtimeTrackingToken}`);
+    console.log(`  Suivi candidat (contrat signé)          : ${baseUrl}/suivi/${r.trackingToken}`);
+    console.log(`  Alertes email      : ${baseUrl}/alertes`);
     await prisma.$disconnect();
   } catch (err) {
     console.error(`Échec du seed : ${err.message}`);
