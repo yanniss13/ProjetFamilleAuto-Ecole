@@ -288,7 +288,7 @@ HTTP 200 → SSE 204.
 
 Expected: aucune remarque critique ou importante avant fusion.
 
-- [ ] **Step 3: Fusionner localement dans `prisma-7`**
+- [x] **Step 3: Fusionner localement dans `prisma-7`**
 
 Depuis le dépôt principal, fusionner `lot-m-temps-reel` dans `prisma-7` sans
 pull ni push, puisque la base locale est la source convenue :
@@ -297,7 +297,7 @@ pull ni push, puisque la base locale est la source convenue :
 git merge lot-m-temps-reel
 ```
 
-- [ ] **Step 4: Vérifier le résultat fusionné**
+- [x] **Step 4: Vérifier le résultat fusionné**
 
 ```powershell
 & "C:\nvm4w\nodejs\npm.cmd" test
@@ -307,7 +307,7 @@ git status --short
 
 Expected: suite complète et Prisma verts sur `prisma-7`, arbre propre.
 
-- [ ] **Step 5: Supprimer le worktree puis la branche fusionnée**
+- [x] **Step 5: Supprimer le worktree puis la branche fusionnée**
 
 Depuis la racine principale uniquement :
 
