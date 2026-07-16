@@ -284,6 +284,42 @@ body {
 .purge-card h2 { font-size: 1rem; margin: 0 0 0.75rem; }
 .purge-card form { margin: 0.5rem 0; }
 
+/* --- Lot M : actualisation en direct des candidatures --- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.realtime-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+.realtime-status-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: #d97706;
+}
+.realtime-status[data-state="live"] .realtime-status-dot { background: #15803d; }
+.realtime-status[data-state="unavailable"] .realtime-status-dot { background: #b91c1c; }
+.realtime-update {
+  padding: 0.75rem 1rem;
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  background: #fffbeb;
+  color: #78350f;
+}
+
 /* --- Accessibilité --- */
 .skip-link {
   position: absolute;
