@@ -6,71 +6,29 @@
     <a href="/mes-annonces" class="btn">Retour</a>
   </div>
 
-  {% if applications|length == 0 %}
-    <p class="muted">Aucune candidature pour cette annonce.</p>
-  {% else %}
-    <ul class="application-list">
-      {% for a in applications %}
-        {% set base = '/mes-annonces/' ~ listing.id ~ '/candidatures/' ~ a.id %}
-        <li class="application-card">
-          <div class="application-head">
-            <h2>{{ a.applicantName }}</h2>
-            {% if a.status == 'accepted' %}
-              <span class="badge badge-available">Acceptée</span>
-            {% elseif a.status == 'rejected' %}
-              <span class="badge badge-rejected">Refusée</span>
-            {% else %}
-              <span class="badge badge-pending">En attente</span>
-            {% endif %}
-          </div>
+  <section data-realtime-context
+           data-realtime-mode="school"
+           data-realtime-page="{{ pagination.page }}"
+           data-realtime-stream-url="/mes-annonces/{{ listing.id }}/candidatures/temps-reel"
+           data-realtime-snapshot-url="/mes-annonces/{{ listing.id }}/candidatures?page={{ pagination.page }}"
+           data-realtime-card-url-template="/mes-annonces/{{ listing.id }}/candidatures/__APPLICATION_ID__/carte">
+    {% include 'partials/realtime-status.twig' with {
+      realtimeReloadUrl: '/mes-annonces/' ~ listing.id ~ '/candidatures?page=' ~ pagination.page
+    } %}
 
-          <p class="muted">
-            {{ a.applicantEmail }}
-            {% if a.applicantPhone %} · {{ a.applicantPhone }}{% endif %}
-            · reçue le {{ a.createdAt|date('d/m/Y à H:i') }}
-          </p>
-
-          <div class="application-message">{{ a.message }}</div>
-
-          <div class="application-actions">
-            <a href="{{ base }}/cv" class="btn btn-small">CV</a>
-            <a href="{{ base }}/piece-identite" class="btn btn-small">Pièce d'identité</a>
-            <a href="{{ base }}/permis" class="btn btn-small">Permis</a>
-            <a href="{{ base }}/carte-enseignant" class="btn btn-small">Carte d'enseignant</a>
-
-            {% if a.status != 'accepted' %}
-              <a href="{{ base }}/accepter" class="btn btn-small btn-primary">Accepter</a>
-            {% endif %}
-            {% if a.status == 'pending' %}
-              <form action="{{ base }}/refuser" method="post" class="inline-form"
-                    data-confirm="Refuser cette candidature ?">
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                <button type="submit" class="btn btn-small btn-danger">Refuser</button>
-              </form>
-            {% endif %}
-          </div>
-
-          {% if a.status == 'accepted' and a.contract %}
-            <div class="application-actions section">
-              {% if a.contract.applicantSignedAt %}
-                <span class="badge badge-available">✍️ Contrat signé le {{ a.contract.applicantSignedAt|date('d/m/Y à H:i') }}</span>
-                <a href="{{ base }}/contrat/telecharger-signe" class="btn btn-small btn-primary">Télécharger le contrat signé</a>
-              {% else %}
-                <a href="{{ base }}/contrat/telecharger" class="btn btn-small btn-primary">Télécharger le contrat</a>
-                <a href="{{ base }}/accepter" class="btn btn-small">Modifier le contrat</a>
-                <form action="{{ base }}/contrat/envoyer" method="post" class="inline-form">
-                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                  <button type="submit" class="btn btn-small">Envoyer pour signature</button>
-                </form>
-                {% if a.contract.sentToApplicantAt %}
-                  <span class="muted">Invitation envoyée le {{ a.contract.sentToApplicantAt|date('d/m/Y à H:i') }} — en attente de signature du candidat</span>
-                {% endif %}
-              {% endif %}
-            </div>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-    {% include 'partials/pagination.twig' %}
-  {% endif %}
+    <div data-application-region>
+      {% if applications|length == 0 %}
+        <p class="muted" data-application-empty>Aucune candidature pour cette annonce.</p>
+      {% endif %}
+      <ul class="application-list" data-application-list>
+        {% for application in applications %}
+          {% include 'dashboard/_application-card.twig' with {
+            application: application,
+            listing: listing
+          } %}
+        {% endfor %}
+      </ul>
+      {% include 'partials/pagination.twig' %}
+    </div>
+  </section>
 {% endblock %}

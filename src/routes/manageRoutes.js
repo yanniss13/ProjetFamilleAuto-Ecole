@@ -19,6 +19,7 @@ router.post('/:id/cloturer', listingController.close);
 // Candidatures d'une annonce + téléchargement protégé des pièces (CV / pièce d'identité).
 router.get('/:id/candidatures', applicationController.forListing);
 router.get('/:id/candidatures/temps-reel', realtimeController.schoolStream);
+router.get('/:id/candidatures/:applicationId/carte', realtimeController.schoolCard);
 router.get('/:id/candidatures/:appId/cv', applicationController.downloadCv);
 router.get('/:id/candidatures/:appId/piece-identite', applicationController.downloadIdCard);
 router.get('/:id/candidatures/:appId/permis', applicationController.downloadLicense);

@@ -92,9 +92,26 @@ async function candidateFragment(req, res, next) {
   }
 }
 
+async function schoolCard(req, res, next) {
+  try {
+    const listingId = parseId(req.params.id);
+    const applicationId = parseId(req.params.applicationId);
+    if (!listingId || !applicationId) return notFound(res);
+    const application = await applicationService.findOwnedById(req.school.id, applicationId);
+    if (!application || application.listingId !== listingId) return notFound(res);
+    res.render('dashboard/_application-card', {
+      application,
+      listing: application.listing,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   openStream,
   schoolStream,
   candidateStream,
   candidateFragment,
+  schoolCard,
 };
