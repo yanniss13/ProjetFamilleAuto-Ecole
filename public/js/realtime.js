@@ -80,6 +80,7 @@
         credentials: 'same-origin',
         headers: { Accept: 'text/html', 'X-Realtime-Fragment': '1' },
       }).then(function (response) {
+        if (stopped) return null;
         if (response.status === 401 || response.status === 403) {
           var unauthorized = new Error('Session temps reel expiree.');
           unauthorized.code = 'UNAUTHORIZED';
@@ -88,6 +89,7 @@
         if (!response.ok || response.redirected) throw new Error('Fragment temps reel indisponible.');
         return response.text();
       }).then(function (html) {
+        if (stopped || html === null) return null;
         return parsedNode(html, selector);
       });
     }
@@ -145,11 +147,11 @@
       var current = context.querySelector(selector);
       if (!current) return Promise.resolve();
       return fetchNode(snapshotUrl, selector).then(function (next) {
-        if (!next) return;
-        if (replaceWithoutStealingFocus(current, next)) {
-          setState(context, 'live');
-          if (message) announce(context, message);
-        }
+        if (stopped || !next) return;
+        var replaced = replaceWithoutStealingFocus(current, next);
+        if (stopped) return;
+        setState(context, 'live');
+        if (replaced && message) announce(context, message);
       });
     }
 
@@ -160,7 +162,7 @@
       }
       var url = cardTemplate.replace('__APPLICATION_ID__', String(applicationId));
       return fetchNode(url, '[data-application-card]').then(function (next) {
-        if (!next) return;
+        if (stopped || !next) return;
         var current = context.querySelector(`[data-application-card="${applicationId}"]`);
         if (current) {
           if (replaceWithoutStealingFocus(current, next)) announce(context, messageFor(event.type));
@@ -176,7 +178,7 @@
         if (update) update.hidden = false;
         announce(context, messageFor(event.type));
       }).then(function () {
-        setState(context, 'live');
+        if (!stopped) setState(context, 'live');
       });
     }
 

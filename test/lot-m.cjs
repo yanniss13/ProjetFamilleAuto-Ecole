@@ -1113,6 +1113,76 @@ async function main() {
       label: 'js vm revue : 403 ferme la source une seule fois',
     });
 
+    const lateSuccessDom = makeRealtimeDom({ mode: 'school' });
+    const lateSuccessRequest = deferred();
+    const lateSuccessBrowser = loadRealtimeScript(
+      lateSuccessDom,
+      () => lateSuccessRequest.promise
+    );
+    lateSuccessBrowser.sources[0].open();
+    await wait(0);
+    lateSuccessBrowser.sources[0].error(2);
+    lateSuccessBrowser.sources[0].error(2);
+    lateSuccessRequest.resolve(fragmentResponse());
+    await wait(20);
+    reviewChecks.push({
+      condition: lateSuccessBrowser.sources[0].closeCalls === 1
+        && lateSuccessDom.status.attrs['data-state'] === 'unavailable'
+        && lateSuccessDom.current.replacements === 0
+        && lateSuccessDom.list.prepended === 0
+        && lateSuccessDom.announcement.textContent === '',
+      label: 'js vm revue : un succes tardif apres fermeture terminale reste inerte',
+    });
+
+    const lateFailureDom = makeRealtimeDom();
+    const lateFailureRequest = deferred();
+    const lateFailureBrowser = loadRealtimeScript(
+      lateFailureDom,
+      () => lateFailureRequest.promise
+    );
+    lateFailureBrowser.sources[0].open();
+    await wait(0);
+    lateFailureBrowser.sources[0].error(2);
+    lateFailureRequest.reject(new Error('rejet apres fermeture terminale'));
+    await wait(20);
+    reviewChecks.push({
+      condition: lateFailureBrowser.sources[0].closeCalls === 1
+        && lateFailureDom.status.attrs['data-state'] === 'unavailable'
+        && lateFailureDom.current.replacements === 0
+        && lateFailureDom.update.hidden === true,
+      label: 'js vm revue : un rejet tardif apres fermeture terminale reste inerte',
+    });
+
+    async function focusedSnapshotRecovery(mode) {
+      const focusedDom = makeRealtimeDom({ mode, focused: true });
+      let calls = 0;
+      const focusedBrowser = loadRealtimeScript(focusedDom, async () => {
+        calls += 1;
+        if (calls === 1) {
+          return { ok: false, status: 500, redirected: false, text: async () => '' };
+        }
+        return fragmentResponse();
+      });
+      focusedBrowser.sources[0].open();
+      await eventually(() => focusedDom.status.attrs['data-state'] === 'unavailable');
+      focusedBrowser.sources[0].invalidate({ type: 'application-accepted' });
+      const liveRestored = await eventually(() => (
+        calls === 2 && focusedDom.status.attrs['data-state'] === 'live'
+      ));
+      return liveRestored
+        && !focusedBrowser.sources[0].closed
+        && focusedDom.current.replacements === 0
+        && focusedDom.update.hidden === false;
+    }
+    reviewChecks.push({
+      condition: await focusedSnapshotRecovery('candidate'),
+      label: 'js vm revue : succes candidat sous focus restaure live sans remplacement',
+    });
+    reviewChecks.push({
+      condition: await focusedSnapshotRecovery('school'),
+      label: 'js vm revue : succes snapshot ecole sous focus restaure live sans remplacement',
+    });
+
     const focusedCardDom = makeRealtimeDom({
       mode: 'school', cardIds: [906], focusedCardId: 906,
     });
