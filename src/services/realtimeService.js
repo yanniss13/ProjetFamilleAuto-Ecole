@@ -13,10 +13,13 @@ const EVENT_TYPES = Object.freeze({
 });
 const ALLOWED_TYPES = new Set(Object.values(EVENT_TYPES));
 
+function isPositiveId(id) {
+  return typeof id === 'number' && Number.isInteger(id) && id > 0;
+}
+
 function positiveId(id) {
-  const parsed = Number(id);
-  if (!Number.isInteger(parsed) || parsed <= 0) throw new TypeError('Identifiant temps reel invalide.');
-  return parsed;
+  if (!isPositiveId(id)) throw new TypeError('Identifiant temps reel invalide.');
+  return id;
 }
 
 function listingChannel(id) {
@@ -47,11 +50,21 @@ function subscribe(channel, callback) {
 }
 
 function publish(channel, event) {
+  let publicEvent;
+  try {
+    if (!event) return;
+    const type = event.type;
+    const applicationId = event.applicationId;
+    if (!ALLOWED_TYPES.has(type) || !isPositiveId(applicationId)) return;
+    publicEvent = Object.freeze({ type, applicationId });
+  } catch {
+    return;
+  }
   const channelSubscribers = subscribers.get(channel);
   if (!channelSubscribers) return;
   for (const callback of [...channelSubscribers]) {
     try {
-      callback(event);
+      callback(publicEvent);
     } catch {
       // Un navigateur parti entre deux écritures ne doit affecter ni les autres
       // abonnés ni l'action métier déjà validée en base.
@@ -60,12 +73,17 @@ function publish(channel, event) {
 }
 
 function publishApplicationUpdate(application, type) {
-  if (!application || !ALLOWED_TYPES.has(type)) return;
-  const applicationId = positiveId(application.id);
-  const listingId = positiveId(application.listingId);
-  const event = { type, applicationId };
-  publish(listingChannel(listingId), event);
-  publish(applicationChannel(applicationId), event);
+  try {
+    if (!application || !ALLOWED_TYPES.has(type)) return;
+    const applicationId = positiveId(application.id);
+    const listingId = positiveId(application.listingId);
+    const event = { type, applicationId };
+    publish(listingChannel(listingId), event);
+    publish(applicationChannel(applicationId), event);
+  } catch {
+    // Une donnée métier incomplète ou inaccessible ne doit jamais faire échouer
+    // l'action du contrôleur déjà validée en base.
+  }
 }
 
 function subscriberCount(channel) {

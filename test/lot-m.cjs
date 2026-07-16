@@ -64,19 +64,93 @@ async function main() {
     ok(listingChannel === 'listing:12' && applicationChannel === 'application:34',
       'service : noms de canaux stables et distincts');
 
+    let coercibleIdsRejected = 0;
+    for (const buildChannel of [
+      () => realtimeService.listingChannel('12'),
+      () => realtimeService.applicationChannel(true),
+    ]) {
+      try {
+        buildChannel();
+      } catch (err) {
+        if (err instanceof TypeError) coercibleIdsRejected += 1;
+      }
+    }
+    ok(coercibleIdsRejected === 2,
+      'service : les constructeurs refusent les identifiants coercibles non numeriques');
+
     const received = [];
     const unsubscribe = realtimeService.subscribe(listingChannel, (event) => received.push(event));
     realtimeService.subscribe(listingChannel, () => { throw new Error('abonne en panne'); });
-    realtimeService.publish(listingChannel, { type: 'application-created', applicationId: 34 });
+    realtimeService.publish(listingChannel, {
+      type: 'application-created',
+      applicationId: 34,
+      email: 'secret@example.test',
+      token: 'secret',
+      document: { path: 'storage/prive.pdf' },
+    });
     ok(received.length === 1 && received[0].applicationId === 34,
       'service : un abonne en erreur ne bloque pas les autres');
+    ok(JSON.stringify(Object.keys(received[0]).sort()) === JSON.stringify(['applicationId', 'type']),
+      'service : publish borne exactement la charge utile aux deux cles publiques');
+
+    let typeReads = 0;
+    let applicationIdReads = 0;
+    const beforeGetterEvent = received.length;
+    realtimeService.publish(listingChannel, {
+      get type() {
+        typeReads += 1;
+        return typeReads === 1 ? realtimeService.EVENT_TYPES.APPLICATION_CREATED : 'type-modifie';
+      },
+      get applicationId() {
+        applicationIdReads += 1;
+        return applicationIdReads === 1 ? 34 : '34';
+      },
+    });
+    const getterEvent = received[beforeGetterEvent];
+    ok(typeReads === 1 && applicationIdReads === 1
+      && getterEvent.type === realtimeService.EVENT_TYPES.APPLICATION_CREATED
+      && getterEvent.applicationId === 34,
+    'service : publish fige les valeurs validees sans relire les getters');
     ok(realtimeService.subscriberCount(listingChannel) === 2,
       'service : compteur diagnostic des abonnes');
 
+    const beforeUnknownType = received.length;
+    let unknownTypeThrew = false;
+    try {
+      realtimeService.publish(listingChannel, { type: 'application-inconnue', applicationId: 34 });
+    } catch {
+      unknownTypeThrew = true;
+    }
+    ok(!unknownTypeThrew && received.length === beforeUnknownType,
+      'service : publish ignore silencieusement un type inconnu');
+
+    const beforeInvalidUpdates = received.length;
+    let invalidUpdateThrew = false;
+    const invalidApplications = [
+      null,
+      {},
+      { id: 0, listingId: 12 },
+      { id: 34, listingId: '12' },
+      { get id() { throw new Error('getter en panne'); }, listingId: 12 },
+    ];
+    for (const invalidApplication of invalidApplications) {
+      try {
+        realtimeService.publishApplicationUpdate(
+          invalidApplication,
+          realtimeService.EVENT_TYPES.APPLICATION_ACCEPTED
+        );
+      } catch {
+        invalidUpdateThrew = true;
+      }
+    }
+    ok(!invalidUpdateThrew && received.length === beforeInvalidUpdates,
+      'service : transition invalide ignoree sans exception ni diffusion');
+
+    const beforeUnsubscribe = received.length;
     unsubscribe();
     unsubscribe();
     realtimeService.publish(listingChannel, { type: 'application-created', applicationId: 35 });
-    ok(received.length === 1, 'service : desabonnement idempotent et definitif');
+    ok(received.length === beforeUnsubscribe, 'service : desabonnement idempotent et definitif');
 
     const byListing = [];
     const byApplication = [];
