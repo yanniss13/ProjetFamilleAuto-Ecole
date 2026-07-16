@@ -51,6 +51,69 @@ async function eventually(fn, tries = 50, delayMs = 10) {
   return false;
 }
 
+function makeJar() { return { cookie: '' }; }
+
+function storeCookies(jar, res) {
+  const values = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
+  for (const value of values) jar.cookie = value.split(';')[0];
+}
+
+async function req(jar, method, urlPath, { body, headers = {} } = {}) {
+  const res = await fetch(BASE + urlPath, {
+    method,
+    redirect: 'manual',
+    headers: { ...(jar.cookie ? { cookie: jar.cookie } : {}), ...headers },
+    body,
+  });
+  storeCookies(jar, res);
+  return {
+    status: res.status,
+    location: res.headers.get('location'),
+    headers: res.headers,
+    text: await res.text(),
+  };
+}
+
+function csrfFrom(html) {
+  const match = html.match(/name="csrf-token" content="([^"]+)"/);
+  if (!match) throw new Error('Jeton CSRF introuvable.');
+  return match[1];
+}
+
+function form(values) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(values)) params.append(key, value);
+  return { body: params.toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
+}
+
+function openSse(jar, urlPath) {
+  return new Promise((resolve, reject) => {
+    const request = http.get(BASE + urlPath, {
+      headers: {
+        accept: 'text/event-stream',
+        ...(jar.cookie ? { cookie: jar.cookie } : {}),
+      },
+    });
+    openSseRequests.add(request);
+    request.on('response', (response) => {
+      response.once('close', () => openSseRequests.delete(request));
+      let body = '';
+      response.setEncoding('utf8');
+      response.on('data', (chunk) => { body += chunk; });
+      response.on('error', reject);
+      const ready = async () => {
+        if (response.statusCode !== 200 || await eventually(() => body.includes(': connexion'))) {
+          resolve({ request, response, body: () => body });
+        } else {
+          reject(new Error('Flux SSE ouvert sans trame de connexion.'));
+        }
+      };
+      ready().catch(reject);
+    });
+    request.on('error', reject);
+  });
+}
+
 async function main() {
   let server;
   try {
@@ -170,6 +233,100 @@ async function main() {
     realtimeService._resetForTests();
     ok(realtimeService.subscriberCount(applicationChannel) === 0,
       'service : reset de test vide tous les canaux');
+
+    // --- 2. Garde ecole et transport SSE ---
+    const school = await prisma.school.create({
+      data: {
+        email: `m.school.${STAMP}@example.test`,
+        passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: 'M Ecole',
+        siret: `6${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    createdSchoolIds.push(school.id);
+    const listing = await prisma.listing.create({
+      data: {
+        title: `Lot M annonce ${STAMP}`,
+        description: 'Annonce de test temps reel',
+        city: 'Marseille',
+        department: '13',
+        schoolId: school.id,
+        titleLower: `lot m annonce ${STAMP}`,
+        descriptionLower: 'annonce de test temps reel',
+        cityLower: 'marseille',
+      },
+    });
+
+    let r = await req(makeJar(), 'GET', `/mes-annonces/${listing.id}/candidatures/temps-reel`, {
+      headers: { accept: 'text/event-stream' },
+    });
+    ok(r.status === 204, 'auth : flux ecole sans session -> 204 sans reconnexion');
+
+    r = await req(makeJar(), 'GET', `/mes-annonces/${listing.id}/candidatures/999/carte`, {
+      headers: { 'x-realtime-fragment': '1' },
+    });
+    ok(r.status === 401, 'auth : fragment ecole sans session -> 401');
+
+    r = await req(makeJar(), 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    ok(r.status === 302 && r.location === '/connexion',
+      'auth : navigation HTML sans session conserve la redirection');
+
+    const staleSchool = await prisma.school.create({
+      data: {
+        email: `m.stale.${STAMP}@example.test`,
+        passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: 'M Ecole supprimee',
+        siret: `4${String(STAMP).slice(-13).padStart(13, '0')}`,
+        emailVerified: true,
+      },
+    });
+    const staleJar = makeJar();
+    r = await req(staleJar, 'GET', '/connexion');
+    r = await req(staleJar, 'POST', '/connexion', form({
+      _csrf: csrfFrom(r.text), email: staleSchool.email, password: 'motdepasse123',
+    }));
+    await prisma.school.delete({ where: { id: staleSchool.id } });
+    r = await req(staleJar, 'GET', '/mes-annonces/999/candidatures/temps-reel', {
+      headers: { accept: 'text/event-stream' },
+    });
+    ok(r.status === 204, 'auth : ecole supprimee en session -> flux 204 apres destruction');
+
+    const schoolJar = makeJar();
+    r = await req(schoolJar, 'GET', '/connexion');
+    r = await req(schoolJar, 'POST', '/connexion', form({
+      _csrf: csrfFrom(r.text), email: school.email, password: 'motdepasse123',
+    }));
+    ok(r.status === 302, 'auth : connexion ecole pour le flux');
+
+    const stream = await openSse(schoolJar, `/mes-annonces/${listing.id}/candidatures/temps-reel`);
+    const channel = realtimeService.listingChannel(listing.id);
+    ok(stream.response.headers['content-type'].startsWith('text/event-stream')
+      && stream.response.headers['cache-control'] === 'no-store'
+      && stream.response.headers['x-accel-buffering'] === 'no',
+    'sse : en-tetes anti-cache et anti-buffering');
+    ok(stream.body().includes('retry: 5000') && realtimeService.subscriberCount(channel) === 1,
+      'sse : delai de reconnexion et abonnement actif');
+    ok(await eventually(() => stream.body().includes(': heartbeat')),
+      'sse : heartbeat emis pendant la connexion');
+
+    stream.request.destroy();
+    ok(await eventually(() => realtimeService.subscriberCount(channel) === 0),
+      'sse : coupure cliente libere l abonnement');
+    realtimeService.publish(channel, { type: 'application-created', applicationId: 999 });
+    ok(realtimeService.subscriberCount(channel) === 0,
+      'sse : publication apres close ne ressuscite pas le callback');
+
+    const previousMaxConnection = process.env.REALTIME_MAX_CONNECTION_MS;
+    process.env.REALTIME_MAX_CONNECTION_MS = '140';
+    try {
+      const timedStream = await openSse(schoolJar, `/mes-annonces/${listing.id}/candidatures/temps-reel`);
+      ok(await eventually(() => timedStream.response.complete, 50, 10)
+        && realtimeService.subscriberCount(channel) === 0,
+      'sse : duree maximale de test ferme et nettoie le flux');
+    } finally {
+      process.env.REALTIME_MAX_CONNECTION_MS = previousMaxConnection;
+    }
 
     console.log(`\n✅ Lot M tests reussis - ${passed} assertions.`);
   } finally {
