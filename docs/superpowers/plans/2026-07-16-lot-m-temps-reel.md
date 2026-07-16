@@ -67,7 +67,7 @@
 - Consumes: identifiants numériques Prisma `Listing.id` et `Application.id`.
 - Produces: `EVENT_TYPES`, `listingChannel(id)`, `applicationChannel(id)`, `subscribe(channel, callback)`, `publish(channel, event)`, `publishApplicationUpdate(application, type)`, `subscriberCount(channel)`, `_resetForTests()`.
 
-- [ ] **Step 1: Vérifier la précondition de worktree**
+- [x] **Step 1: Vérifier la précondition de worktree**
 
 Run:
 
@@ -77,7 +77,7 @@ git status --short
 
 Expected: aucun changement non commité dans les cinq fichiers signalés par les contraintes globales. S'ils sont encore modifiés, arrêter l'exécution et demander une décision ; le plan lui-même peut rester commité.
 
-- [ ] **Step 2: Écrire le harnais et les assertions RED du service**
+- [x] **Step 2: Écrire le harnais et les assertions RED du service**
 
 Créer `test/lot-m.cjs` avec l'en-tête, les helpers et cette première section :
 
@@ -215,7 +215,7 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 3: Exécuter le test et constater l'échec**
+- [x] **Step 3: Exécuter le test et constater l'échec**
 
 Run:
 
@@ -225,7 +225,7 @@ Run:
 
 Expected: FAIL avec `Cannot find module '../src/services/realtimeService'`.
 
-- [ ] **Step 4: Implémenter le service minimal complet**
+- [x] **Step 4: Implémenter le service minimal complet**
 
 Créer `src/services/realtimeService.js` :
 
@@ -321,7 +321,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 5: Exécuter le test du lot**
+- [x] **Step 5: Exécuter le test du lot**
 
 Run:
 
@@ -331,7 +331,7 @@ Run:
 
 Expected: sortie 0 et toutes les assertions de la section « Registre mémoire » vertes.
 
-- [ ] **Step 6: Commit ciblé**
+- [x] **Step 6: Commit ciblé**
 
 ```powershell
 git add -- src/services/realtimeService.js test/lot-m.cjs
@@ -354,7 +354,7 @@ git commit -m "M: ajouter le registre temps reel en memoire"
 - Consumes: `realtimeService.listingChannel(id)`, `subscribe`, `listingService.findOwnedById(schoolId, id)`, `req.school` fourni par `loadSchool`.
 - Produces: `realtimeAuthResponse.respond(req, res): boolean`, `realtimeController.openStream(req, res, channel)`, `realtimeController.schoolStream(req, res, next)`.
 
-- [ ] **Step 1: Ajouter les helpers HTTP/SSE au harnais**
+- [x] **Step 1: Ajouter les helpers HTTP/SSE au harnais**
 
 Ajouter avant `main()` dans `test/lot-m.cjs` :
 
@@ -423,7 +423,7 @@ function openSse(jar, urlPath) {
 }
 ```
 
-- [ ] **Step 2: Écrire les assertions RED HTTP et nettoyage**
+- [x] **Step 2: Écrire les assertions RED HTTP et nettoyage**
 
 Dans `main()`, après la section service, créer une école et une annonce puis ajouter :
 
@@ -523,7 +523,7 @@ Dans `main()`, après la section service, créer une école et une annonce puis 
     }
 ```
 
-- [ ] **Step 3: Exécuter et observer l'échec de route**
+- [x] **Step 3: Exécuter et observer l'échec de route**
 
 Run:
 
@@ -533,7 +533,7 @@ Run:
 
 Expected: FAIL, la requête SSE authentifiée obtient 404 ou la première assertion 204 obtient encore la redirection actuelle.
 
-- [ ] **Step 4: Créer la réponse d'authentification spécialisée**
+- [x] **Step 4: Créer la réponse d'authentification spécialisée**
 
 Créer `src/middlewares/realtimeAuthResponse.js` :
 
@@ -603,7 +603,7 @@ module.exports = async function loadSchool(req, res, next) {
 };
 ```
 
-- [ ] **Step 5: Créer le transport SSE et la route école**
+- [x] **Step 5: Créer le transport SSE et la route école**
 
 Créer `src/controllers/realtimeController.js` :
 
@@ -684,7 +684,7 @@ router.get('/:id/candidatures', applicationController.forListing);
 router.get('/:id/candidatures/temps-reel', realtimeController.schoolStream);
 ```
 
-- [ ] **Step 6: Rejouer les tests ciblés puis les gardes existantes**
+- [x] **Step 6: Rejouer les tests ciblés puis les gardes existantes**
 
 Run:
 
@@ -695,7 +695,7 @@ Run:
 
 Expected: deux sorties 0 ; le Lot M prouve heartbeat/close/204, et les redirections/cloisonnements existants restent verts.
 
-- [ ] **Step 7: Commit ciblé**
+- [x] **Step 7: Commit ciblé**
 
 ```powershell
 git add -- src/middlewares/realtimeAuthResponse.js src/middlewares/requireAuth.js src/middlewares/loadSchool.js src/controllers/realtimeController.js src/routes/manageRoutes.js test/lot-m.cjs
@@ -719,7 +719,7 @@ git commit -m "M: securiser et borner les flux SSE ecole"
 - Consumes: `req.session.realtimeApplicationIds: number[]`, `applicationService.findByIdForTracking(id)`.
 - Produces: `bindRealtimeApplication(req, id): Promise<void>`, `candidateStream`, `candidateFragment`, partial racine `[data-tracking-status]`.
 
-- [ ] **Step 1: Écrire les assertions RED candidat**
+- [x] **Step 1: Écrire les assertions RED candidat**
 
 Ajouter après la section SSE école :
 
@@ -802,7 +802,7 @@ Puis tester l'expiration :
     ok(r.status === 204, 'candidat : session expiree -> flux terminal 204');
 ```
 
-- [ ] **Step 2: Exécuter et observer l'échec**
+- [x] **Step 2: Exécuter et observer l'échec**
 
 Run:
 
@@ -812,7 +812,7 @@ Run:
 
 Expected: FAIL, la page de suivi ne contient pas les URLs temps réel ou les nouvelles routes renvoient 404.
 
-- [ ] **Step 3: Ajouter la lecture Prisma autorisée par identifiant**
+- [x] **Step 3: Ajouter la lecture Prisma autorisée par identifiant**
 
 Dans `applicationService.js`, ajouter sans toucher à `ensureTrackingToken` déjà présent :
 
@@ -839,7 +839,7 @@ module.exports = {
 };
 ```
 
-- [ ] **Step 4: Lier et sauvegarder les cinq identifiants récents**
+- [x] **Step 4: Lier et sauvegarder les cinq identifiants récents**
 
 Remplacer `trackingController.js` par :
 
@@ -882,7 +882,7 @@ async function show(req, res, next) {
 module.exports = { show, bindRealtimeApplication };
 ```
 
-- [ ] **Step 5: Extraire le partial candidat**
+- [x] **Step 5: Extraire le partial candidat**
 
 Créer `views/tracking/_status.twig` en déplaçant sans reformuler le bloc de statut actuel :
 
@@ -945,7 +945,7 @@ Réduire `views/tracking/show.twig` au contenu fixe et aux données de connexion
 {% endblock %}
 ```
 
-- [ ] **Step 6: Ajouter les endpoints candidat avant `/:token`**
+- [x] **Step 6: Ajouter les endpoints candidat avant `/:token`**
 
 Étendre `realtimeController.js` :
 
@@ -999,7 +999,7 @@ router.get('/fragment/:applicationId', realtimeController.candidateFragment);
 router.get('/:token', trackingController.show);
 ```
 
-- [ ] **Step 7: Rejouer les tests Lot M et Lot B/G**
+- [x] **Step 7: Rejouer les tests Lot M et Lot B/G**
 
 Run:
 
@@ -1011,7 +1011,7 @@ Run:
 
 Expected: trois sorties 0 ; le suivi opaque et la signature existante ne régressent pas.
 
-- [ ] **Step 8: Commit ciblé**
+- [x] **Step 8: Commit ciblé**
 
 ```powershell
 git add -- src/services/applicationService.js src/controllers/trackingController.js src/controllers/realtimeController.js src/routes/trackingRoutes.js views/tracking/show.twig views/tracking/_status.twig test/lot-m.cjs
@@ -1035,7 +1035,7 @@ git commit -m "M: autoriser le suivi candidat temps reel par session"
 - Consumes: `applicationService.findOwnedById(schoolId, applicationId)` et `pagination.page` du contrôleur existant.
 - Produces: `schoolCard(req, res, next)`, racines `[data-application-card]`, `[data-application-region]`, `[data-realtime-status]`, contexte école avec `data-realtime-snapshot-url` et `data-realtime-card-url-template`.
 
-- [ ] **Step 1: Écrire les assertions RED de rendu et d'isolation**
+- [x] **Step 1: Écrire les assertions RED de rendu et d'isolation**
 
 Ajouter dans `test/lot-m.cjs` :
 
@@ -1104,7 +1104,7 @@ Ajouter dans `test/lot-m.cjs` :
     'vues : suivi contient l indicateur mais le script sera branche en Tache 6');
 ```
 
-- [ ] **Step 2: Exécuter et observer l'échec**
+- [x] **Step 2: Exécuter et observer l'échec**
 
 Run:
 
@@ -1114,7 +1114,7 @@ Run:
 
 Expected: FAIL, absence de `data-realtime-context`, de l'indicateur ou route carte en 404.
 
-- [ ] **Step 3: Créer le partial d'état accessible**
+- [x] **Step 3: Créer le partial d'état accessible**
 
 Créer `views/partials/realtime-status.twig` :
 
@@ -1134,7 +1134,7 @@ Créer `views/partials/realtime-status.twig` :
 
 Le texte « Actualisation en direct » sera posé par JavaScript à l'ouverture ; l'assertion comportementale correspondante sera ajoutée à la Tâche 6.
 
-- [ ] **Step 4: Extraire la carte école sans duplication**
+- [x] **Step 4: Extraire la carte école sans duplication**
 
 Créer `views/dashboard/_application-card.twig` :
 
@@ -1198,7 +1198,7 @@ Créer `views/dashboard/_application-card.twig` :
 </li>
 ```
 
-- [ ] **Step 5: Réécrire la vue liste autour d'une région remplaçable**
+- [x] **Step 5: Réécrire la vue liste autour d'une région remplaçable**
 
 Remplacer le corps de `views/dashboard/applications.twig` par :
 
@@ -1248,7 +1248,7 @@ Dans `views/tracking/show.twig`, inclure le même indicateur juste avant `_statu
     {% include 'tracking/_status.twig' %}
 ```
 
-- [ ] **Step 6: Ajouter le fragment carte et sa route `:id`**
+- [x] **Step 6: Ajouter le fragment carte et sa route `:id`**
 
 Dans `realtimeController.js` :
 
@@ -1285,7 +1285,7 @@ router.get('/:id/candidatures/:applicationId/carte', realtimeController.schoolCa
 router.get('/:id/candidatures/:appId/cv', applicationController.downloadCv);
 ```
 
-- [ ] **Step 7: Rejouer Lot M et les vues historiques**
+- [x] **Step 7: Rejouer Lot M et les vues historiques**
 
 Run:
 
@@ -1297,7 +1297,7 @@ Run:
 
 Expected: trois sorties 0 ; cartes, contrats et formulaires CSRF restent présents.
 
-- [ ] **Step 8: Commit ciblé**
+- [x] **Step 8: Commit ciblé**
 
 ```powershell
 git add -- views/partials/realtime-status.twig views/dashboard/_application-card.twig views/dashboard/applications.twig views/tracking/show.twig src/controllers/realtimeController.js src/routes/manageRoutes.js test/lot-m.cjs
@@ -1318,7 +1318,7 @@ git commit -m "M: extraire les fragments candidat et ecole"
 - Consumes: `realtimeService.publishApplicationUpdate(application, realtimeService.EVENT_TYPES.*)`.
 - Produces: événements `application-created`, `application-accepted`, `application-rejected`, `contract-sent`, `contract-signed`, toujours après la mutation Prisma correspondante.
 
-- [ ] **Step 1: Ajouter les fixtures binaires et formulaires au test**
+- [x] **Step 1: Ajouter les fixtures binaires et formulaires au test**
 
 Ajouter avant `main()` :
 
@@ -1364,7 +1364,7 @@ async function waitForSse(stream, type) {
 }
 ```
 
-- [ ] **Step 2: Écrire le scénario RED de bout en bout**
+- [x] **Step 2: Écrire le scénario RED de bout en bout**
 
 Ajouter dans `main()` en conservant `schoolJar` et `listing` :
 
@@ -1465,7 +1465,7 @@ Ajouter dans `main()` en conservant `schoolJar` et `listing` :
     rejectedEvents.request.destroy();
 ```
 
-- [ ] **Step 3: Exécuter et vérifier l'absence d'événements**
+- [x] **Step 3: Exécuter et vérifier l'absence d'événements**
 
 Run:
 
@@ -1475,7 +1475,7 @@ Run:
 
 Expected: FAIL sur `depot persiste puis notifie`, car aucun contrôleur ne publie encore.
 
-- [ ] **Step 4: Publier la création après `createForListing`**
+- [x] **Step 4: Publier la création après `createForListing`**
 
 Dans `applicationController.js`, importer l'objet puis conserver le résultat créé :
 
@@ -1498,7 +1498,7 @@ realtimeService.publishApplicationUpdate(
 
 Garder ensuite les emails et la redirection actuels.
 
-- [ ] **Step 5: Publier acceptation, refus et invitation**
+- [x] **Step 5: Publier acceptation, refus et invitation**
 
 Dans `contractController.js`, importer l'objet et ajouter exactement après les écritures réussies :
 
@@ -1526,7 +1526,7 @@ realtimeService.publishApplicationUpdate(
 
 Ne pas déplacer ni supprimer le correctif `ensureTrackingToken` déjà présent dans `sendContract`.
 
-- [ ] **Step 6: Publier le contreseing avant les emails best-effort**
+- [x] **Step 6: Publier le contreseing avant les emails best-effort**
 
 Dans `signatureController.js`, importer l'objet et ajouter après `contractService.signByApplicant` :
 
@@ -1539,7 +1539,7 @@ realtimeService.publishApplicationUpdate(
 
 Les deux emails restent ensuite dans leur `Promise.all` actuel : leur latence n'empêche pas l'écran école de recevoir le signal.
 
-- [ ] **Step 7: Rejouer le workflow et les lots métier concernés**
+- [x] **Step 7: Rejouer le workflow et les lots métier concernés**
 
 Run:
 
@@ -1552,7 +1552,7 @@ Run:
 
 Expected: quatre sorties 0 ; statuts, signatures, emails et `rejectedAt` restent verts.
 
-- [ ] **Step 8: Commit ciblé**
+- [x] **Step 8: Commit ciblé**
 
 ```powershell
 git add -- src/controllers/applicationController.js src/controllers/contractController.js src/controllers/signatureController.js test/lot-m.cjs
@@ -1574,7 +1574,7 @@ git commit -m "M: publier les transitions de candidature et contrat"
 - Consumes: attributs `data-realtime-*`, événements SSE `invalidate`, fragments `[data-tracking-status]`, `[data-application-region]`, `[data-application-card]`.
 - Produces: `initRealtime(doc, win, fetchImpl, EventSourceCtor, ParserCtor)`, `startRealtime(context, doc, win, fetchImpl, EventSourceCtor, ParserCtor)`, états `live|connecting|unavailable`, fetch avec `X-Realtime-Fragment: 1`, aucun timer de reconnexion applicatif.
 
-- [ ] **Step 1: Ajouter un faux navigateur et les assertions RED**
+- [x] **Step 1: Ajouter un faux navigateur et les assertions RED**
 
 Ajouter avant `main()` dans `test/lot-m.cjs` :
 
@@ -1748,7 +1748,7 @@ Ajouter la section suivante dans `main()` :
       'structure : page ecole respecte la CSP sans script inline');
 ```
 
-- [ ] **Step 2: Exécuter et voir l'échec de fichier**
+- [x] **Step 2: Exécuter et voir l'échec de fichier**
 
 Run:
 
@@ -1758,7 +1758,7 @@ Run:
 
 Expected: FAIL avec le code `ENOENT` et un chemin se terminant par `public/js/realtime.js`.
 
-- [ ] **Step 3: Implémenter le client navigateur complet**
+- [x] **Step 3: Implémenter le client navigateur complet**
 
 Créer `public/js/realtime.js` :
 
@@ -1947,7 +1947,7 @@ Créer `public/js/realtime.js` :
 })();
 ```
 
-- [ ] **Step 4: Brancher uniquement le script externe**
+- [x] **Step 4: Brancher uniquement le script externe**
 
 Ajouter à la fin de `views/tracking/show.twig` et `views/dashboard/applications.twig` :
 
@@ -1959,7 +1959,7 @@ Ajouter à la fin de `views/tracking/show.twig` et `views/dashboard/applications
 
 Mettre à jour l'assertion temporaire de la Tâche 4 : le suivi doit maintenant contenir `/js/realtime.js`.
 
-- [ ] **Step 5: Ajouter les styles visibles et accessibles**
+- [x] **Step 5: Ajouter les styles visibles et accessibles**
 
 Ajouter près des styles de candidatures dans `public/css/style.css` :
 
@@ -2001,7 +2001,7 @@ Ajouter près des styles de candidatures dans `public/css/style.css` :
 }
 ```
 
-- [ ] **Step 6: Exécuter les tests Node et le contrôle CSP**
+- [x] **Step 6: Exécuter les tests Node et le contrôle CSP**
 
 Run:
 
@@ -2013,7 +2013,7 @@ Run:
 
 Expected: trois sorties 0. Le test `vm` prouve la machine d'état simulée ; il ne doit pas être présenté comme un test de focus ou d'EventSource dans un vrai navigateur.
 
-- [ ] **Step 7: Commit ciblé**
+- [x] **Step 7: Commit ciblé**
 
 ```powershell
 git add -- public/js/realtime.js public/css/style.css views/tracking/show.twig views/dashboard/applications.twig test/lot-m.cjs
@@ -2033,7 +2033,7 @@ git commit -m "M: actualiser les candidatures dans le navigateur"
 - Consumes: première candidature vitrine `v === 0`, déjà `pending` et située sur une annonce ouverte.
 - Produces: `realtimeTrackingToken`, `realtimeApplicationId`, `realtimeListingId` dans le résultat du seed, `DEMO_BASE_URL` optionnelle pour imprimer une URL LAN.
 
-- [ ] **Step 1: Écrire le test RED du dossier temps réel**
+- [x] **Step 1: Écrire le test RED du dossier temps réel**
 
 Dans `test/lot-k.cjs`, après le contrôle du contrat signé :
 
@@ -2054,7 +2054,7 @@ Dans `test/lot-k.cjs`, après le contrôle du contrat signé :
       'seed : suivi temps reel pret a ouvrir sur le telephone');
 ```
 
-- [ ] **Step 2: Exécuter et constater l'échec**
+- [x] **Step 2: Exécuter et constater l'échec**
 
 Run:
 
@@ -2064,7 +2064,7 @@ Run:
 
 Expected: FAIL car `realtimeApplicationId` et `realtimeTrackingToken` sont absents.
 
-- [ ] **Step 3: Exposer la candidature pending existante**
+- [x] **Step 3: Exposer la candidature pending existante**
 
 Dans `scripts/seed-demo.js`, initialiser et capturer la première candidature vitrine :
 
@@ -2097,7 +2097,7 @@ Dans la boucle existante, juste après l'appel à `creeCandidature`, utiliser ce
   };
 ```
 
-- [ ] **Step 4: Imprimer des URLs utilisables sur le LAN**
+- [x] **Step 4: Imprimer des URLs utilisables sur le LAN**
 
 Dans `runCli()`, remplacer les URLs en dur par une base nettoyée :
 
@@ -2114,7 +2114,7 @@ Dans `runCli()`, remplacer les URLs en dur par une base nettoyée :
 
 `DEMO_BASE_URL` ne change aucune donnée ; il formate seulement les liens affichés.
 
-- [ ] **Step 5: Rejouer le seed deux fois**
+- [x] **Step 5: Rejouer le seed deux fois**
 
 Run:
 
@@ -2124,7 +2124,7 @@ Run:
 
 Expected: sortie 0 ; relance idempotente, volumes inchangés, dossier signé et dossier temps réel accessibles.
 
-- [ ] **Step 6: Commit ciblé**
+- [x] **Step 6: Commit ciblé**
 
 ```powershell
 git add -- scripts/seed-demo.js test/lot-k.cjs

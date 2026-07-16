@@ -31,7 +31,8 @@ on ne saisit en direct que ce qui a de la valeur devant le jury.
 - démarrer le serveur, puis exécuter le seed avec
   `DEMO_BASE_URL` réglée sur l'adresse IPv4 LAN du PC et le port 3000 ;
 - ouvrir sur le téléphone l'URL « Suivi candidat (temps réel, en attente) » ;
-- ouvrir sur le PC la liste des candidatures de l'annonce correspondante ;
+- ouvrir sur le PC la liste des candidatures de l'annonce correspondante et
+  repérer « Julien Martin — dossier temps réel du seed » ;
 - conserver deux onglets PC comme scénario de secours si le réseau local refuse
   le téléphone.
 
@@ -45,9 +46,9 @@ on ne saisit en direct que ce qui a de la valeur devant le jury.
 | 16:15 | même page | Dérouler le formulaire de candidature, joindre les 4 pièces, envoyer | « Aucun compte moniteur : c'est le choix produit central. Les fichiers sont contrôlés par contenu, pas par extension. » | Formulaires, uploads |
 | 17:30 | Mailpit | Ouvrir l'email de confirmation, cliquer le lien de suivi | « Le candidat suit son dossier par un jeton opaque — la page n'expose aucune donnée personnelle. » | Emails, RGPD |
 | 18:15 | `/connexion` | Connexion école vitrine → candidatures de l'annonce | « Toute requête de gestion est scopée par l'école : une autre école recevrait 404. » | Auth, droits |
-| 19:00 | candidature fraîche | Accepter : remplir le contrat, **dessiner la signature au pad**, valider | « Le téléphone candidat vient de passer à Acceptée sans actualisation ; le serveur n'a envoyé qu'un signal, puis la page a relu l'état autorisé en base. » | Métier, temps réel |
-| 20:30 | même écran | Envoyer l'invitation à signer | « Le PDF est horodaté et son empreinte SHA-256 est calculée ; l'email reste le canal durable. » | Workflow, PDF, crypto |
-| 21:00 | suivi candidat | Cocher l'acceptation, signer et valider ; montrer le badge « Contrat signé » apparaître côté école | « Le PDF final porte les deux signatures et une nouvelle empreinte. » | Signature, sécurité, temps réel |
+| 19:00 | Julien Martin — dossier temps réel du seed | Sélectionner ce dossier, accepter : remplir le contrat, **dessiner la signature au pad**, valider | « Le téléphone candidat vient de passer à Acceptée sans actualisation ; le serveur n'a envoyé qu'un signal, puis la page a relu l'état autorisé en base. » | Métier, temps réel |
+| 20:30 | même dossier Julien Martin | Envoyer l'invitation à signer | « Le PDF est horodaté et son empreinte SHA-256 est calculée ; l'email reste le canal durable. » | Workflow, PDF, crypto |
+| 21:00 | suivi candidat de Julien Martin | Cocher l'acceptation, signer et valider ; montrer le badge « Contrat signé » apparaître côté école | « Le PDF final porte les deux signatures et une nouvelle empreinte. » | Signature, sécurité, temps réel |
 | 22:30 | page de suivi | Télécharger le PDF final signé, montrer la page des signatures | « Horodatages et empreintes des deux versions : le dossier est traçable de bout en bout. » | Sorties |
 | 23:00 | `/tableau-de-bord` | Faire défiler tuiles, barres, entonnoir | « Statistiques calculées serveur, SVG construits en DOM — zéro bibliothèque de graphiques. » | Dashboard |
 | 23:45 | `/admin` | Connexion admin, montrer stats plateforme puis **« Lancer une purge maintenant »** | « L'alerte jamais confirmée du jeu de démo vient d'être supprimée : la purge RGPD est journalisée — voici le compteur. » | Admin, RGPD |
