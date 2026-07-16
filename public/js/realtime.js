@@ -212,7 +212,19 @@
         });
       }
     });
-    win.addEventListener('pagehide', closeSource);
+    function handlePagehide() {
+      closeSource();
+    }
+
+    function handlePageshow(event) {
+      if (!event || event.persisted !== true) return;
+      win.removeEventListener('pagehide', handlePagehide);
+      win.removeEventListener('pageshow', handlePageshow);
+      startRealtime(context, doc, win, fetchImpl, EventSourceCtor, ParserCtor);
+    }
+
+    win.addEventListener('pagehide', handlePagehide);
+    win.addEventListener('pageshow', handlePageshow);
     return source;
   }
 
