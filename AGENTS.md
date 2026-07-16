@@ -25,7 +25,7 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   être sauté si l'environnement ne permet vraiment pas de l'exécuter.
 - `npm run dev` — serveur en watch (http://localhost:3000). Nécessite un `.env` avec
   `SESSION_SECRET` et `DATABASE_URL="file:./prisma/dev.db"` (fail-fast sinon).
-- `npm test` — suite complète (15 fichiers `.cjs`, 448 assertions). TOUJOURS la lancer
+- `npm test` — suite complète (16 fichiers `.cjs`, 546 assertions). TOUJOURS la lancer
   avant de commiter.
 - `npm run admin:create -- <email> <motdepasse>` — crée/maj un admin.
 - `npm run purge` — purge RGPD à la demande (sinon : automatique, 30 s après le
@@ -70,6 +70,10 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   30/min/IP), service cache 10 min jamais bloquant, datalist navigateur sur les
   champs `address` d'inscription et de profil. Tests : `test/lot-l.cjs` (port
   4070, 20 assertions).
+- **Lot M (suivi des candidatures en temps réel) : LIVRÉ** — SSE natifs, canaux
+  isolés par annonce/candidature, rattrapage après reconnexion, session candidat
+  sans jeton dans les URLs du flux, arrêt 204 à expiration, fragments Twig et
+  repli sans JavaScript. Tests : `test/lot-m.cjs` (port 4072).
 - **Préparation jury DWWM (mise à jour 2026-07-10)** : trois chantiers livrés
   — consolidation, conformité visible et script de soutenance (deck 28 diapos
   `docs/jury/soutenance/soutenance.html`, démo minutée, 26 Q/R, deux
@@ -80,8 +84,8 @@ devant un jury : la priorité est la feuille de route « features démo » ci-de
   composition mobile implémentés en TDD, `captures-jury.js` et
   `conformite-jury.js` sur le viewport visuel exact, puis **preuves finales
   régénérées le 2026-07-11** — W3C 0/0, axe 0 violation, débordement 0/60,
-  45 captures exactes. **Plus aucun chantier jury planifié côté agent.** Point
-  de reprise : `docs/jury/README.md`. ⚠️ Pièges :
+  45 captures exactes. Cette préparation initiale a ensuite été complétée par
+  le Lot M le 2026-07-16. Point de reprise : `docs/jury/README.md`. ⚠️ Pièges :
   redémarrer le serveur après toute modif de vue (cache Twig) ; seeder
   APRÈS le démarrage du serveur (la purge auto consomme l'alerte de démo
   30 s après le boot). Les documents de juin sous `docs/historique/2026-06/`
