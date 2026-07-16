@@ -258,6 +258,90 @@ function installTransitionOrderProbe() {
   };
 }
 
+function makeRealtimeDom({ mode = 'candidate', focused = false, page = '1' } = {}) {
+  const statusText = { textContent: '' };
+  const status = {
+    hidden: true,
+    attrs: {},
+    setAttribute(name, value) { this.attrs[name] = String(value); },
+    querySelector(selector) { return selector === '[data-realtime-status-text]' ? statusText : null; },
+  };
+  const announcement = { textContent: '' };
+  const update = { hidden: true };
+  const current = {
+    replacements: 0,
+    contains() { return focused; },
+    replaceWith() { this.replacements += 1; },
+  };
+  const list = {
+    prepended: 0,
+    prepend() { this.prepended += 1; },
+  };
+  const empty = { removed: false, remove() { this.removed = true; } };
+  const attrs = {
+    'data-realtime-mode': mode,
+    'data-realtime-page': page,
+    'data-realtime-stream-url': '/flux-sans-jeton',
+    'data-realtime-snapshot-url': '/fragment-sans-jeton',
+    'data-realtime-card-url-template': '/cartes/__APPLICATION_ID__',
+  };
+  const context = {
+    getAttribute(name) { return attrs[name] || null; },
+    querySelector(selector) {
+      if (selector === '[data-realtime-status]') return status;
+      if (selector === '[data-realtime-announcement]') return announcement;
+      if (selector === '[data-realtime-update]') return update;
+      if (selector === '[data-tracking-status]' && mode === 'candidate') return current;
+      if (selector === '[data-application-region]' && mode === 'school') return current;
+      if (selector === '[data-application-list]') return list;
+      if (selector === '[data-application-empty]') return empty;
+      return null;
+    },
+  };
+  const document = {
+    activeElement: focused ? {} : null,
+    body: {},
+    querySelectorAll(selector) { return selector === '[data-realtime-context]' ? [context] : []; },
+    importNode(node) { return node; },
+  };
+  return { document, context, status, statusText, announcement, update, current, list, empty };
+}
+
+function loadRealtimeScript(dom, fetchImpl) {
+  const sources = [];
+  class FakeEventSource {
+    constructor(url) {
+      this.url = url;
+      this.readyState = 0;
+      this.listeners = {};
+      this.closed = false;
+      sources.push(this);
+    }
+    addEventListener(name, callback) { this.listeners[name] = callback; }
+    close() { this.closed = true; this.readyState = 2; }
+    open() { this.readyState = 1; if (this.onopen) this.onopen(); }
+    error(state) { this.readyState = state; if (this.onerror) this.onerror(); }
+    invalidate(payload) {
+      if (this.listeners.invalidate) this.listeners.invalidate({ data: JSON.stringify(payload) });
+    }
+  }
+  class FakeDOMParser {
+    parseFromString() {
+      const node = { querySelector() { return null; } };
+      return { querySelector() { return node; } };
+    }
+  }
+  const module = { exports: {} };
+  const win = {
+    addEventListener() {},
+    AbortController,
+  };
+  const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'realtime.js'), 'utf8');
+  vm.runInNewContext(script, { module, document: undefined, window: undefined, console });
+  module.exports.initRealtime(dom.document, win, fetchImpl, FakeEventSource, FakeDOMParser);
+  return { api: module.exports, sources };
+}
+
 async function main() {
   let server;
   let transitionOrderProbe;
@@ -596,8 +680,8 @@ async function main() {
     r = await req(makeJar(), 'GET', `/suivi/${displayedApplication.trackingToken}`);
     ok(r.text.includes('data-realtime-status')
       && r.text.includes('Reconnexion en cours')
-      && r.text.includes('/js/realtime.js') === false,
-    'vues : suivi contient l indicateur mais le script sera branche en Tache 6');
+      && r.text.includes('/js/realtime.js'),
+    'vues : suivi contient l indicateur et charge le client temps reel');
 
     // --- 5. Publications après les écritures métier ---
     transitionOrderProbe = installTransitionOrderProbe();
@@ -720,6 +804,119 @@ async function main() {
       rejectedApplication.id,
       realtimeService.EVENT_TYPES.APPLICATION_REJECTED
     ), 'ordre : application-rejected publiee apres statut et rejectedAt persistes');
+
+    // --- 6. Simulation Node du client, sans prétendre couvrir un vrai navigateur ---
+    const browserCalls = [];
+    const candidateDom = makeRealtimeDom();
+    const candidateBrowser = loadRealtimeScript(candidateDom, async (url, options) => {
+      browserCalls.push({ url, options });
+      return { ok: true, status: 200, redirected: false, text: async () => '<section></section>' };
+    });
+    ok(candidateBrowser.sources.length === 1
+      && candidateBrowser.sources[0].url === '/flux-sans-jeton',
+    'js vm : un seul EventSource ouvert sur l URL sans jeton');
+
+    const duplicateDom = makeRealtimeDom();
+    duplicateDom.document.querySelectorAll = function queryDuplicateContexts(selector) {
+      return selector === '[data-realtime-context]'
+        ? [duplicateDom.context, duplicateDom.context]
+        : [];
+    };
+    const duplicateBrowser = loadRealtimeScript(duplicateDom, async () => ({
+      ok: true, status: 200, redirected: false, text: async () => '<section></section>',
+    }));
+    ok(duplicateBrowser.sources.length === 1,
+      'js vm : un seul EventSource maximum est cree par page');
+
+    candidateBrowser.sources[0].open();
+    ok(await eventually(() => browserCalls.length === 1)
+      && browserCalls[0].options.headers['X-Realtime-Fragment'] === '1'
+      && candidateDom.statusText.textContent === 'Actualisation en direct',
+    'js vm : open actualise le fragment et l indicateur');
+    candidateBrowser.sources[0].open();
+    ok(await eventually(() => browserCalls.length === 2),
+      'js vm : chaque reconnexion rattrape l etat courant');
+
+    candidateBrowser.sources[0].error(0);
+    ok(candidateDom.statusText.textContent === 'Reconnexion en cours',
+      'js vm : coupure recuperable annonce la reconnexion');
+    candidateBrowser.sources[0].error(2);
+    ok(candidateDom.statusText.textContent.includes('Temps réel indisponible')
+      && candidateBrowser.sources[0].closed,
+    'js vm : etat terminal ferme la source sans boucle maison');
+
+    let unauthorizedCalls = 0;
+    const unauthorizedDom = makeRealtimeDom();
+    const unauthorizedBrowser = loadRealtimeScript(unauthorizedDom, async () => {
+      unauthorizedCalls += 1;
+      return { ok: false, status: 401, redirected: false, text: async () => '' };
+    });
+    unauthorizedBrowser.sources[0].open();
+    ok(await eventually(() => unauthorizedBrowser.sources[0].closed)
+      && unauthorizedCalls === 1
+      && unauthorizedDom.statusText.textContent.includes('Temps réel indisponible'),
+    'js vm : fragment 401 provoque un arret unique et explicite');
+
+    let forbiddenCalls = 0;
+    const forbiddenDom = makeRealtimeDom();
+    const forbiddenBrowser = loadRealtimeScript(forbiddenDom, async () => {
+      forbiddenCalls += 1;
+      return { ok: false, status: 403, redirected: false, text: async () => '' };
+    });
+    forbiddenBrowser.sources[0].open();
+    ok(await eventually(() => forbiddenBrowser.sources[0].closed)
+      && forbiddenCalls === 1
+      && forbiddenDom.statusText.textContent.includes('Temps réel indisponible'),
+    'js vm : fragment 403 provoque un arret unique et explicite');
+
+    const failedFragmentDom = makeRealtimeDom();
+    const failedFragmentBrowser = loadRealtimeScript(failedFragmentDom, async () => ({
+      ok: false, status: 500, redirected: false, text: async () => '',
+    }));
+    failedFragmentBrowser.sources[0].open();
+    ok(await eventually(() => failedFragmentBrowser.sources[0].closed)
+      && failedFragmentDom.statusText.textContent.includes('Temps réel indisponible'),
+    'js vm : echec terminal du fragment ferme la source');
+
+    const focusDom = makeRealtimeDom({ focused: true });
+    const focusBrowser = loadRealtimeScript(focusDom, async () => ({
+      ok: true, status: 200, redirected: false, text: async () => '<section></section>',
+    }));
+    focusBrowser.sources[0].open();
+    ok(await eventually(() => focusDom.update.hidden === false)
+      && focusDom.current.replacements === 0,
+    'js vm : cible focalisee non remplacee, bandeau d actualisation affiche');
+
+    const schoolDom = makeRealtimeDom({ mode: 'school' });
+    const schoolBrowser = loadRealtimeScript(schoolDom, async () => ({
+      ok: true, status: 200, redirected: false, text: async () => '<li></li>',
+    }));
+    schoolBrowser.sources[0].open();
+    await eventually(() => schoolDom.current.replacements === 1);
+    schoolBrowser.sources[0].invalidate({ type: 'application-created', applicationId: 987 });
+    ok(await eventually(() => schoolDom.list.prepended === 1)
+      && schoolDom.update.hidden === false,
+    'js vm : nouvelle candidature inseree en page 1 avec invitation a rafraichir');
+
+    const secondPageDom = makeRealtimeDom({ mode: 'school', page: '2' });
+    const secondPageBrowser = loadRealtimeScript(secondPageDom, async () => ({
+      ok: true, status: 200, redirected: false, text: async () => '<li></li>',
+    }));
+    secondPageBrowser.sources[0].open();
+    await eventually(() => secondPageDom.current.replacements === 1);
+    secondPageBrowser.sources[0].invalidate({ type: 'application-created', applicationId: 988 });
+    ok(await eventually(() => secondPageDom.update.hidden === false)
+      && secondPageDom.list.prepended === 0,
+    'js vm : page ulterieure conserve sa pagination et affiche le bandeau');
+
+    r = await req(makeJar(), 'GET', `/suivi/${displayedApplication.trackingToken}`);
+    ok(r.text.includes('/js/realtime.js')
+      && r.text.includes('role="status"')
+      && r.text.includes('aria-live="polite"'),
+    'structure : suivi charge le script externe et les regions accessibles');
+    r = await req(schoolJar, 'GET', `/mes-annonces/${listing.id}/candidatures`);
+    ok(r.text.includes('/js/realtime.js') && !r.text.includes('<script>'),
+      'structure : page ecole respecte la CSP sans script inline');
 
     schoolEvents.request.destroy();
     candidateEvents.request.destroy();
