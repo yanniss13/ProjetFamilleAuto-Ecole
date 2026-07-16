@@ -216,12 +216,21 @@ async function main() {
       'école : ré-édition -> anciens fichiers supprimés du disque');
 
     // --- 5. invitation à signer ---
+    // Cas historique : les candidatures créées avant le Lot B n'avaient pas de
+    // jeton de suivi. L'envoi doit leur en attribuer un avant de construire le lien.
+    await prisma.application.update({
+      where: { id: application.id },
+      data: { trackingToken: null },
+    });
     r = await req(jarE, 'GET', `${apBase}/accepter`);
     r = await req(jarE, 'POST', `${apBase}/contrat/envoyer`, form({ _csrf: csrfFrom(r.text) }));
     ok(r.status === 302, 'invitation : envoi -> redirection');
     const invit = mailCalls.find((c) => c[0] === 'invitation');
-    ok(invit && invit[1] === application.applicantEmail && invit[4] === application.trackingToken,
-      'invitation : email au candidat avec le jeton de suivi');
+    const applicationAvecJeton = await prisma.application.findUnique({ where: { id: application.id } });
+    ok(invit && invit[1] === application.applicantEmail
+      && /^[a-f0-9]{64}$/.test(applicationAvecJeton.trackingToken)
+      && invit[4] === applicationAvecJeton.trackingToken,
+    'invitation : candidature historique complétée et email avec le jeton de suivi');
     contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
     ok(contract.sentToApplicantAt instanceof Date, 'invitation : date d’envoi enregistrée');
     r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
@@ -230,7 +239,7 @@ async function main() {
 
     // --- 6. contreseing du candidat ---
     const pub = makeJar();
-    const suivi = `/suivi/${application.trackingToken}`;
+    const suivi = `/suivi/${applicationAvecJeton.trackingToken}`;
     r = await req(pub, 'GET', `${suivi}/contrat`);
     ok(r.status === 200 && r.text.startsWith('%PDF'), 'candidat : lecture du PDF proposé via le jeton');
     r = await req(makeJar(), 'GET', `/suivi/${'0'.repeat(64)}/contrat`);
