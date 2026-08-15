@@ -18,6 +18,7 @@ npm-debug.log*
 # Fichiers et caches locaux des agents, jamais destines au depot
 .claude/
 docs/superpowers/
+AGENTS.md
 .agents/
 .superpowers/
 worktrees/
