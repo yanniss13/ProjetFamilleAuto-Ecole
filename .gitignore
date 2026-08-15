@@ -16,7 +16,8 @@ npm-debug.log*
 .vscode/
 
 # Fichiers et caches locaux des agents, jamais destines au depot
-.claude/settings.local.json
+.claude/
+docs/superpowers/
 .agents/
 .superpowers/
 tmp/
