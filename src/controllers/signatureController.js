@@ -6,6 +6,7 @@ const path = require('path');
 const crypto = require('crypto');
 const applicationService = require('../services/applicationService');
 const contractService = require('../services/contractService');
+const realtimeService = require('../services/realtimeService');
 const signatureImage = require('../services/signatureImage');
 const { buildContractPdf } = require('../services/contractPdf');
 const { sha256Hex, formatHash } = require('../utils/hash');
@@ -109,6 +110,10 @@ async function sign(req, res, next) {
       signedPdfPath: `${SUBDIRS.contracts}/${filename}`,
       signedPdfHash: sha256Hex(pdf),
     });
+    realtimeService.publishApplicationUpdate(
+      application,
+      realtimeService.EVENT_TYPES.CONTRACT_SIGNED
+    );
 
     // Best-effort : le PDF final part aux deux parties ; un échec d'email n'annule
     // pas la signature (le document reste téléchargeable des deux côtés).

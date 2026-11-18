@@ -5,14 +5,22 @@
 // créer de compte.
 
 generator client {
-  provider = "prisma-client-js"
+  // Prisma 7 : générateur "prisma-client" (sans moteur Rust), émission
+  // JavaScript CommonJS pour ce projet sans TypeScript. Le client généré vit
+  // hors de node_modules et n'est pas versionné (npx prisma generate).
+  provider               = "prisma-client"
+  output                 = "../../src/generated/prisma"
+  runtime                = "nodejs"
+  moduleFormat           = "cjs"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
 }
 
 datasource db {
-  // SQLite en développement (zéro install). En production : passer le provider à
-  // "postgresql" et fournir une DATABASE_URL Postgres — aucun changement de code.
-  // ⚠️ L'URL SQLite relative se résout depuis CE fichier : la base prisma/dev.db
-  // s'écrit "file:../dev.db" dans .env.
+  // SQLite en développement (zéro install). Depuis Prisma 7, l'URL ne vit plus
+  // ici : le CLI la lit dans prisma.config.ts et le client la reçoit via
+  // l'adaptateur better-sqlite3 (src/config/prisma.js) — les deux depuis
+  // DATABASE_URL, relative à la racine du dépôt ("file:./prisma/dev.db").
+  // En production : provider "postgresql" + adaptateur @prisma/adapter-pg.
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }

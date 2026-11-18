@@ -3,6 +3,7 @@
 const fs = require('fs');
 const listingService = require('../services/listingService');
 const applicationService = require('../services/applicationService');
+const realtimeService = require('../services/realtimeService');
 const { validateApplication } = require('../validators/applicationValidator');
 const mailer = require('../services/mailer');
 const { relPathOf } = require('../middlewares/upload');
@@ -67,7 +68,7 @@ async function apply(req, res, next) {
     }
 
     const trackingToken = generateOpaqueToken();
-    await applicationService.createForListing(id, {
+    const application = await applicationService.createForListing(id, {
       ...value,
       cvPath: relPathOf(cvFile),
       idCardPath: relPathOf(idFile),
@@ -75,6 +76,10 @@ async function apply(req, res, next) {
       teachingCardPath: relPathOf(teachingFile),
       trackingToken,
     });
+    realtimeService.publishApplicationUpdate(
+      application,
+      realtimeService.EVENT_TYPES.APPLICATION_CREATED
+    );
 
     // Best-effort, en parallèle (mailer.send ne lève jamais) : notification à l'école
     // + confirmation au candidat avec son lien de suivi.

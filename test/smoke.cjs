@@ -157,6 +157,11 @@ async function main() {
     ok(r.text.includes(keyword), 'Annonce visible (filtre département)');
     ok(/default-src 'self'/.test(r.headers.get('content-security-policy') || ''),
       'A4 : en-tête Content-Security-Policy présent et strict');
+    // Hors production, upgrade-insecure-requests doit être absente : servie en HTTP
+    // sur une adresse IP LAN (démo téléphone), elle ferait réécrire CSS/JS en https://
+    // inexistant et casserait la page (localhost, origine de confiance, ne le révèle pas).
+    ok(!/upgrade-insecure-requests/.test(r.headers.get('content-security-policy') || ''),
+      'A4 : CSP hors production sans upgrade-insecure-requests (démo LAN en HTTP)');
     r = await req(pub, 'GET', `/annonces?q=${keyword}`);
     ok(r.text.includes(keyword), 'Annonce trouvée par recherche');
     r = await req(pub, 'GET', `/annonces?q=${keyword.toLowerCase()}`);

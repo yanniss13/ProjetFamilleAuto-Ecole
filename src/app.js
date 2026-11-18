@@ -29,6 +29,9 @@ app.use(
       useDefaults: true,
       directives: {
         'img-src': ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
+        // Démo LAN en HTTP : sans TLS, upgrade-insecure-requests ferait réécrire
+        // CSS/JS en https:// et casserait toute page ouverte via une adresse IP.
+        ...(isProd ? {} : { upgradeInsecureRequests: null }),
       },
     },
   })

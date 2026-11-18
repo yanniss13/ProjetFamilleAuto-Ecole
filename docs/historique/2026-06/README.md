@@ -6,7 +6,7 @@ Ce dossier conserve les documents de conception produits entre le 22 et le 25 ju
 ## Contenu
 
 - `DESIGN.md` : document de cadrage initial (13 juin, classé ici le
-  10 juillet avec un bandeau — l'état actuel est dans `docs/jury/`) ;
+  10 juillet avec un bandeau — l'état actuel est dans le README du dépôt) ;
 - `CAHIER-DES-CHARGES.md` : expression initiale du besoin ;
 - `SPECIFICATIONS-FONCTIONNELLES-ET-TECHNIQUES.md` : source éditable du dossier de
   conception ;
@@ -20,7 +20,4 @@ Ce dossier conserve les documents de conception produits entre le 22 et le 25 ju
 
 Ces fichiers sont une **version 1 historique**. Ils ne doivent pas être modifiés pour
 faire croire qu'ils décrivaient dès l'origine les fonctionnalités ajoutées ensuite.
-Le code, les migrations, les tests, `AGENTS.md` et `docs/jury/` décrivent l'état actuel.
-
-Les écarts connus et l'usage recommandé sont détaillés dans
-[`../../jury/inventaire-documents-historiques.md`](../../jury/inventaire-documents-historiques.md).
+Le code, les migrations, les tests et le README du dépôt décrivent l'état actuel.

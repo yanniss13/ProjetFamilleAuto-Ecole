@@ -41,7 +41,7 @@ const MINI_PDF = Buffer.from(
 );
 
 // ------------------------------ Données rédigées ------------------------------
-// (Le jury lira ces textes : tout est écrit, rien n'est généré aléatoirement.)
+// (Textes écrits à la main : rien n'est généré aléatoirement.)
 
 const ECOLES = [
   // La première entrée est l'école « vitrine » (compte de connexion de la démo).
@@ -313,6 +313,7 @@ async function seedDemo() {
   // Vitrine : pièces réelles sur les 4 premières, un contrat signé sur la 2e.
   const STATUTS_VITRINE = ['pending', 'accepted', 'accepted', 'rejected', 'pending', 'accepted', 'pending', 'rejected', 'pending', 'pending', 'pending', 'rejected', 'pending', 'accepted', 'pending'];
   let candidatureSignee = null;
+  let candidatureTempsReel = null;
   for (let v = 0; v < 15; v += 1) {
     // Jamais l'annonce clôturée (dernier index) ; la candidature signée (v = 1)
     // est forcée sur l'annonce phare : le contrat généré la référence.
@@ -329,6 +330,7 @@ async function seedDemo() {
       }
     }
     const candidature = await creeCandidature(annonce, v, STATUTS_VITRINE[v], (v * 6) % 80, extra);
+    if (v === 0) candidatureTempsReel = candidature; // Julien Martin — en attente
     if (v === 1) candidatureSignee = candidature; // Sophie Bernard — dossier signé
   }
   await creeContratSigne(vitrine, annoncesVitrine[0], candidatureSignee);
@@ -341,7 +343,7 @@ async function seedDemo() {
   }
 
   // Alertes : 3 confirmées + 1 non confirmée antidatée (elle « meurt » en direct
-  // quand on clique « Lancer une purge maintenant » devant le jury).
+  // quand on clique « Lancer une purge maintenant » pendant une démonstration).
   const ALERTES = [
     { email: `alerte.marseille${DEMO_SUFFIX}`, department: '13', keyword: null, confirmedAt: daysAgo(20), createdAt: daysAgo(21) },
     { email: `alerte.lyon.moto${DEMO_SUFFIX}`, department: '69', keyword: 'moto', confirmedAt: daysAgo(9), createdAt: daysAgo(9) },
@@ -371,6 +373,9 @@ async function seedDemo() {
   return {
     ...compteurs,
     trackingToken: candidatureSignee.trackingToken,
+    realtimeTrackingToken: candidatureTempsReel.trackingToken,
+    realtimeApplicationId: candidatureTempsReel.id,
+    realtimeListingId: candidatureTempsReel.listingId,
     credentials: {
       school: { email: vitrine.email, password: MDP_ECOLE },
       admin: { email: admin.email, password: MDP_ADMIN },
@@ -388,12 +393,14 @@ async function runCli() {
     console.log('\nComptes de démonstration :');
     console.log(`  École vitrine : ${r.credentials.school.email} / ${r.credentials.school.password}`);
     console.log(`  Admin         : ${r.credentials.admin.email} / ${r.credentials.admin.password}`);
+    const baseUrl = String(process.env.DEMO_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '');
     console.log('\nURLs clés :');
-    console.log('  Carte des annonces : http://localhost:3000/annonces?vue=carte');
-    console.log('  Tableau de bord    : http://localhost:3000/tableau-de-bord');
-    console.log('  Administration     : http://localhost:3000/admin');
-    console.log(`  Suivi candidat (contrat signé) : http://localhost:3000/suivi/${r.trackingToken}`);
-    console.log('  Alertes email      : http://localhost:3000/alertes');
+    console.log(`  Carte des annonces : ${baseUrl}/annonces?vue=carte`);
+    console.log(`  Tableau de bord    : ${baseUrl}/tableau-de-bord`);
+    console.log(`  Administration     : ${baseUrl}/admin`);
+    console.log(`  Suivi candidat (temps réel, en attente) : ${baseUrl}/suivi/${r.realtimeTrackingToken}`);
+    console.log(`  Suivi candidat (contrat signé)          : ${baseUrl}/suivi/${r.trackingToken}`);
+    console.log(`  Alertes email      : ${baseUrl}/alertes`);
     await prisma.$disconnect();
   } catch (err) {
     console.error(`Échec du seed : ${err.message}`);
