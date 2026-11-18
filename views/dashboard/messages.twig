@@ -1,0 +1,24 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+  <div class="page-header">
+    <h1>Messages — {{ application.applicantName }}</h1>
+    <a href="/mes-annonces/{{ listing.id }}/candidatures#application-{{ application.id }}" class="btn">Retour aux candidatures</a>
+  </div>
+  <p class="muted">Annonce : <strong>{{ listing.title }}</strong></p>
+
+  <section id="messages" data-realtime-context
+           data-realtime-mode="thread"
+           data-realtime-application-id="{{ application.id }}"
+           data-realtime-stream-url="/mes-annonces/{{ listing.id }}/candidatures/temps-reel"
+           data-realtime-snapshot-url="{{ threadPath }}/fragment">
+    {% include 'partials/realtime-status.twig' with { realtimeReloadUrl: threadPath } %}
+    {% include 'partials/messages-list.twig' with { viewer: 'school' } %}
+  </section>
+
+  {% include 'partials/message-form.twig' with { messageAction: threadPath } %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/realtime.js" defer></script>
+{% endblock %}

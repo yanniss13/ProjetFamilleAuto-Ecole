@@ -5,6 +5,8 @@ const { generateOpaqueToken } = require('./tokens');
 
 // Fil de messages (lot N) chargé avec la candidature, dans l'ordre d'écriture.
 const MESSAGES_IN_ORDER = { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] };
+// Nombre de messages du moniteur pas encore lus par l'école (compteur de la carte).
+const UNREAD_FOR_SCHOOL = { select: { messages: { where: { author: 'applicant', readAt: null } } } };
 
 // Dépose une candidature sur une annonce.
 function createForListing(listingId, data) {
@@ -19,7 +21,7 @@ async function findForOwnedListing(schoolId, listingId, page = 1) {
   const items = await prisma.application.findMany({
     where,
     orderBy: { createdAt: 'desc' },
-    include: { contract: true },
+    include: { contract: true, _count: UNREAD_FOR_SCHOOL },
     skip,
     take,
   });
@@ -31,7 +33,7 @@ async function findForOwnedListing(schoolId, listingId, page = 1) {
 function findOwnedById(schoolId, applicationId) {
   return prisma.application.findFirst({
     where: { id: applicationId, listing: { schoolId } },
-    include: { listing: { include: { school: true } }, contract: true },
+    include: { listing: { include: { school: true } }, contract: true, _count: UNREAD_FOR_SCHOOL },
   });
 }
 

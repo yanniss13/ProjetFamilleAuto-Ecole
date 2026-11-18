@@ -185,12 +185,87 @@ async function testApplicant() {
   }
 }
 
+async function loginSchool(school) {
+  const jar = makeJar();
+  let r = await req(jar, 'GET', '/connexion');
+  r = await req(jar, 'POST', '/connexion', form({ _csrf: csrfFrom(r.text), email: school.email, password: 'motdepasse123' }));
+  if (r.status !== 302) throw new Error('Connexion ecole impossible.');
+  return jar;
+}
+
+async function testSchool() {
+  const school = await makeSchool('ecole');
+  const other = await makeSchool('autre');
+  const application = await makeApplication(school);
+  const listPath = `/mes-annonces/${application.listingId}/candidatures`;
+  const thread = `${listPath}/${application.id}/messages`;
+  await messageService.create(application.id, 'applicant', 'Question <script>alert(1)</script> du moniteur');
+
+  const jar = await loginSchool(school);
+  let r = await req(jar, 'GET', listPath);
+  ok(r.status === 200 && r.text.includes(`href="${thread}"`), 'ecole : la carte de candidature mene au fil');
+  ok(/data-unread-count="1"/.test(r.text), 'ecole : la carte affiche 1 message non lu');
+
+  r = await req(jar, 'GET', thread);
+  ok(r.status === 200 && r.text.includes('du moniteur') && r.text.includes('data-message-list'), 'ecole : le fil affiche le message du moniteur');
+  ok(!r.text.includes('<script>alert(1)</script>') && r.text.includes('&lt;script&gt;'), 'ecole : le HTML d un message est echappe');
+  ok(r.text.includes('data-realtime-mode="thread"'), 'ecole : le fil est branche sur le temps reel');
+  const csrf = csrfFrom(r.text);
+  r = await req(jar, 'GET', listPath);
+  ok(/data-unread-count="0"/.test(r.text), 'ecole : apres lecture, plus aucun non lu');
+
+  r = await req(jar, 'GET', `${thread}/fragment`);
+  ok(r.status === 200 && r.text.includes('data-message-list') && !r.text.includes('<textarea'),
+    'ecole : le fragment du fil ne contient jamais le formulaire');
+
+  const mail = spyMail();
+  const rt = spyRealtime(application.id);
+  try {
+    r = await req(jar, 'POST', thread, form({ _csrf: csrf, body: 'Merci, nous vous appelons demain.' }));
+    ok(r.status === 302 && r.location.startsWith(thread), 'ecole : envoi valide => redirection vers le fil');
+    const list = await messageService.listForApplication(application.id);
+    ok(list.length === 2 && list[1].author === 'school', 'ecole : message enregistre au nom de l ecole');
+    ok(mail.calls.length === 1 && mail.calls[0][0] === application.applicantEmail
+      && mail.calls[0][3].endsWith(`/suivi/${application.trackingToken}`),
+    'ecole : le moniteur est prevenu par email avec son lien de suivi');
+    ok(!JSON.stringify(mail.calls[0]).includes('appelons demain'), 'ecole : l email ne recopie pas le texte');
+    ok(rt.events.length === 1 && rt.events[0].type === 'message-created', 'ecole : evenement temps reel publie');
+
+    r = await req(jar, 'POST', thread, form({ _csrf: csrf, body: '\n\t ' }));
+    ok(r.status === 400 && await prisma.message.count({ where: { applicationId: application.id } }) === 2,
+      'ecole : message vide => 400 sans ecriture');
+
+    const otherJar = await loginSchool(other);
+    r = await req(otherJar, 'GET', thread);
+    ok(r.status === 404, 'ecole : une autre ecole => 404 sur le fil');
+    r = await req(otherJar, 'GET', listPath);
+    const otherCsrf = csrfFrom(r.text);
+    r = await req(otherJar, 'POST', thread, form({ _csrf: otherCsrf, body: 'Intrusion' }));
+    ok(r.status === 404 && await prisma.message.count({ where: { applicationId: application.id } }) === 2,
+      'ecole : une autre ecole => 404 a l envoi, rien enregistre');
+    r = await req(otherJar, 'GET', `${thread}/fragment`);
+    ok(r.status === 404, 'ecole : une autre ecole => 404 sur le fragment');
+
+    await prisma.application.update({ where: { id: application.id }, data: { status: 'rejected' } });
+    r = await req(jar, 'GET', thread);
+    ok(r.status === 200 && !r.text.includes('<textarea') && /lecture seule/i.test(r.text),
+      'ecole : candidature refusee => formulaire absent');
+    r = await req(jar, 'POST', thread, form({ _csrf: csrf, body: 'Apres refus' }));
+    ok(r.status === 302 && await prisma.message.count({ where: { applicationId: application.id } }) === 2,
+      'ecole : candidature refusee => envoi refuse');
+  } finally {
+    mail.restore();
+    rt.off();
+  }
+}
+
 async function main() {
   let server;
   try {
     server = await new Promise((resolve) => { const s = app.listen(PORT, () => resolve(s)); });
     await testService();
     await testApplicant();
+    await testSchool();
     console.log(`\n✅ Messagerie tests reussis - ${passed} assertions.`);
   } finally {
     for (const id of created.schoolIds) await prisma.school.delete({ where: { id } }).catch(() => {});

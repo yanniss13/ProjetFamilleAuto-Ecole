@@ -24,6 +24,10 @@
     <a href="{{ base }}/piece-identite" class="btn btn-small">Pièce d'identité</a>
     <a href="{{ base }}/permis" class="btn btn-small">Permis</a>
     <a href="{{ base }}/carte-enseignant" class="btn btn-small">Carte d'enseignant</a>
+    {% set unread = application._count.messages|default(0) %}
+    <a href="{{ base }}/messages" class="btn btn-small" data-unread-count="{{ unread }}">
+      Messages{% if unread > 0 %} <span class="badge badge-pending">{{ unread }}<span class="visually-hidden"> non lu{{ unread > 1 ? 's' : '' }}</span></span>{% endif %}
+    </a>
     {% if application.status != 'accepted' %}
       <a href="{{ base }}/accepter" class="btn btn-small btn-primary">Accepter</a>
     {% endif %}

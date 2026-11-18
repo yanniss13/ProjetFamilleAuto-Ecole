@@ -5,8 +5,11 @@ const listingController = require('../controllers/listingController');
 const applicationController = require('../controllers/applicationController');
 const contractController = require('../controllers/contractController');
 const realtimeController = require('../controllers/realtimeController');
+const messageController = require('../controllers/messageController');
+const { createMessageLimiter } = require('../middlewares/messageLimiter');
 
 const router = express.Router();
+const messageLimiter = createMessageLimiter((req) => req.originalUrl);
 
 router.get('/', listingController.mine);
 router.get('/nouvelle', listingController.newForm);
@@ -24,6 +27,11 @@ router.get('/:id/candidatures/:appId/cv', applicationController.downloadCv);
 router.get('/:id/candidatures/:appId/piece-identite', applicationController.downloadIdCard);
 router.get('/:id/candidatures/:appId/permis', applicationController.downloadLicense);
 router.get('/:id/candidatures/:appId/carte-enseignant', applicationController.downloadTeachingCard);
+
+// Messagerie avec le moniteur (lot N).
+router.get('/:id/candidatures/:appId/messages', messageController.showForSchool);
+router.post('/:id/candidatures/:appId/messages', messageLimiter, messageController.postFromSchool);
+router.get('/:id/candidatures/:appId/messages/fragment', messageController.schoolFragment);
 
 // Acceptation / refus + contrat (génération, téléchargement, envoi au candidat).
 router.post('/:id/candidatures/:appId/refuser', contractController.reject);

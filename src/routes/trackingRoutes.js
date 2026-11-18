@@ -6,6 +6,7 @@ const trackingController = require('../controllers/trackingController');
 const signatureController = require('../controllers/signatureController');
 const realtimeController = require('../controllers/realtimeController');
 const messageController = require('../controllers/messageController');
+const { createMessageLimiter } = require('../middlewares/messageLimiter');
 const applicationService = require('../services/applicationService');
 
 const router = express.Router();
@@ -47,14 +48,7 @@ const signLimiter = rateLimit({
   },
 });
 
-// Anti-spam de la messagerie (lot N) : 30 messages / 15 min par IP.
-const messageLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false,
-  handler: (req, res) => {
-    req.flash('error', 'Trop de messages envoyés. Veuillez réessayer plus tard.');
-    res.status(429).redirect(`/suivi/${req.params.token}`);
-  },
-});
+const messageLimiter = createMessageLimiter((req) => `/suivi/${req.params.token}`);
 
 router.use(hideBackOfficeLocals);
 router.param('token', detachForValidToken);
