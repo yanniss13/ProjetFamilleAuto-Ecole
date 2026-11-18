@@ -11,8 +11,7 @@ Le MVP et **onze lots itératifs** sont livrés (A–C et E–L ; le lot D est r
 réservé) : notifications et suivi candidat, administration/modération, carte
 des annonces, vérification SIRET, signature électronique, tableaux de bord
 statistiques, alertes email en double opt-in, purge RGPD automatique, jeu de
-démonstration et autocomplétion d'adresse. Résumé complet :
-[`docs/jury/resume-projet.md`](docs/jury/resume-projet.md).
+démonstration et autocomplétion d'adresse.
 
 ## Fonctionnalités livrées
 
@@ -78,8 +77,6 @@ d'authentification n'est envoyé).
 ## Documentation
 
 - [`docs/README.md`](docs/README.md) — index de la documentation ;
-- [`docs/jury/README.md`](docs/jury/README.md) — dossier de soutenance DWWM
-  (résumé, besoin, compétences, BDD, conformité W3C/accessibilité, veilles) ;
 - [`AGENTS.md`](AGENTS.md) — guide d'exécution du dépôt (conventions, pièges) ;
 - conception initiale de juin 2026 :
   [`docs/historique/2026-06/`](docs/historique/2026-06/README.md) (préservée

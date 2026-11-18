@@ -41,7 +41,7 @@ const MINI_PDF = Buffer.from(
 );
 
 // ------------------------------ Données rédigées ------------------------------
-// (Le jury lira ces textes : tout est écrit, rien n'est généré aléatoirement.)
+// (Textes écrits à la main : rien n'est généré aléatoirement.)
 
 const ECOLES = [
   // La première entrée est l'école « vitrine » (compte de connexion de la démo).
@@ -343,7 +343,7 @@ async function seedDemo() {
   }
 
   // Alertes : 3 confirmées + 1 non confirmée antidatée (elle « meurt » en direct
-  // quand on clique « Lancer une purge maintenant » devant le jury).
+  // quand on clique « Lancer une purge maintenant » pendant une démonstration).
   const ALERTES = [
     { email: `alerte.marseille${DEMO_SUFFIX}`, department: '13', keyword: null, confirmedAt: daysAgo(20), createdAt: daysAgo(21) },
     { email: `alerte.lyon.moto${DEMO_SUFFIX}`, department: '69', keyword: 'moto', confirmedAt: daysAgo(9), createdAt: daysAgo(9) },

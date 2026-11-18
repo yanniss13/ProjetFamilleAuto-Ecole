@@ -21,7 +21,6 @@ const { validateListing } = require('../src/validators/listingValidator');
 const { validateApplication } = require('../src/validators/applicationValidator');
 const { validateRegister, validateProfile } = require('../src/validators/schoolValidator');
 const { STORAGE_DIR } = require('../src/config/storage');
-const { configureViewport } = require('../scripts/captures-jury');
 
 const PORT = 4060;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -101,27 +100,6 @@ async function main() {
       && attributsNavigation['aria-label'] === 'Ouvrir le menu',
     'navigation mobile : fermeture synchronise classe et attributs ARIA');
 
-    // --- Captures jury : le viewport CDP ne depend pas de la fenetre Edge ---
-    {
-      const appels = [];
-      const fauxCdp = {
-        cmd: async (methode, parametres) => appels.push({ methode, parametres }),
-      };
-      await configureViewport(fauxCdp, 320, 1000);
-      ok(appels[0].methode === 'Emulation.setDeviceMetricsOverride'
-        && appels[0].parametres.width === 320
-        && appels[0].parametres.height === 1000
-        && appels[0].parametres.deviceScaleFactor === 1
-        && appels[0].parametres.mobile === true
-        && appels[1]
-        && appels[1].methode === 'Emulation.setScrollbarsHidden'
-        && appels[1].parametres.hidden === true,
-      'captures jury : viewport mobile fixe exactement a 320 px');
-
-      await configureViewport(fauxCdp, 768, 1000);
-      ok(appels[2].parametres.width === 768 && appels[2].parametres.mobile === false,
-        'captures jury : 768 px utilise le viewport desktop exact');
-    }
 
     // ------------------- 5. Sessions persistées en base (Prisma) -------------------
     const PrismaSessionStore = require('../src/config/sessionStore');
