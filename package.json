@@ -15,7 +15,7 @@
     "purge": "node scripts/purge.js",
     "seed:demo": "node scripts/seed-demo.js",
     "demo:start": "node scripts/demo-start.js",
-    "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-b.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/ameliorations-v2.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs && node test/lot-l.cjs && node test/lot-m.cjs && node test/lot-k.cjs && node test/demo.cjs && node test/revue.cjs"
+    "test": "node test/smoke.cjs && node test/lot-a.cjs && node test/lot-b.cjs && node test/lot-c.cjs && node test/correctifs.cjs && node test/ameliorations.cjs && node test/ameliorations-v2.cjs && node test/lot-e.cjs && node test/lot-f.cjs && node test/lot-g.cjs && node test/lot-h.cjs && node test/lot-i.cjs && node test/lot-j.cjs && node test/lot-l.cjs && node test/lot-m.cjs && node test/lot-k.cjs && node test/demo.cjs && node test/revue.cjs && node test/messagerie.cjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.8.0",

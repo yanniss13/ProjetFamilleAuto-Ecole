@@ -23,6 +23,7 @@ model Application {
   listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   contract Contract?
+  messages Message[]
 
   createdAt DateTime @default(now())
 

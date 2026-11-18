@@ -1,0 +1,13 @@
+// Message du fil d'une candidature (lot N), écrit par l'école ou par le moniteur
+// via son lien de suivi. Supprimé avec la candidature (purge RGPD comprise).
+model Message {
+  id            Int         @id @default(autoincrement())
+  applicationId Int
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author        String // "school" | "applicant" (validé applicativement)
+  body          String // 1 à 2 000 caractères
+  createdAt     DateTime    @default(now())
+  readAt        DateTime? // lu par le destinataire
+
+  @@index([applicationId])
+}
