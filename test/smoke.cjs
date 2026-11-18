@@ -162,6 +162,11 @@ async function main() {
     // inexistant et casserait la page (localhost, origine de confiance, ne le révèle pas).
     ok(!/upgrade-insecure-requests/.test(r.headers.get('content-security-policy') || ''),
       'A4 : CSP hors production sans upgrade-insecure-requests (démo LAN en HTTP)');
+    // Les serveurs de tuiles OpenStreetMap refusent toute requête sans Referer (image
+    // « Access blocked »). Le défaut helmet `no-referrer` cassait donc les cartes ; on
+    // envoie l'origine seule aux autres sites, jamais le chemin (/suivi/<jeton> reste privé).
+    ok(r.headers.get('referrer-policy') === 'strict-origin-when-cross-origin',
+      'Carte : Referrer-Policy envoie l\'origine aux tuiles OSM, sans le chemin');
     r = await req(pub, 'GET', `/annonces?q=${keyword}`);
     ok(r.text.includes(keyword), 'Annonce trouvée par recherche');
     r = await req(pub, 'GET', `/annonces?q=${keyword.toLowerCase()}`);

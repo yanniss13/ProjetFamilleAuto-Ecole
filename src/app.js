@@ -37,6 +37,10 @@ app.use(
         ...(isProd ? {} : { upgradeInsecureRequests: null }),
       },
     },
+    // Le défaut helmet `no-referrer` faisait bloquer les tuiles : OpenStreetMap refuse
+    // toute requête sans Referer (image « Access blocked »). Les autres sites reçoivent
+    // l'origine seule, jamais le chemin : un lien /suivi/<jeton> ne fuit pas.
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   })
 );
 
