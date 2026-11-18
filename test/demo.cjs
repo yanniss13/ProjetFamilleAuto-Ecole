@@ -17,7 +17,10 @@ const app = require('../src/app');
 const { DEMO_ACCOUNTS, isDemoMode } = require('../src/config/demo');
 const { DEMO_DOMAIN } = require('../scripts/seed-demo');
 
+const passwordUtil = require('../src/utils/password');
+
 const PORT = 4073;
+const STAMP = Date.now();
 const BASE = `http://127.0.0.1:${PORT}`;
 
 let passed = 0;
@@ -30,6 +33,24 @@ async function page(urlPath) {
   const res = await fetch(BASE + urlPath, { redirect: 'manual' });
   return { status: res.status, text: await res.text() };
 }
+async function req(jar, method, urlPath, { body, headers = {} } = {}) {
+  const res = await fetch(BASE + urlPath, {
+    method, redirect: 'manual', headers: { ...(jar.cookie ? { cookie: jar.cookie } : {}), ...headers }, body,
+  });
+  const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
+  for (const c of sc) jar.cookie = c.split(';')[0];
+  return { status: res.status, location: res.headers.get('location'), text: await res.text() };
+}
+function csrfFrom(html) {
+  const m = html.match(/name="csrf-token" content="([^"]+)"/);
+  if (!m) throw new Error('Jeton CSRF introuvable.');
+  return m[1];
+}
+function form(obj) {
+  return { body: new URLSearchParams(obj).toString(), headers: { 'content-type': 'application/x-www-form-urlencoded' } };
+}
+
+const created = {};
 
 async function main() {
   let server;
@@ -73,9 +94,45 @@ async function main() {
     ok(r.text.includes(DEMO_ACCOUNTS.admin.email) && r.text.includes(DEMO_ACCOUNTS.admin.password),
       'demo : la connexion admin affiche les acces admin');
 
+    // --- Admin en lecture seule pendant la démo ---
+    const admin = await prisma.admin.create({
+      data: { email: `demo.admin.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('motdepasse123') },
+    });
+    created.adminId = admin.id;
+    const school = await prisma.school.create({
+      data: {
+        email: `demo.ecole.${STAMP}@example.test`, passwordHash: await passwordUtil.hash('motdepasse123'),
+        businessName: 'Demo Lecture Seule', siret: `5${String(STAMP).slice(-13).padStart(13, '0')}`, emailVerified: true,
+      },
+    });
+    created.schoolId = school.id;
+    const jar = { cookie: '' };
+    r = await req(jar, 'GET', '/admin/connexion');
+    r = await req(jar, 'POST', '/admin/connexion', form({ _csrf: csrfFrom(r.text), email: admin.email, password: 'motdepasse123' }));
+    ok(r.status === 302, 'demo admin : connexion admin');
+    r = await req(jar, 'GET', '/admin/ecoles');
+    ok(r.status === 200, 'demo admin : la liste des ecoles reste consultable');
+    const csrf = csrfFrom(r.text);
+    r = await req(jar, 'POST', `/admin/ecoles/${school.id}/suspendre`, form({ _csrf: csrf }));
+    ok(r.status === 302, 'demo admin : suspension refusee par redirection');
+    ok((await prisma.school.findUnique({ where: { id: school.id } })).suspended === false,
+      'demo admin : l ecole n est pas suspendue');
+    r = await req(jar, 'GET', r.location || '/admin');
+    ok(/lecture seule/i.test(r.text), 'demo admin : message lecture seule affiche');
+    const runsAvant = await prisma.purgeRun.count();
+    r = await req(jar, 'POST', '/admin/purge', form({ _csrf: csrf }));
+    ok(r.status === 302 && await prisma.purgeRun.count() === runsAvant, 'demo admin : purge manuelle refusee');
+
+    delete process.env.DEMO_MODE;
+    r = await req(jar, 'POST', `/admin/ecoles/${school.id}/suspendre`, form({ _csrf: csrf }));
+    ok((await prisma.school.findUnique({ where: { id: school.id } })).suspended === true,
+      'hors demo : la suspension admin fonctionne toujours');
+
     console.log(`\n✅ Mode demo tests reussis - ${passed} assertions.`);
   } finally {
     delete process.env.DEMO_MODE;
+    if (created.adminId) await prisma.admin.delete({ where: { id: created.adminId } }).catch(() => {});
+    if (created.schoolId) await prisma.school.delete({ where: { id: created.schoolId } }).catch(() => {});
     if (server) await new Promise((r) => server.close(r));
     await prisma.$disconnect();
   }

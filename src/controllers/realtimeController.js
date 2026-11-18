@@ -11,7 +11,37 @@ function duration(name, fallback) {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
+// Plafonds de flux SSE simultanés : chaque flux garde une socket, un abonné et
+// deux minuteries jusqu'à 5 minutes. Un onglet ouvre un flux ; au-delà, on
+// répond 429 (EventSource ne se reconnecte pas sur un statut d'erreur).
+const MAX_STREAMS_PER_SESSION = 5;
+const MAX_STREAMS_TOTAL = 500;
+const streamsBySession = new Map();
+let streamsTotal = 0;
+
+function reserveStream(req) {
+  const key = req.sessionID || 'sans-session';
+  const count = streamsBySession.get(key) || 0;
+  if (count >= MAX_STREAMS_PER_SESSION || streamsTotal >= MAX_STREAMS_TOTAL) return null;
+  streamsBySession.set(key, count + 1);
+  streamsTotal += 1;
+  let released = false;
+  return function release() {
+    if (released) return;
+    released = true;
+    streamsTotal -= 1;
+    const left = (streamsBySession.get(key) || 1) - 1;
+    if (left > 0) streamsBySession.set(key, left);
+    else streamsBySession.delete(key);
+  };
+}
+
 function openStream(req, res, channel) {
+  const release = reserveStream(req);
+  if (!release) {
+    res.status(429).set('Retry-After', '60').end();
+    return;
+  }
   res.status(200);
   res.set({
     'Content-Type': 'text/event-stream; charset=utf-8',
@@ -37,6 +67,7 @@ function openStream(req, res, channel) {
     clearInterval(heartbeat);
     clearTimeout(lifetime);
     unsubscribe();
+    release();
   }
 
   res.once('close', cleanup);
@@ -109,6 +140,7 @@ async function schoolCard(req, res, next) {
 }
 
 module.exports = {
+  MAX_STREAMS_PER_SESSION,
   openStream,
   schoolStream,
   candidateStream,

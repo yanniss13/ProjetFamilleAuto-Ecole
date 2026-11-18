@@ -44,7 +44,14 @@ async function runPurge() {
     },
     include: { contract: true }, // par sécurité — un refus nettoie déjà son contrat
   });
+  // Suppression une à une, conditionnée au statut « refusée » : une candidature
+  // repêchée entre la lecture et la suppression n'est ni effacée ni vidée de ses
+  // pièces. Les fichiers ne partent qu'après la suppression effective en base.
+  let rejectedApplications = 0;
   for (const a of rejected) {
+    const { count } = await prisma.application.deleteMany({ where: { id: a.id, status: 'rejected' } });
+    if (count !== 1) continue;
+    rejectedApplications += 1;
     for (const rel of [a.cvPath, a.idCardPath, a.licensePath, a.teachingCardPath]) deleteStored(rel);
     if (a.contract) {
       for (const rel of [a.contract.pdfPath, a.contract.schoolSignaturePath, a.contract.applicantSignaturePath, a.contract.signedPdfPath]) {
@@ -52,9 +59,6 @@ async function runPurge() {
       }
     }
   }
-  const { count: rejectedApplications } = await prisma.application.deleteMany({
-    where: { id: { in: rejected.map((a) => a.id) } },
-  });
 
   // 3. Jetons expirés : minimisation — on nettoie les jetons, jamais les comptes.
   const nowDate = new Date(now);

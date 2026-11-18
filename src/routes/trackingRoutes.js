@@ -5,22 +5,36 @@ const rateLimit = require('express-rate-limit');
 const trackingController = require('../controllers/trackingController');
 const signatureController = require('../controllers/signatureController');
 const realtimeController = require('../controllers/realtimeController');
+const applicationService = require('../services/applicationService');
 
 const router = express.Router();
 
 // Un lien de suivi est un espace candidat : s'il est ouvert dans un navigateur où
-// une école ou un admin est connecté, on détache cette authentification avant rendu.
-// Le jeton CSRF et les flashs restent dans la session publique du candidat.
-function detachAuthenticatedSession(req, res, next) {
-  if (req.session) {
-    delete req.session.schoolId;
-    delete req.session.adminId;
-  }
+// une école ou un admin est connecté, la page s'affiche sans le contexte
+// back-office (nav, liens). Le jeton CSRF et les flashs restent dans la session
+// publique du candidat.
+function hideBackOfficeLocals(req, res, next) {
   delete res.locals.currentSchool;
   delete res.locals.currentAdmin;
   delete res.locals.adminSessionActive;
   res.locals.backOfficeSession = false;
   next();
+}
+
+// L'authentification école/admin n'est détachée de la session que pour un jeton
+// valide : sinon n'importe quel site pourrait déconnecter une école par un simple
+// <img src="/suivi/x">. Le contrôleur relit la candidature ensuite (404 si absent).
+async function detachForValidToken(req, res, next, token) {
+  try {
+    if (req.session && (req.session.schoolId || req.session.adminId)
+      && await applicationService.findByTrackingToken(token)) {
+      delete req.session.schoolId;
+      delete req.session.adminId;
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
 }
 
 // Anti-abus sur la signature (écriture disque + génération PDF).
@@ -32,7 +46,8 @@ const signLimiter = rateLimit({
   },
 });
 
-router.use(detachAuthenticatedSession);
+router.use(hideBackOfficeLocals);
+router.param('token', detachForValidToken);
 
 router.get('/temps-reel/:applicationId', realtimeController.candidateStream);
 router.get('/fragment/:applicationId', realtimeController.candidateFragment);

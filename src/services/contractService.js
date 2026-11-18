@@ -24,8 +24,21 @@ function deleteForApplication(applicationId) {
 }
 
 // Contreseing du candidat : fige la signature, le PDF final et son empreinte.
-function signByApplicant(id, data) {
-  return prisma.contract.update({ where: { id }, data });
+// Conditionnel : n'écrit que si le contrat est toujours transmis, non signé, et
+// dans la version lue par le candidat (empreinte du PDF proposé). Deux envois
+// simultanés ou une ré-édition entre-temps ne peuvent donc pas écraser une
+// signature. Renvoie le contrat signé, ou null si la signature est refusée.
+async function signByApplicant(id, expectedProposedHash, data) {
+  const { count } = await prisma.contract.updateMany({
+    where: {
+      id,
+      applicantSignedAt: null,
+      sentToApplicantAt: { not: null },
+      proposedPdfHash: expectedProposedHash,
+    },
+    data,
+  });
+  return count === 1 ? prisma.contract.findUnique({ where: { id } }) : null;
 }
 
 // Dernier contrat saisi par une école : sert à pré-remplir les champs « côté école »

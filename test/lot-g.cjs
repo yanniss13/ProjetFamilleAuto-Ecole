@@ -195,8 +195,8 @@ async function main() {
     ok(contract.proposedPdfHash === sha256Hex(fs.readFileSync(absStored(contract.pdfPath))),
       'école : empreinte du PDF proposé exacte (recalculée)');
 
-    // Ré-édition : les champs candidat/signés (posés artificiellement) sont invalidés
-    // et les fichiers correspondants supprimés.
+    // Contrat contresigné (posé artificiellement) : verrouillé, la ré-édition est
+    // refusée et ne touche à rien (revue du 18/11/2026, voir test/revue.cjs).
     const fakeApplicantSig = 'signatures/lotg-fake-sig.png';
     const fakeSignedPdf = 'contracts/lotg-fake-signed.pdf';
     fs.writeFileSync(absStored(fakeApplicantSig), 'x');
@@ -205,15 +205,26 @@ async function main() {
       where: { id: contract.id },
       data: { applicantSignaturePath: fakeApplicantSig, applicantSignedAt: new Date(), signedPdfPath: fakeSignedPdf, signedPdfHash: 'h' },
     });
+    r = await req(jarE, 'POST', `${apBase}/accepter`, form({ ...termsForm, signatureData: SIGNATURE_PNG }));
+    ok(r.status === 302, 'école : ré-édition d’un contrat contresigné refusée');
+    ok(fs.existsSync(absStored(fakeApplicantSig)) && fs.existsSync(absStored(fakeSignedPdf)),
+      'école : contrat contresigné -> fichiers conservés');
+    fs.unlinkSync(absStored(fakeApplicantSig));
+    fs.unlinkSync(absStored(fakeSignedPdf));
+    await prisma.contract.update({
+      where: { id: contract.id },
+      data: { applicantSignaturePath: null, applicantSignedAt: null, signedPdfPath: null, signedPdfHash: null },
+    });
+
+    // Ré-édition d'un contrat pas encore contresigné : nouveau PDF, ancien supprimé.
+    const ancienPdf = contract.pdfPath;
     r = await req(jarE, 'GET', `${apBase}/accepter`);
     r = await req(jarE, 'POST', `${apBase}/accepter`, form({ ...termsForm, _csrf: csrfFrom(r.text), signatureData: SIGNATURE_PNG }));
     ok(r.status === 302, 'école : ré-édition du contrat OK');
     contract = await prisma.contract.findUnique({ where: { applicationId: application.id } });
-    ok(contract.applicantSignaturePath === null && contract.applicantSignedAt === null
-      && contract.signedPdfPath === null && contract.signedPdfHash === null,
-      'école : ré-édition -> signature candidat et PDF signé invalidés');
-    ok(!fs.existsSync(absStored(fakeApplicantSig)) && !fs.existsSync(absStored(fakeSignedPdf)),
-      'école : ré-édition -> anciens fichiers supprimés du disque');
+    ok(contract.pdfPath !== ancienPdf && fs.existsSync(absStored(contract.pdfPath)),
+      'école : ré-édition -> nouveau PDF proposé');
+    ok(!fs.existsSync(absStored(ancienPdf)), 'école : ré-édition -> ancien PDF supprimé du disque');
 
     // --- 5. invitation à signer ---
     // Cas historique : les candidatures créées avant le Lot B n'avaient pas de
@@ -297,11 +308,26 @@ async function main() {
     ok(/Contrat signé/.test(r.text), 'école : badge « contrat signé » sur la liste');
 
     // --- 7. nettoyage disque ---
-    // Refus d'une candidature signée : contrat + signatures + PDF final supprimés.
-    const relsAvantRefus = [contract.pdfPath, contract.schoolSignaturePath, contract.applicantSignaturePath, contract.signedPdfPath];
-    ok(relsAvantRefus.every((rel) => rel && fs.existsSync(absStored(rel))), 'nettoyage : fichiers présents avant refus');
+    // Refus d'une candidature contresignée : refusé, le contrat engage les deux parties.
+    const relsSignes = [contract.pdfPath, contract.schoolSignaturePath, contract.applicantSignaturePath, contract.signedPdfPath];
+    ok(relsSignes.every((rel) => rel && fs.existsSync(absStored(rel))), 'nettoyage : fichiers présents avant refus');
     r = await req(jarE, 'GET', `/mes-annonces/${listing.id}/candidatures`);
-    r = await req(jarE, 'POST', `${apBase}/refuser`, form({ _csrf: csrfFrom(r.text) }));
+    const csrfRefus = csrfFrom(r.text);
+    r = await req(jarE, 'POST', `${apBase}/refuser`, form({ _csrf: csrfRefus }));
+    ok(r.status === 302, 'nettoyage : refus d’un contrat contresigné -> redirection');
+    ok(relsSignes.every((rel) => fs.existsSync(absStored(rel)))
+      && await prisma.contract.findUnique({ where: { applicationId: application.id } }),
+      'nettoyage : contrat contresigné conservé (fichiers et base)');
+
+    // Refus d'une candidature acceptée mais pas encore contresignée : contrat et
+    // fichiers supprimés (sinon ils resteraient téléchargeables).
+    for (const rel of [contract.applicantSignaturePath, contract.signedPdfPath]) fs.unlinkSync(absStored(rel));
+    await prisma.contract.update({
+      where: { id: contract.id },
+      data: { applicantSignaturePath: null, applicantSignedAt: null, signedPdfPath: null, signedPdfHash: null },
+    });
+    const relsAvantRefus = [contract.pdfPath, contract.schoolSignaturePath];
+    r = await req(jarE, 'POST', `${apBase}/refuser`, form({ _csrf: csrfRefus }));
     ok(r.status === 302, 'nettoyage : refus -> redirection');
     ok(relsAvantRefus.every((rel) => !fs.existsSync(absStored(rel))), 'nettoyage : refus -> tous les fichiers du contrat supprimés');
     ok(!(await prisma.contract.findUnique({ where: { applicationId: application.id } })), 'nettoyage : contrat supprimé en base');

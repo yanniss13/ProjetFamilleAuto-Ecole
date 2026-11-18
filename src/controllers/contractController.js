@@ -34,11 +34,27 @@ function candidaturesUrl(application) {
   return `/mes-annonces/${application.listingId}/candidatures`;
 }
 
+// Un contrat contresigné par le candidat engage les deux parties : l'école ne
+// peut plus ni le ré-éditer ni refuser la candidature (ce qui le supprimerait).
+// Renvoie true si la requête a été traitée (redirection avec message).
+function refuseIfFullySigned(req, res, application) {
+  if (!application.contract || !application.contract.applicantSignedAt) return false;
+  req.flash('error', 'Ce contrat est signé par les deux parties : il ne peut plus être modifié ni annulé.');
+  res.redirect(candidaturesUrl(application));
+  return true;
+}
+
+// Supprime des fichiers stockés (best-effort, chemins relatifs à storage/).
+function removeStored(rels) {
+  for (const rel of rels) if (rel) deleteStored(rel);
+}
+
 // POST .../:appId/refuser
 async function reject(req, res, next) {
   try {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
+    if (refuseIfFullySigned(req, res, application)) return;
 
     // Si un contrat avait été généré (candidature acceptée puis refusée), on supprime
     // PDF et signatures — sinon ils resteraient téléchargeables pour un candidat refusé.
@@ -120,6 +136,7 @@ async function acceptForm(req, res, next) {
   try {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
+    if (refuseIfFullySigned(req, res, application)) return;
     const values = await buildPrefill(req.school.id, application);
     res.render('dashboard/contract_form', {
       title: 'Établir le contrat',
@@ -138,6 +155,7 @@ async function accept(req, res, next) {
   try {
     const application = await loadOwnedApplication(req, res);
     if (!application) return;
+    if (refuseIfFullySigned(req, res, application)) return;
 
     const { isValid, errors, value } = validateContract(req.body);
     // Signature de l'école obligatoire (dessinée dans le formulaire).
@@ -153,51 +171,56 @@ async function accept(req, res, next) {
       });
     }
 
-    const schoolSignaturePath = await signatureImage.saveSignature(sigBuf);
-    const schoolSignedAt = new Date();
+    // Nouveaux fichiers d'abord ; les anciens ne sont supprimés qu'une fois la base
+    // à jour, sinon une panne laisserait le contrat pointer vers des fichiers effacés.
+    const created = [];
+    try {
+      const schoolSignaturePath = await signatureImage.saveSignature(sigBuf);
+      created.push(schoolSignaturePath);
+      const schoolSignedAt = new Date();
 
-    // PDF « proposé » : contrat + page de signatures avec le cadre école rempli.
-    const pdf = await buildContractPdf({
-      type: value.type,
-      school: application.listing.school,
-      applicant: application,
-      listing: application.listing,
-      terms: value,
-      signatures: {
-        school: { imagePath: resolveStored(schoolSignaturePath), signedAt: schoolSignedAt, name: application.listing.school.businessName },
-        applicant: null,
-        proposedHash: null,
-      },
-    });
-    const proposedPdfHash = sha256Hex(pdf);
-    const filename = `${crypto.randomBytes(16).toString('hex')}.pdf`;
-    const relPath = `${SUBDIRS.contracts}/${filename}`;
-    await fs.promises.writeFile(path.join(STORAGE_DIR, SUBDIRS.contracts, filename), pdf);
+      // PDF « proposé » : contrat + page de signatures avec le cadre école rempli.
+      const pdf = await buildContractPdf({
+        type: value.type,
+        school: application.listing.school,
+        applicant: application,
+        listing: application.listing,
+        terms: value,
+        signatures: {
+          school: { imagePath: resolveStored(schoolSignaturePath), signedAt: schoolSignedAt, name: application.listing.school.businessName },
+          applicant: null,
+          proposedHash: null,
+        },
+      });
+      const proposedPdfHash = sha256Hex(pdf);
+      const filename = `${crypto.randomBytes(16).toString('hex')}.pdf`;
+      const relPath = `${SUBDIRS.contracts}/${filename}`;
+      await fs.promises.writeFile(path.join(STORAGE_DIR, SUBDIRS.contracts, filename), pdf);
+      created.push(relPath);
 
-    // Ré-édition : l'ancien PDF, l'ancienne signature école, et tout ce qui touche au
-    // contreseing candidat (signature + PDF final) sont supprimés — le candidat devra
-    // re-signer la nouvelle version.
-    if (application.contract) {
-      const old = application.contract;
-      for (const rel of [old.pdfPath, old.schoolSignaturePath, old.applicantSignaturePath, old.signedPdfPath]) {
-        if (rel) {
-          const abs = resolveStored(rel);
-          if (abs) fs.unlink(abs, () => {});
-        }
-      }
+      await contractService.upsertForApplication(application.id, {
+        ...value,
+        pdfPath: relPath,
+        schoolSignaturePath,
+        schoolSignedAt,
+        proposedPdfHash,
+        applicantSignaturePath: null,
+        applicantSignedAt: null,
+        signedPdfPath: null,
+        signedPdfHash: null,
+      });
+    } catch (err) {
+      removeStored(created);
+      throw err;
     }
 
-    await contractService.upsertForApplication(application.id, {
-      ...value,
-      pdfPath: relPath,
-      schoolSignaturePath,
-      schoolSignedAt,
-      proposedPdfHash,
-      applicantSignaturePath: null,
-      applicantSignedAt: null,
-      signedPdfPath: null,
-      signedPdfHash: null,
-    });
+    // Ré-édition : l'ancien PDF et l'ancienne signature école sont supprimés (le
+    // candidat n'avait pas encore signé : refuseIfFullySigned l'a vérifié).
+    if (application.contract) {
+      const old = application.contract;
+      removeStored([old.pdfPath, old.schoolSignaturePath, old.applicantSignaturePath, old.signedPdfPath]);
+    }
+
     await applicationService.updateStatus(application.id, 'accepted');
     realtimeService.publishApplicationUpdate(
       application,
