@@ -3,6 +3,12 @@
 {% block content %}
   <section class="form-card">
     <h1>Connexion auto-école</h1>
+    {% if demo %}
+    <div class="demo-access" role="note">
+      <p><strong>Accès de démonstration</strong></p>
+      <p>Email : <code>{{ demo.school.email }}</code><br>Mot de passe : <code>{{ demo.school.password }}</code></p>
+    </div>
+    {% endif %}
     {% if errors.global %}<div class="flash flash-error" role="alert">{{ errors.global }}</div>{% endif %}
 
     <form action="/connexion" method="post" novalidate>

@@ -1,0 +1,32 @@
+# Instance publique de démonstration sur Render (offre gratuite, sans disque
+# persistant). Render > New > Blueprint > ce dépôt : tout est décrit ici.
+# La base SQLite et les fichiers sont recréés par le seed à chaque démarrage
+# (scripts/demo-start.js). Aucun email n'est envoyé : SMTP_HOST reste vide.
+services:
+  - type: web
+    name: moniteur-connect
+    runtime: node
+    plan: free
+    region: frankfurt
+    # --include=dev : le CLI Prisma (migrations, génération du client) et
+    # Leaflet sont des devDependencies, omises par défaut en production.
+    buildCommand: npm ci --include=dev
+    startCommand: npm run demo:start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: "true"
+      - key: DATABASE_URL
+        value: file:./prisma/demo.db
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: APP_URL
+        sync: false
+      - key: DEMO_BASE_URL
+        sync: false
+      - key: SMTP_HOST
+        value: ""

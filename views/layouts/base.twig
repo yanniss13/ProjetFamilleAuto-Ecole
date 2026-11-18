@@ -10,6 +10,9 @@
 </head>
 <body>
   <a href="#main" class="skip-link">Aller au contenu</a>
+  {% if demo %}
+  <p class="demo-banner" data-demo-banner>Démonstration : données fictives, remises à zéro à chaque redémarrage. Aucun email n'est envoyé.</p>
+  {% endif %}
   {% include 'partials/nav.twig' %}
 
   <main id="main" class="container">

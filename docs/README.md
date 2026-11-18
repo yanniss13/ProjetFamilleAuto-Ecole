@@ -3,13 +3,11 @@
 ## Où commencer
 
 - Conception initiale de juin 2026 : [`historique/2026-06/README.md`](historique/2026-06/README.md)
-- Spécifications et plans d'implémentation : `superpowers/{specs,plans}/`
 
 ## Organisation
 
 - `historique/2026-06/` : cahier des charges, spécifications, maquettes et diagrammes
-  initiaux à conserver comme version 1 ;
-- `superpowers/` : spécifications et plans détaillés des lots livrés.
+  initiaux à conserver comme version 1.
 
 Les fichiers tiers isolés sous `_a_retirer_du_projet/` (captures d'un cours
 UML) ont été examinés puis supprimés le 2026-07-12.

@@ -17,10 +17,12 @@ const signatureImage = require('../src/services/signatureImage');
 const { sha256Hex } = require('../src/utils/hash');
 const { STORAGE_DIR, SUBDIRS, resolveStored, deleteStored } = require('../src/config/storage');
 
-const DEMO_DOMAIN = 'demo.moniteur-connect.example';
+// Domaine et mots de passe partagés avec le mode démo (src/config/demo.js),
+// qui affiche ces accès sur les pages de connexion de l'instance publique.
+const { DEMO_DOMAIN, DEMO_ACCOUNTS } = require('../src/config/demo');
 const DEMO_SUFFIX = `@${DEMO_DOMAIN}`;
-const MDP_ECOLE = 'demo1234';
-const MDP_ADMIN = 'admin1234';
+const MDP_ECOLE = DEMO_ACCOUNTS.school.password;
+const MDP_ADMIN = DEMO_ACCOUNTS.admin.password;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 function daysAgo(n) { return new Date(Date.now() - n * DAY_MS); }
