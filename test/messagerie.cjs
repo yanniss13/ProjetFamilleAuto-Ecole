@@ -259,6 +259,66 @@ async function testSchool() {
   }
 }
 
+// Exécute public/js/realtime.js dans un faux navigateur en mode « thread » (page du fil école).
+function loadThreadScript(fetchImpl) {
+  const fs = require('fs');
+  const path = require('path');
+  const vm = require('vm');
+  const attrs = {
+    'data-realtime-mode': 'thread',
+    'data-realtime-application-id': '7',
+    'data-realtime-stream-url': '/flux',
+    'data-realtime-snapshot-url': '/fil/fragment',
+  };
+  const update = { hidden: true };
+  const list = { replaced: 0, contains: () => false, replaceWith() { this.replaced += 1; } };
+  const context = {
+    getAttribute: (name) => attrs[name] || null,
+    querySelector(selector) {
+      if (selector === '[data-message-list]') return list;
+      if (selector === '[data-realtime-update]') return update;
+      return null;
+    },
+  };
+  const document = { activeElement: null, body: {}, querySelectorAll: () => [context], importNode: (n) => n };
+  const sources = [];
+  class FakeEventSource {
+    constructor(url) { this.url = url; this.listeners = {}; sources.push(this); }
+    addEventListener(name, cb) { this.listeners[name] = cb; }
+    close() {}
+    invalidate(payload) { this.listeners.invalidate({ data: JSON.stringify(payload) }); }
+  }
+  class FakeDOMParser {
+    parseFromString() { return { querySelector: (s) => (s === 'script' ? null : { querySelector: () => null }) }; }
+  }
+  const win = { addEventListener() {}, removeEventListener() {} };
+  const module = { exports: {} };
+  const script = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'realtime.js'), 'utf8');
+  vm.runInNewContext(script, { module, document: undefined, window: undefined, console });
+  module.exports.initRealtime(document, win, fetchImpl, FakeEventSource, FakeDOMParser);
+  return { source: sources[0], list, update };
+}
+
+async function testThreadRealtime() {
+  const fetched = [];
+  const fetchImpl = async (url) => {
+    fetched.push(url);
+    return { ok: true, status: 200, redirected: false, text: async () => '<div data-message-list></div>' };
+  };
+  const { source, list, update } = loadThreadScript(fetchImpl);
+  ok(source && source.url === '/flux', 'temps reel : le fil ecole ecoute le flux de l annonce');
+  source.invalidate({ type: 'message-created', applicationId: 8 });
+  await new Promise((r) => setTimeout(r, 20));
+  ok(fetched.length === 0, 'temps reel : un message d une autre candidature est ignore');
+  source.invalidate({ type: 'message-created', applicationId: 7 });
+  await new Promise((r) => setTimeout(r, 20));
+  ok(fetched.length === 1 && fetched[0] === '/fil/fragment' && list.replaced === 1,
+    'temps reel : un nouveau message recharge la liste du fil');
+  source.invalidate({ type: 'application-rejected', applicationId: 7 });
+  await new Promise((r) => setTimeout(r, 20));
+  ok(update.hidden === false, 'temps reel : un changement de statut propose d actualiser la page');
+}
+
 async function main() {
   let server;
   try {
@@ -266,6 +326,7 @@ async function main() {
     await testService();
     await testApplicant();
     await testSchool();
+    await testThreadRealtime();
     console.log(`\n✅ Messagerie tests reussis - ${passed} assertions.`);
   } finally {
     for (const id of created.schoolIds) await prisma.school.delete({ where: { id } }).catch(() => {});

@@ -7,11 +7,12 @@ consultent les annonces (recherche, carte, rayon), **postulent sans créer de
 compte** avec leurs pièces justificatives, suivent leur dossier par un lien
 privé et contresignent leur contrat en ligne.
 
-Le MVP et **douze lots itératifs** sont livrés (A–C et E–M ; le lot D est resté
+Le MVP et **treize lots itératifs** sont livrés (A–C et E–N ; le lot D est resté
 réservé) : notifications et suivi candidat, administration/modération, carte
 des annonces, vérification SIRET, signature électronique, tableaux de bord
 statistiques, alertes email en double opt-in, purge RGPD automatique, jeu de
-démonstration, autocomplétion d'adresse et suivi des candidatures en temps réel.
+démonstration, autocomplétion d'adresse, suivi des candidatures en temps réel
+et messagerie école ↔ moniteur.
 
 ## Fonctionnalités livrées
 
@@ -21,6 +22,9 @@ démonstration, autocomplétion d'adresse et suivi des candidatures en temps ré
 - suivi de candidature sans compte, par jeton opaque reçu par email ;
 - actualisation en direct des candidatures et des contrats, côté école comme
   côté candidat (Server-Sent Events), avec un parcours complet sans JavaScript ;
+- messagerie par candidature entre l'auto-école et le moniteur (sans compte,
+  via son lien de suivi) : email au destinataire sans recopier le texte,
+  affichage en direct, compteur de non-lus, lecture seule après un refus ;
 - acceptation avec génération de contrat PDF, signature au pad par l'école,
   contreseing du candidat, empreintes SHA-256 et horodatages ;
 - inscription auto-école avec email vérifié et SIRET contrôlé (répertoire

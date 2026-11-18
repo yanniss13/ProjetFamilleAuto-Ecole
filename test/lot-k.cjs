@@ -139,6 +139,12 @@ async function main() {
       && realtimeApplication.listing.status === 'open'
       && realtimeApplication.listing.schoolId === vitrine.id,
     'seed : candidature vitrine en attente dediee a la scene temps reel');
+    const demoMessages = await prisma.message.findMany({
+      where: { applicationId: r2.realtimeApplicationId }, orderBy: { id: 'asc' },
+    });
+    ok(demoMessages.length === 2 && demoMessages[0].author === 'school' && demoMessages[1].author === 'applicant'
+      && demoMessages[1].readAt === null && r2.messages === 2,
+    'seed : la candidature vitrine en attente porte un echange, dont 1 message non lu');
 
     const rr = await get(`/suivi/${r2.realtimeTrackingToken}`);
     ok(rr.status === 200 && rr.text.includes('En attente'),

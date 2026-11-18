@@ -206,7 +206,7 @@ async function seedDemo() {
   await nettoieDemo();
 
   const hashEcole = await passwordUtil.hash(MDP_ECOLE);
-  const compteurs = { schools: 0, listings: 0, applications: 0, alerts: 0, signedContracts: 0 };
+  const compteurs = { schools: 0, listings: 0, applications: 0, alerts: 0, signedContracts: 0, messages: 0 };
 
   // Écoles.
   const ecoles = [];
@@ -331,11 +331,30 @@ async function seedDemo() {
         extra.idCardPath = idRel;
       }
     }
-    const candidature = await creeCandidature(annonce, v, STATUTS_VITRINE[v], (v * 6) % 80, extra);
+    const candidature = await creeCandidature(annonce, v, STATUTS_VITRINE[v], v === 0 ? 2 : (v * 6) % 80, extra);
     if (v === 0) candidatureTempsReel = candidature; // Julien Martin — en attente
     if (v === 1) candidatureSignee = candidature; // Sophie Bernard — dossier signé
   }
   await creeContratSigne(vitrine, annoncesVitrine[0], candidatureSignee);
+
+  // Messagerie : un échange sur la candidature en attente (déposée il y a 2 jours),
+  // la réponse du moniteur non lue.
+  const debutEchange = daysAgo(1);
+  await prisma.message.create({
+    data: {
+      applicationId: candidatureTempsReel.id, author: 'school',
+      body: 'Bonjour, votre profil nous intéresse. Seriez-vous disponible pour un entretien jeudi après-midi ?',
+      createdAt: debutEchange, readAt: new Date(debutEchange.getTime() + 2 * 3600 * 1000),
+    },
+  });
+  await prisma.message.create({
+    data: {
+      applicationId: candidatureTempsReel.id, author: 'applicant',
+      body: 'Bonjour, oui avec plaisir. Jeudi à partir de 14 h me convient très bien.',
+      createdAt: new Date(debutEchange.getTime() + 3 * 3600 * 1000),
+    },
+  });
+  compteurs.messages += 2;
   compteurs.signedContracts += 1;
 
   // Autres écoles : 45 candidatures réparties sur les annonces ouvertes.
@@ -391,7 +410,7 @@ async function runCli() {
   try {
     const r = await seedDemo();
     console.log('Données de démo prêtes :');
-    console.log(`  ${r.schools} auto-écoles, ${r.listings} annonces, ${r.applications} candidatures, ${r.alerts} alertes, ${r.signedContracts} contrat signé.`);
+    console.log(`  ${r.schools} auto-écoles, ${r.listings} annonces, ${r.applications} candidatures, ${r.alerts} alertes, ${r.signedContracts} contrat signé, ${r.messages} messages.`);
     console.log('\nComptes de démonstration :');
     console.log(`  École vitrine : ${r.credentials.school.email} / ${r.credentials.school.password}`);
     console.log(`  Admin         : ${r.credentials.admin.email} / ${r.credentials.admin.password}`);

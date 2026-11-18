@@ -34,6 +34,7 @@
       'application-rejected': 'La candidature a été refusée.',
       'contract-sent': 'Le contrat est maintenant prêt à signer.',
       'contract-signed': 'Le contrat a été signé par le candidat.',
+      'message-created': 'Nouveau message reçu.',
     };
     return messages[type] || 'La candidature a été mise à jour.';
   }
@@ -44,6 +45,7 @@
     var snapshotUrl = context.getAttribute('data-realtime-snapshot-url');
     var cardTemplate = context.getAttribute('data-realtime-card-url-template');
     var page = context.getAttribute('data-realtime-page') || '1';
+    var threadApplicationId = Number(context.getAttribute('data-realtime-application-id'));
     if (!streamUrl || !snapshotUrl || !EventSourceCtor || !fetchImpl || !ParserCtor) return null;
 
     setState(context, 'connecting');
@@ -143,7 +145,9 @@
     }
 
     function refreshSnapshot(message) {
-      var selector = mode === 'school' ? '[data-application-region]' : '[data-tracking-status]';
+      var selector = mode === 'school'
+        ? '[data-application-region]'
+        : (mode === 'thread' ? '[data-message-list]' : '[data-tracking-status]');
       var current = context.querySelector(selector);
       if (!current) return Promise.resolve();
       return fetchNode(snapshotUrl, selector).then(function (next) {
@@ -200,7 +204,15 @@
         return;
       }
       if (stopped) return;
-      if (mode === 'school') {
+      if (mode === 'thread') {
+        // Le flux de l'annonce couvre toutes ses candidatures : seul ce fil compte.
+        if (!event || event.applicationId !== threadApplicationId) return;
+        if (event.type === 'message-created') {
+          enqueueRefresh('snapshot', function () { return refreshSnapshot(messageFor(event.type)); });
+        } else {
+          showUpdate(context);
+        }
+      } else if (mode === 'school') {
         var applicationId = event && event.applicationId;
         var key = Number.isInteger(applicationId) && applicationId > 0
           ? `card:${applicationId}`
