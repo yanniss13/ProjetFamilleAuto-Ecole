@@ -88,6 +88,9 @@ async function testService() {
   ok('error' in messageService.validateBody('x'.repeat(2001)), 'service : message de 2 001 caracteres refuse');
   ok(messageService.validateBody('x'.repeat(2000)).value.length === 2000, 'service : 2 000 caracteres acceptes');
   ok(messageService.validateBody(' Bonjour ').value === 'Bonjour', 'service : espaces autour retires');
+  const withBreaks = messageService.validateBody(`${'a'.repeat(1990)}${'\r\nb'.repeat(5)}`);
+  ok(withBreaks.value && withBreaks.value.length === 2000 && !withBreaks.value.includes('\r'),
+    'service : un retour a la ligne compte pour 1 caractere, comme dans la zone de saisie');
   ok(messageService.isThreadOpen({ status: 'rejected' }) === false, 'service : fil ferme apres refus');
   ok(messageService.isThreadOpen({ status: 'pending' }) && messageService.isThreadOpen({ status: 'accepted' }),
     'service : fil ouvert en attente et acceptee');

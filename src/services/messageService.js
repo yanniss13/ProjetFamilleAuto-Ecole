@@ -13,7 +13,9 @@ function isThreadOpen(application) {
 }
 
 function validateBody(raw) {
-  const value = typeof raw === 'string' ? raw.trim() : '';
+  // Les navigateurs envoient les retours à la ligne en \r\n alors que la zone de
+  // saisie (maxlength) les compte pour 1 : on normalise avant de mesurer.
+  const value = typeof raw === 'string' ? raw.replace(/\r\n?/g, '\n').trim() : '';
   if (!value) return { error: 'Le message est vide.' };
   if (value.length > MAX_BODY) return { error: `Le message dépasse ${MAX_BODY} caractères.` };
   return { value };
