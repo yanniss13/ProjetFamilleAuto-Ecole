@@ -17,6 +17,7 @@
     } %}
     {% include 'tracking/_status.twig' %}
   </div>
+  {% include 'partials/message-form.twig' with { messageAction: '/suivi/' ~ application.trackingToken ~ '/messages' } %}
 {% endblock %}
 
 {% block scripts %}

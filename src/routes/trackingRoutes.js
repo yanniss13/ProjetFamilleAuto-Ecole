@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const trackingController = require('../controllers/trackingController');
 const signatureController = require('../controllers/signatureController');
 const realtimeController = require('../controllers/realtimeController');
+const messageController = require('../controllers/messageController');
 const applicationService = require('../services/applicationService');
 
 const router = express.Router();
@@ -46,6 +47,15 @@ const signLimiter = rateLimit({
   },
 });
 
+// Anti-spam de la messagerie (lot N) : 30 messages / 15 min par IP.
+const messageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false,
+  handler: (req, res) => {
+    req.flash('error', 'Trop de messages envoyés. Veuillez réessayer plus tard.');
+    res.status(429).redirect(`/suivi/${req.params.token}`);
+  },
+});
+
 router.use(hideBackOfficeLocals);
 router.param('token', detachForValidToken);
 
@@ -55,5 +65,6 @@ router.get('/:token', trackingController.show);
 router.get('/:token/contrat', signatureController.downloadContract);
 router.get('/:token/signer', signatureController.showSign);
 router.post('/:token/signer', signLimiter, signatureController.sign);
+router.post('/:token/messages', messageLimiter, messageController.postFromApplicant);
 
 module.exports = router;

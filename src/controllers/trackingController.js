@@ -1,6 +1,7 @@
 // Page de suivi publique accessible par jeton. Après validation, seul l'identifiant
 // est conservé en session pour les lectures temps réel suivantes.
 const applicationService = require('../services/applicationService');
+const messageService = require('../services/messageService');
 const { notFound } = require('../utils/http');
 
 const MAX_REALTIME_APPLICATIONS = 5;
@@ -38,6 +39,7 @@ async function show(req, res, next) {
     if (!token) return notFound(res);
     const application = await applicationService.findByTrackingToken(token);
     if (!application) return notFound(res);
+    await messageService.markReadBy(application.id, 'applicant');
     try {
       await bindRealtimeApplication(req, application.id);
     } catch (err) {

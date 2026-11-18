@@ -1,0 +1,21 @@
+{# Fil de messages d'une candidature (lot N). Racine rafraîchie en temps réel :
+   ne contient jamais le formulaire, pour ne pas effacer un message en cours de saisie. #}
+<div class="message-list" data-message-list>
+  {% if application.messages is defined and messages is not defined %}{% set messages = application.messages %}{% endif %}
+  {% if messages is empty %}
+    <p class="muted">Aucun message pour l'instant.</p>
+  {% else %}
+    <ol class="messages">
+      {% for m in messages %}
+        {% set mine = m.author == viewer %}
+        <li class="message {{ mine ? 'message--mine' : 'message--theirs' }}">
+          <p class="message__meta">
+            <strong>{% if mine %}Vous{% elseif m.author == 'school' %}{{ application.listing.school.businessName }}{% else %}{{ application.applicantName }}{% endif %}</strong>
+            · {{ m.createdAt|date('d/m/Y à H:i') }}{% if mine and m.readAt %} · Lu{% endif %}
+          </p>
+          <p class="message__body">{{ m.body }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+</div>

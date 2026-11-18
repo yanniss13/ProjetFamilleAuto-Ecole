@@ -15,6 +15,8 @@ const prisma = require('../src/config/prisma');
 const app = require('../src/app');
 const passwordUtil = require('../src/utils/password');
 const messageService = require('../src/services/messageService');
+const realtimeService = require('../src/services/realtimeService');
+const mailer = require('../src/services/mailer');
 
 const PORT = 4075;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -112,11 +114,83 @@ async function testService() {
     'service : messages supprimes avec la candidature');
 }
 
+// Remplace un envoi d'email le temps d'un test et journalise ses appels.
+function spyMail() {
+  const calls = [];
+  const original = mailer.sendNewMessage;
+  mailer.sendNewMessage = async (...args) => { calls.push(args); return true; };
+  return { calls, restore() { mailer.sendNewMessage = original; } };
+}
+function spyRealtime(applicationId) {
+  const events = [];
+  const off = realtimeService.subscribe(realtimeService.applicationChannel(applicationId), (e) => events.push(e));
+  return { events, off };
+}
+
+async function testApplicant() {
+  const school = await makeSchool('moniteur');
+  const application = await makeApplication(school);
+  const token = application.trackingToken;
+  ok(realtimeService.EVENT_TYPES.MESSAGE_CREATED === 'message-created', 'moniteur : evenement message-created declare');
+
+  await messageService.create(application.id, 'school', 'Bonjour, etes-vous disponible le samedi ?');
+  const jar = makeJar();
+  let r = await req(jar, 'GET', `/suivi/${token}`);
+  ok(r.status === 200 && r.text.includes('etes-vous disponible le samedi'), 'moniteur : la page de suivi affiche le message de l ecole');
+  ok(r.text.includes('data-message-list') && r.text.includes(`/suivi/${token}/messages`),
+    'moniteur : fil et formulaire presents sur la page de suivi');
+  const fromSchool = (await messageService.listForApplication(application.id))[0];
+  ok(fromSchool.readAt, 'moniteur : le message de l ecole est marque lu a l affichage');
+  const csrf = csrfFrom(r.text);
+
+  const mail = spyMail();
+  const rt = spyRealtime(application.id);
+  try {
+    r = await req(jar, 'POST', `/suivi/${token}/messages`, form({ _csrf: csrf, body: '  Oui, le samedi matin.  ' }));
+    ok(r.status === 302 && r.location.startsWith(`/suivi/${token}`), 'moniteur : envoi valide => redirection vers le suivi');
+    const list = await messageService.listForApplication(application.id);
+    ok(list.length === 2 && list[1].author === 'applicant' && list[1].body === 'Oui, le samedi matin.',
+      'moniteur : message enregistre au nom du moniteur');
+    ok(mail.calls.length === 1 && mail.calls[0][0] === school.email
+      && mail.calls[0][3].endsWith(`/mes-annonces/${application.listingId}/candidatures/${application.id}/messages`),
+    'moniteur : l ecole est prevenue par email avec le lien du fil');
+    ok(!JSON.stringify(mail.calls[0]).includes('samedi matin'), 'moniteur : l email ne recopie pas le texte du message');
+    ok(rt.events.length === 1 && rt.events[0].type === 'message-created', 'moniteur : evenement temps reel publie');
+
+    r = await req(jar, 'POST', `/suivi/${token}/messages`, form({ _csrf: csrf, body: '    ' }));
+    ok(r.status === 400, 'moniteur : message vide => 400');
+    r = await req(jar, 'POST', `/suivi/${token}/messages`, form({ _csrf: csrf, body: 'y'.repeat(2001) }));
+    ok(r.status === 400 && r.text.includes('y'.repeat(50)), 'moniteur : 2 001 caracteres => 400, brouillon conserve');
+    ok(await prisma.message.count({ where: { applicationId: application.id } }) === 2,
+      'moniteur : aucun message enregistre apres un refus de validation');
+    ok(mail.calls.length === 1, 'moniteur : aucun email pour un message refuse');
+
+    r = await req(jar, 'POST', '/suivi/jeton-inexistant-0000000000/messages', form({ _csrf: csrf, body: 'Bonjour' }));
+    ok(r.status === 404, 'moniteur : jeton inconnu => 404');
+
+    r = await req(jar, 'GET', `/suivi/fragment/${application.id}`);
+    ok(r.status === 200 && r.text.includes('data-message-list') && !r.text.includes('<textarea'),
+      'moniteur : le fragment temps reel contient le fil mais jamais le formulaire');
+
+    await prisma.application.update({ where: { id: application.id }, data: { status: 'rejected' } });
+    r = await req(jar, 'POST', `/suivi/${token}/messages`, form({ _csrf: csrf, body: 'Encore une question' }));
+    ok(r.status === 302 && await prisma.message.count({ where: { applicationId: application.id } }) === 2,
+      'moniteur : candidature refusee => envoi refuse');
+    r = await req(jar, 'GET', `/suivi/${token}`);
+    ok(r.text.includes('samedi matin') && !r.text.includes(`/suivi/${token}/messages`) && /lecture seule/i.test(r.text),
+      'moniteur : candidature refusee => fil en lecture seule');
+  } finally {
+    mail.restore();
+    rt.off();
+  }
+}
+
 async function main() {
   let server;
   try {
     server = await new Promise((resolve) => { const s = app.listen(PORT, () => resolve(s)); });
     await testService();
+    await testApplicant();
     console.log(`\n✅ Messagerie tests reussis - ${passed} assertions.`);
   } finally {
     for (const id of created.schoolIds) await prisma.school.delete({ where: { id } }).catch(() => {});

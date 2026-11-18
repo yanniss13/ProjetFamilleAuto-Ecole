@@ -3,6 +3,9 @@ const prisma = require('../config/prisma');
 const { paginate } = require('../utils/pagination');
 const { generateOpaqueToken } = require('./tokens');
 
+// Fil de messages (lot N) chargé avec la candidature, dans l'ordre d'écriture.
+const MESSAGES_IN_ORDER = { orderBy: [{ createdAt: 'asc' }, { id: 'asc' }] };
+
 // Dépose une candidature sur une annonce.
 function createForListing(listingId, data) {
   return prisma.application.create({ data: { ...data, listingId } });
@@ -65,14 +68,14 @@ async function ensureTrackingToken(applicationId, currentToken) {
 function findByTrackingToken(token) {
   return prisma.application.findUnique({
     where: { trackingToken: token },
-    include: { listing: { include: { school: true } }, contract: true },
+    include: { listing: { include: { school: true } }, contract: true, messages: MESSAGES_IN_ORDER },
   });
 }
 
 function findByIdForTracking(applicationId) {
   return prisma.application.findUnique({
     where: { id: applicationId },
-    include: { listing: { include: { school: true } }, contract: true },
+    include: { listing: { include: { school: true } }, contract: true, messages: MESSAGES_IN_ORDER },
   });
 }
 

@@ -2,6 +2,7 @@
 
 const listingService = require('../services/listingService');
 const applicationService = require('../services/applicationService');
+const messageService = require('../services/messageService');
 const realtimeService = require('../services/realtimeService');
 const { parseId, notFound } = require('../utils/http');
 
@@ -117,6 +118,7 @@ async function candidateFragment(req, res, next) {
     if (!applicationId || !candidateIsAuthorized(req, applicationId)) return res.status(401).end();
     const application = await applicationService.findByIdForTracking(applicationId);
     if (!application) return notFound(res);
+    await messageService.markReadBy(application.id, 'applicant');
     res.render('tracking/_status', { application });
   } catch (err) {
     next(err);

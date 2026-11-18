@@ -10,6 +10,7 @@ const EVENT_TYPES = Object.freeze({
   APPLICATION_REJECTED: 'application-rejected',
   CONTRACT_SENT: 'contract-sent',
   CONTRACT_SIGNED: 'contract-signed',
+  MESSAGE_CREATED: 'message-created',
 });
 const ALLOWED_TYPES = new Set(Object.values(EVENT_TYPES));
 

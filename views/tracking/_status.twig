@@ -31,4 +31,7 @@
   {% else %}
     <p>Votre candidature est en cours d'examen par l'auto-école.</p>
   {% endif %}
+
+  <h2 id="messages" class="section">Messages avec l'auto-école</h2>
+  {% include 'partials/messages-list.twig' with { viewer: 'applicant' } %}
 </section>

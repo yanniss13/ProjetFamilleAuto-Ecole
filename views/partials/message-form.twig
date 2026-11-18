@@ -1,0 +1,16 @@
+{# Formulaire d'envoi d'un message (lot N), hors de la zone rafraîchie en temps réel. #}
+{% if application.status != 'rejected' %}
+  <form action="{{ messageAction }}" method="post" class="message-form">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="form-group">
+      <label for="message-body">Votre message</label>
+      <textarea id="message-body" name="body" rows="4" maxlength="2000" required
+        {% if messageError %}aria-invalid="true" aria-describedby="message-error"{% endif %}>{{ messageDraft }}</textarea>
+      {% if messageError %}<p class="field-error" id="message-error" role="alert">{{ messageError }}</p>{% endif %}
+      <p class="fine-print">2 000 caractères maximum.</p>
+    </div>
+    <button type="submit" class="btn btn-primary">Envoyer</button>
+  </form>
+{% else %}
+  <p class="muted">Cette candidature a été refusée : la messagerie est en lecture seule.</p>
+{% endif %}

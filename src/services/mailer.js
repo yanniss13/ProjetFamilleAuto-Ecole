@@ -300,6 +300,23 @@ function sendListingAlert(email, listing, unsubscribeToken) {
   );
 }
 
+// Prévient le destinataire d'un nouveau message (lot N). Le texte du message
+// n'est jamais recopié : le lien vers le fil suffit.
+function sendNewMessage(to, name, listingTitle, link) {
+  return send(
+    to,
+    `Nouveau message — ${listingTitle}`,
+    emailLayout({
+      title: 'Vous avez reçu un message',
+      contentHtml: `<p>Bonjour ${esc(name)},</p>
+        <p>Un nouveau message vous attend à propos de « ${esc(listingTitle)} ».</p>
+        <p>Ouvrez le fil pour le lire et y répondre.</p>`,
+      cta: { label: 'Lire le message', url: link },
+    }),
+    { link }
+  );
+}
+
 module.exports = {
   send,
   emailLayout,
@@ -314,6 +331,7 @@ module.exports = {
   sendApplicationRejected,
   sendAlertConfirmation,
   sendListingAlert,
+  sendNewMessage,
   maskEmail,
   esc,
   APP_URL,
