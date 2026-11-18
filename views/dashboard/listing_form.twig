@@ -39,7 +39,7 @@
           <option value="">—</option>
           <option value="cdi" {% if values.contractType == 'cdi' %}selected{% endif %}>CDI</option>
           <option value="cdd" {% if values.contractType == 'cdd' %}selected{% endif %}>CDD</option>
-          <option value="freelance" {% if values.contractType == 'freelance' %}selected{% endif %}>Freelance</option>
+          <option value="freelance" {% if values.contractType == 'freelance' %}selected{% endif %}>Indépendant</option>
           <option value="apprentissage" {% if values.contractType == 'apprentissage' %}selected{% endif %}>Apprentissage</option>
         </select>
         {% if errors.contractType %}<p class="field-error">{{ errors.contractType }}</p>{% endif %}

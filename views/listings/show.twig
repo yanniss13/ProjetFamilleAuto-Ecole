@@ -5,11 +5,11 @@
      que rejectBackOfficeApplication — l'affichage suit exactement ce que la route refuse. #}
   <article class="hero">
     <h1>{{ listing.title }}</h1>
-    <p class="muted">
-      {{ listing.city }} ({{ listing.department }})
-      {% if listing.contractType %} · {{ listing.contractType }}{% endif %}
-      {% if listing.hoursPerWeek %} · {{ listing.hoursPerWeek }} h/sem{% endif %}
-    </p>
+    <ul class="listing-facts" aria-label="Informations clés">
+      <li>{{ listing.city }} ({{ listing.department }})</li>
+      {% if listing.contractType %}<li>{{ listing.contractType|contrat }}</li>{% endif %}
+      {% if listing.hoursPerWeek %}<li>{{ listing.hoursPerWeek }} h/sem</li>{% endif %}
+    </ul>
     {% if listing.compensation %}<p><strong>Rémunération :</strong> {{ listing.compensation }}</p>{% endif %}
     <p>{{ listing.description }}</p>
     <p class="muted">

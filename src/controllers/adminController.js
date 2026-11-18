@@ -1,4 +1,5 @@
 // Espace d'administration : supervision et modération (protégé par requireAdmin + loadAdmin).
+const { contractLabel } = require('../utils/labels');
 const listingService = require('../services/listingService');
 const schoolService = require('../services/schoolService');
 const statsService = require('../services/statsService');
@@ -29,9 +30,6 @@ function isRecordNotFound(err) {
   return Boolean(err) && err.code === 'P2025';
 }
 
-function contractLabel(type) {
-  return ({ cdi: 'CDI', cdd: 'CDD', freelance: 'Freelance', apprentissage: 'Apprentissage' })[type] || type || '';
-}
 
 function pluralLabel(count, singular, plural) {
   return `${count} ${count > 1 ? plural : singular}`;

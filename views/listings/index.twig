@@ -3,24 +3,38 @@
 {% block content %}
   <div class="page-header"><h1>Annonces</h1></div>
 
-  <form action="/annonces" method="get" class="filter-bar">
+  <form action="/annonces" method="get" class="filter-bar" role="search" aria-label="Filtrer les annonces">
     {% if vue == 'carte' %}<input type="hidden" name="vue" value="carte">{% endif %}
-    <input type="text" name="q" value="{{ filters.q }}" placeholder="Mot-clé (poste, ville…)">
-    <input type="text" name="departement" value="{{ filters.departement }}" placeholder="Département (ex. 13)">
-    <input type="text" name="ville" value="{{ filters.ville }}" placeholder="Autour de… (ville)">
-    <select name="rayon" aria-label="Rayon de recherche">
-      {% for r in rayons %}
-        <option value="{{ r }}" {% if filters.rayon == r %}selected{% endif %}>{{ r }} km</option>
-      {% endfor %}
-    </select>
-    <button type="submit" class="btn">Filtrer</button>
+    <div class="filter-field filter-field--wide">
+      <label for="f-q">Mot-clé</label>
+      <input id="f-q" type="text" name="q" value="{{ filters.q }}" placeholder="poste, ville…">
+    </div>
+    <div class="filter-field">
+      <label for="f-dep">Département</label>
+      <input id="f-dep" type="text" name="departement" value="{{ filters.departement }}" inputmode="numeric" placeholder="ex. 13">
+    </div>
+    <div class="filter-field">
+      <label for="f-ville">Autour de</label>
+      <input id="f-ville" type="text" name="ville" value="{{ filters.ville }}" placeholder="ville">
+    </div>
+    <div class="filter-field filter-field--narrow">
+      <label for="f-rayon">Rayon</label>
+      <select id="f-rayon" name="rayon">
+        {% for r in rayons %}
+          <option value="{{ r }}" {% if filters.rayon == r %}selected{% endif %}>{{ r }} km</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrer</button>
   </form>
 
-  <div class="view-toggle">
-    <a href="{{ listeUrl }}" class="btn btn-small {% if vue == 'liste' %}btn-primary{% endif %}">Liste</a>
-    <a href="{{ carteUrl }}" class="btn btn-small {% if vue == 'carte' %}btn-primary{% endif %}">Carte</a>
+  <div class="listing-toolbar">
+    <div class="view-toggle" role="group" aria-label="Affichage">
+      <a href="{{ listeUrl }}" class="btn btn-small {% if vue == 'liste' %}btn-primary{% endif %}"{% if vue == 'liste' %} aria-current="page"{% endif %}>Liste</a>
+      <a href="{{ carteUrl }}" class="btn btn-small {% if vue == 'carte' %}btn-primary{% endif %}"{% if vue == 'carte' %} aria-current="page"{% endif %}>Carte</a>
+    </div>
+    <p class="muted listing-toolbar__alert"><a href="{{ alerteUrl }}">Créer une alerte pour cette recherche</a> et recevoir les prochaines annonces par email.</p>
   </div>
-  <p class="muted"><a href="{{ alerteUrl }}">Créer une alerte pour cette recherche</a> — recevez les prochaines annonces par email.</p>
 
   {% if villeIntrouvable %}
     <div class="flash flash-error" role="alert">Ville introuvable — le filtre de rayon a été ignoré.</div>
@@ -40,22 +54,7 @@
     {% else %}
       <ul class="listing-list">
         {% for l in listings %}
-          <li class="listing-card">
-            <a href="/annonces/{{ l.id }}"><h2>{{ l.title }}</h2></a>
-            <p class="muted">
-              {{ l.city }} ({{ l.department }})
-              {% if l.contractType %} · {{ l.contractType }}{% endif %}
-              {% if l.hoursPerWeek %} · {{ l.hoursPerWeek }} h/sem{% endif %}
-              {% if l.distanceKm %} <span class="badge-distance">à {{ l.distanceKm }} km</span>{% endif %}
-              {% if l.school.siretStatus == 'verified' %} <span class="badge-verified">✓ École vérifiée</span>{% endif %}
-            </p>
-            <p>{{ l.description }}</p>
-            <p>
-              <a href="/annonces/{{ l.id }}" class="btn btn-small">
-                {% if backOfficeSession %}Voir l'annonce{% else %}Voir &amp; postuler{% endif %}
-              </a>
-            </p>
-          </li>
+          {% include 'listings/_card.twig' with { l: l } %}
         {% endfor %}
       </ul>
       {% include 'partials/pagination.twig' %}

@@ -1,17 +1,66 @@
 {% extends 'layouts/base.twig' %}
 
-{% block content %}
-  <section class="hero">
-    <h1>MoniteurConnect</h1>
-    <p>La plateforme qui relie les <strong>auto-écoles</strong> et les
-       <strong>moniteurs indépendants</strong>.</p>
-    <p class="muted">
-      Auto-écoles : publiez vos besoins. Moniteurs : trouvez une mission près de chez
-      vous et postulez en ligne, sans créer de compte.
-    </p>
-    <p class="dashboard-actions">
-      <a href="/annonces" class="btn btn-primary">Voir les annonces</a>
-      <a href="/inscription" class="btn">Inscrire mon auto-école</a>
-    </p>
+{% block hero %}
+  <section class="home-hero" aria-labelledby="home-title">
+    <div class="home-hero__inner">
+      <h1 id="home-title">Des moniteurs indépendants pour les auto&#8209;écoles, près de chez vous.</h1>
+      <p class="home-hero__lede">
+        Les auto-écoles publient leurs besoins. Les moniteurs postulent en ligne avec leurs
+        pièces, sans créer de compte, et signent leur contrat à distance.
+      </p>
+      <form class="home-search" action="/annonces" method="get" role="search" aria-label="Rechercher une annonce">
+        <div class="home-search__field">
+          <label for="home-q">Poste, ville ou mot-clé</label>
+          <input id="home-q" type="text" name="q" placeholder="ex. Marseille, remorque, CDI">
+        </div>
+        <div class="home-search__field home-search__field--short">
+          <label for="home-dep">Département</label>
+          <input id="home-dep" type="text" name="departement" inputmode="numeric" maxlength="3" placeholder="ex. 13">
+        </div>
+        <button type="submit" class="btn btn-accent">Rechercher</button>
+      </form>
+      <p class="home-hero__count">
+        {% if openCount > 1 %}{{ openCount }} annonces ouvertes en ce moment.{% elseif openCount == 1 %}1 annonce ouverte en ce moment.{% else %}Aucune annonce ouverte pour l'instant.{% endif %}
+        <a href="/annonces?vue=carte">Voir la carte</a>
+      </p>
+    </div>
+    <div class="lane-marking" aria-hidden="true"></div>
   </section>
+{% endblock %}
+
+{% block content %}
+  <section class="home-paths" aria-label="Comment ça marche">
+    <div class="home-path">
+      <h2>Vous êtes une auto-école</h2>
+      <ol class="steps">
+        <li><strong>Publiez votre besoin</strong> : horaires, type de contrat, rémunération.</li>
+        <li><strong>Recevez des dossiers complets</strong> : CV, permis et autorisation d'enseigner.</li>
+        <li><strong>Signez le contrat en ligne</strong>, puis échangez avec le moniteur depuis votre espace.</li>
+      </ol>
+      <a href="/inscription" class="btn btn-primary">Inscrire mon auto-école</a>
+    </div>
+    <div class="home-path">
+      <h2>Vous êtes moniteur</h2>
+      <ol class="steps">
+        <li><strong>Trouvez une mission</strong> par ville, par département ou sur la carte.</li>
+        <li><strong>Postulez sans compte</strong>, avec vos pièces, en quelques minutes.</li>
+        <li><strong>Suivez votre dossier</strong> grâce au lien reçu par email, et répondez à l'école.</li>
+      </ol>
+      <a href="/annonces" class="btn">Voir les annonces</a>
+    </div>
+  </section>
+
+  {% if latest|length > 0 %}
+    <section class="home-latest" aria-labelledby="latest-title">
+      <div class="section-head">
+        <h2 id="latest-title">Dernières annonces</h2>
+        <a href="/annonces">Toutes les annonces</a>
+      </div>
+      <ul class="listing-list">
+        {% for l in latest %}
+          {% include 'listings/_card.twig' with { l: l, headingLevel: 3 } %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
 {% endblock %}

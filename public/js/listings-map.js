@@ -58,14 +58,14 @@
     var centerLatLng = [data.center.lat, data.center.lng];
     var circle = L.circle(centerLatLng, {
       radius: data.center.radiusKm * 1000,
-      color: '#1d4ed8',
-      fillColor: '#1d4ed8',
+      color: '#0f4f8f',
+      fillColor: '#0f4f8f',
       fillOpacity: 0.08,
       weight: 1.5,
     }).addTo(map);
     var centerMarker = L.circleMarker(centerLatLng, {
       radius: 6,
-      color: '#1d4ed8',
+      color: '#0f4f8f',
       fillColor: '#ffffff',
       fillOpacity: 1,
       weight: 3,

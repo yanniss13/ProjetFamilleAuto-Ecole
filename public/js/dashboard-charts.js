@@ -13,7 +13,7 @@
   }
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  var BAR = '#2563eb'; // teinte unique validée (contraste + daltonisme, surface claire)
+  var BAR = '#0f4f8f'; // teinte unique validée (contraste + daltonisme, surface claire)
   var INK = '#374151'; // encre neutre : le texte ne porte jamais la couleur des barres
   var MUTED = '#5b6470'; // aligné sur --color-muted (contraste WCAG AA)
   var GRID = '#e5e7eb';

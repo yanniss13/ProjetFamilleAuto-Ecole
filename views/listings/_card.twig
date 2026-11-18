@@ -1,0 +1,22 @@
+{# Carte d'annonce publique, partagée par la liste et l'accueil.
+   headingLevel : niveau de titre selon la page (2 dans la liste, 3 sur l'accueil). #}
+{% set level = headingLevel|default(2) %}
+<li class="listing-card">
+  <div class="listing-card__head">
+    <h{{ level }} class="listing-card__title"><a href="/annonces/{{ l.id }}">{{ l.title }}</a></h{{ level }}>
+    {% if l.school.siretStatus == 'verified' %}<span class="badge-verified">✓ École vérifiée</span>{% endif %}
+  </div>
+  <p class="listing-card__school">{{ l.school.businessName }}</p>
+  <ul class="listing-facts" aria-label="Informations clés">
+    <li>{{ l.city }} ({{ l.department }})</li>
+    {% if l.contractType %}<li>{{ l.contractType|contrat }}</li>{% endif %}
+    {% if l.hoursPerWeek %}<li>{{ l.hoursPerWeek }} h/sem</li>{% endif %}
+    {% if l.distanceKm %}<li class="listing-facts__distance">à {{ l.distanceKm }} km</li>{% endif %}
+  </ul>
+  <p class="listing-card__desc">{{ l.description }}</p>
+  <p class="listing-card__cta">
+    <a href="/annonces/{{ l.id }}" class="btn btn-small">
+      {% if backOfficeSession %}Voir l'annonce{% else %}Voir &amp; postuler{% endif %}
+    </a>
+  </p>
+</li>

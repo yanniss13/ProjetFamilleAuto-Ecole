@@ -5,23 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrfToken }}">
   <title>{% if title %}{{ title }} · {% endif %}MoniteurConnect</title>
+  <link rel="preload" href="/fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/barlow-semi-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/style.css">
   {% block head %}{% endblock %}
 </head>
 <body>
   <a href="#main" class="skip-link">Aller au contenu</a>
   {% if demo %}
-  <p class="demo-banner" data-demo-banner>Démonstration : données fictives, remises à zéro à chaque redémarrage. Aucun email n'est envoyé.</p>
+  <aside class="demo-banner" data-demo-banner aria-label="Mode démonstration">
+    <p>Démonstration : données fictives, remises à zéro à chaque redémarrage. Aucun email n'est envoyé.</p>
+  </aside>
   {% endif %}
   {% include 'partials/nav.twig' %}
 
-  <main id="main" class="container">
-    {% include 'partials/flash.twig' %}
-    {% block content %}{% endblock %}
+  <main id="main">
+    {% block hero %}{% endblock %}
+    <div class="container">
+      {% include 'partials/flash.twig' %}
+      {% block content %}{% endblock %}
+    </div>
   </main>
 
   <footer class="footer">
-    <p>MoniteurConnect — auto-écoles &amp; moniteurs indépendants</p>
+    <div class="footer__inner">
+      <p class="footer__brand">MoniteurConnect</p>
+      <p>La mise en relation des auto-écoles et des moniteurs indépendants.</p>
+      {% if not backOfficeSession %}
+        <nav class="footer__links" aria-label="Liens du pied de page">
+          <a href="/annonces">Annonces</a>
+          <a href="/alertes">Alertes email</a>
+          <a href="/inscription">Inscrire mon auto-école</a>
+        </nav>
+      {% endif %}
+    </div>
   </footer>
   <script src="/js/confirm.js" defer></script>
   <script src="/js/mobile-nav.js" defer></script>

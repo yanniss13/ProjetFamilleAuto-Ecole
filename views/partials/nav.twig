@@ -1,5 +1,7 @@
 <header class="navbar">
-  <a class="navbar-brand" href="{% if adminSessionActive %}/admin{% else %}/{% endif %}">MoniteurConnect</a>
+  <a class="navbar-brand" href="{% if adminSessionActive %}/admin{% else %}/{% endif %}">
+    <span class="brand-mark" aria-hidden="true"></span>MoniteurConnect
+  </a>
   <button class="navbar-toggle" id="navigation-toggle" type="button"
           aria-expanded="false" aria-controls="navigation-principale"
           aria-label="Ouvrir le menu" hidden>
@@ -28,7 +30,7 @@
       </form>
     {% else %}
       <a href="/connexion">Connexion</a>
-      <a href="/inscription">Inscription auto-école</a>
+      <a href="/inscription" class="navbar-cta">Inscrire mon auto-école</a>
     {% endif %}
   </nav>
 </header>

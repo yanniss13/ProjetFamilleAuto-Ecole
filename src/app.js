@@ -2,6 +2,8 @@
 // Le démarrage du serveur est dans server.js.
 const path = require('path');
 const express = require('express');
+const Twig = require('twig');
+const { contractLabel } = require('./utils/labels');
 const session = require('express-session');
 const helmet = require('helmet');
 
@@ -44,6 +46,8 @@ app.use(
 // JSON.stringify avec « < » échappé côté serveur, jamais du HTML.
 app.set('views', path.join(__dirname, '..', 'views'));
 app.set('view engine', 'twig');
+// Filtre de vue : « cdi » -> « CDI », « freelance » -> « Indépendant ».
+Twig.extendFilter('contrat', contractLabel);
 app.set('twig options', { autoescape: true });
 
 // Corps des formulaires (urlencoded). Les formulaires multipart (upload CV) sont

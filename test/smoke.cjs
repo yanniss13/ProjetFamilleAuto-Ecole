@@ -168,6 +168,16 @@ async function main() {
     ok(r.text.includes(keyword), 'A2 : recherche par mot-clé en minuscules trouve l’annonce');
     r = await req(pub, 'GET', '/annonces?q=MARSEILLE');
     ok(r.text.includes(keyword), 'A2 : recherche ville « MARSEILLE » insensible à la casse');
+    ok(r.text.includes('<li>CDI</li>') && !/<li>cdi<\/li>/.test(r.text), 'Liste : type de contrat affiché en libellé lisible (CDI)');
+
+    // Accueil : recherche directe, nombre réel d'annonces ouvertes, dernières annonces.
+    const openNow = await prisma.listing.count({ where: { status: 'open', school: { suspended: false } } });
+    r = await req(pub, 'GET', '/');
+    ok(r.status === 200 && r.text.includes('action="/annonces"') && r.text.includes('name="departement"'),
+      'Accueil : formulaire de recherche vers /annonces');
+    ok(r.text.includes(openNow > 1 ? `${openNow} annonces ouvertes` : 'annonce ouverte'),
+      'Accueil : nombre d annonces ouvertes conforme a la base');
+    ok(r.text.includes(keyword), 'Accueil : la derniere annonce publiee apparait');
 
     // 4) Carte de localisation (page détail)
     r = await req(pub, 'GET', `/annonces/${listing.id}`);
